@@ -33,7 +33,10 @@
   2. pgvector extension is enabled and a test cosine similarity query executes without error
   3. Supabase Storage buckets for STEP files and thumbnails exist with correct RLS policies
   4. Schema includes `embedding_model` and `embedding_version` columns for future re-embedding
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — SQL-Migrationsdatei (parts-Tabelle, pgvector, HNSW-Index, Indexes, Trigger)
+- [ ] 01-02-PLAN.md — Supabase-Client aktivieren, Admin-Client, .env.local.example, Integrations-Test, Nutzer-Checkpoint
 
 ---
 
@@ -165,7 +168,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Database Foundation | 0/? | Not started | - |
+| 1. Database Foundation | 0/2 | Not started | - |
 | 2. Python Worker Spike | 0/? | Not started | - |
 | 3. Ingestion API + Queue | 0/? | Not started | - |
 | 4. Ingestion UI | 0/? | Not started | - |
