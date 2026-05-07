@@ -4,9 +4,8 @@
 -- Einspielen: Supabase Dashboard > SQL Editor > Dateiinhalt einfügen und ausführen
 
 -- 1. pgvector-Extension aktivieren
---    'with schema extensions' ist Supabase-Konvention (nicht 'public')
-create extension if not exists vector
-with schema extensions;
+--    Neon hat pgvector vorinstalliert; einfaches CREATE EXTENSION reicht
+create extension if not exists vector;
 
 -- 2. parts-Tabelle anlegen (17 Felder gemäß D-04)
 create table parts (

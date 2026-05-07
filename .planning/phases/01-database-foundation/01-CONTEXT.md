@@ -39,25 +39,25 @@ Das Datenbankschema wird final festgelegt und in Supabase eingespielt — `parts
   ```
 - **D-05:** HNSW-Index auf `embedding` mit Cosine-Distanz (architektonisch gesetzt, niemals IVFFlat).
 
-### Auth & RLS
+### Auth & Datenbankzugang
 
-- **D-06:** **Kein Auth für den Pilot** — RLS deaktiviert. Frontend kommuniziert ausschließlich mit der Next.js API, nie direkt mit Supabase.
-- **D-07:** Backend (Next.js API Routes + Python Worker) nutzt **`SUPABASE_SERVICE_ROLE_KEY`** als Server-only env var. Der Key kommt nie ins Client-Bundle.
+- **D-06:** **Kein Auth für den Pilot** — Frontend kommuniziert ausschließlich mit der Next.js API, nie direkt mit der Datenbank.
+- **D-07:** Backend (Next.js API Routes + Python Worker) nutzt **`DATABASE_URL`** (Neon Connection String) als Server-only env var. Nie ins Client-Bundle.
 
-### Storage-Buckets
+### Storage-Buckets (AWS S3)
 
-- **D-08:** **2 getrennte Buckets**: `parts-steps` (STEP-Dateien, privat) und `parts-thumbnails` (Thumbnails, ggf. später public). Verschiedene Access-Policies möglich ohne Umbau.
+- **D-08:** **2 getrennte S3-Buckets**: `parts-steps` (STEP-Dateien, privat) und `parts-thumbnails` (Thumbnails, ggf. später public). Getrennte Bucket-Policies möglich ohne Umbau.
 - **D-09:** **Pfadkonvention**: `{part_id}/original.step` und `{part_id}/view_0.png` bis `{part_id}/view_7.png`. Part-ID als Ordner, feste Dateinamen.
 
 ### Migrations-Strategie
 
 - **D-10:** Schema als **SQL-Migrationsdatei im Repo** (`supabase/migrations/001_parts_schema.sql`). Versioniert und reproduzierbar.
-- **D-11:** Einspielen **manuell im Supabase SQL Editor** — kein CLI-Setup für Phase 1. Datei liegt im Repo, wird auf supabase.com ausgeführt.
+- **D-11:** Einspielen **manuell im Neon SQL Editor** — kein CLI-Setup für Phase 1. Datei liegt im Repo, wird auf console.neon.tech ausgeführt.
 
 ### Claude's Discretion
 
 - HNSW-Index-Parameter (`m`, `ef_construction`) — Standardwerte sind akzeptabel für den Start. Tuning in Phase 10 (Hardening).
-- `updated_at`-Trigger: Standard-Supabase-Trigger via `moddatetime`-Extension oder manuell in der Migration.
+- `updated_at`-Trigger: Custom PL/pgSQL-Funktion in der Migration (kein moddatetime).
 
 </decisions>
 
@@ -76,8 +76,9 @@ Das Datenbankschema wird final festgelegt und in Supabase eingespielt — `parts
 - `.planning/research/PITFALLS.md` — Kritische Pitfalls (C1: STEP-Validierung, C2: Embedding-Asymmetrie)
 
 ### Codebase
-- `.planning/codebase/STACK.md` — Bestehende Next.js/Supabase-Konfiguration im Template
-- `.planning/codebase/INTEGRATIONS.md` — Bestehende Supabase-Client-Einrichtung (`src/lib/supabase.ts`)
+- `.planning/codebase/STACK.md` — Bestehende Next.js-Konfiguration im Template
+- `src/lib/db.ts` — Neon SQL-Client (`db`)
+- `src/lib/s3.ts` — AWS S3-Client (`s3`, `BUCKET_STEPS`, `BUCKET_THUMBNAILS`)
 
 </canonical_refs>
 
@@ -85,16 +86,17 @@ Das Datenbankschema wird final festgelegt und in Supabase eingespielt — `parts
 ## Existing Code Insights
 
 ### Reusable Assets
-- `src/lib/supabase.ts` — Supabase-Client bereits konfiguriert (Template). Prüfen ob Service Role Key Variante vorhanden ist.
+- `src/lib/db.ts` — Neon SQL-Client (`db`), tagged-template-literal API
+- `src/lib/s3.ts` — AWS S3-Client (`s3`, `BUCKET_STEPS`, `BUCKET_THUMBNAILS`)
 - `src/lib/utils.ts` — Allgemeine Utilities (cn, etc.)
 
 ### Established Patterns
-- Next.js App Router — API Routes liegen in `src/app/api/`. Kein direkter Supabase-Zugriff aus Client-Komponenten.
+- Next.js App Router — API Routes liegen in `src/app/api/`. Kein direkter DB-Zugriff aus Client-Komponenten.
 - shadcn/ui + Tailwind — UI-Komponenten bereits installiert, für Phase 1 irrelevant (kein UI).
 
 ### Integration Points
-- Migration-Datei `supabase/migrations/001_parts_schema.sql` → wird per Hand im Supabase SQL Editor eingespielt.
-- `src/lib/supabase.ts` → ggf. Server-seitige Client-Variante mit Service Role Key anlegen.
+- Migration-Datei `supabase/migrations/001_parts_schema.sql` → wird per Hand im Neon SQL Editor eingespielt.
+- `src/lib/db.ts` → Neon-Client für alle API Routes; `DATABASE_URL` als Server-only env var.
 
 </code_context>
 
