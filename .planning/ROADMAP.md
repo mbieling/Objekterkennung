@@ -34,9 +34,16 @@
   3. Supabase Storage buckets for STEP files and thumbnails exist with correct RLS policies
   4. Schema includes `embedding_model` and `embedding_version` columns for future re-embedding
 **Plans**: 2 plans
-Plans:
+
+**Wave 1**
 - [ ] 01-01-PLAN.md — SQL-Migrationsdatei (parts-Tabelle, pgvector, HNSW-Index, Indexes, Trigger)
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-02-PLAN.md — Supabase-Client aktivieren, Admin-Client, .env.local.example, Integrations-Test, Nutzer-Checkpoint
+
+**Cross-cutting constraints:**
+- `SUPABASE_SERVICE_ROLE_KEY` darf niemals im Client-Bundle landen (kein `NEXT_PUBLIC_` Prefix)
+- RLS ist bewusst deaktiviert (D-06); jede Datei, die die Tabelle berührt, muss diesen Kommentar respektieren
 
 ---
 
@@ -168,7 +175,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Database Foundation | 0/2 | Not started | - |
+| 1. Database Foundation | 0/2 | Ready to execute | - |
 | 2. Python Worker Spike | 0/? | Not started | - |
 | 3. Ingestion API + Queue | 0/? | Not started | - |
 | 4. Ingestion UI | 0/? | Not started | - |
