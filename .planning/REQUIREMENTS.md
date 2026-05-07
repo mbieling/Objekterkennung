@@ -65,31 +65,29 @@
 
 ## Traceability
 
-*(Wird während der Roadmap-Erstellung befüllt)*
-
 | Anforderung | Phase | Status |
 |-------------|-------|--------|
-| INGEST-01 | — | Pending |
-| INGEST-02 | — | Pending |
-| INGEST-03 | — | Pending |
-| INGEST-04 | — | Pending |
-| ADMIN-01 | — | Pending |
-| ADMIN-02 | — | Pending |
-| ADMIN-03 | — | Pending |
-| ADMIN-04 | — | Pending |
-| SEARCH-01 | — | Pending |
-| SEARCH-02 | — | Pending |
-| SEARCH-03 | — | Pending |
-| SEARCH-04 | — | Pending |
-| SEARCH-05 | — | Pending |
-| DETAIL-01 | — | Pending |
-| DETAIL-02 | — | Pending |
+| INGEST-01 | Phase 4 — Ingestion UI | Pending |
+| INGEST-02 | Phase 4 — Ingestion UI | Pending |
+| INGEST-03 | Phase 2 — Python Worker Spike | Pending |
+| INGEST-04 | Phase 3 — Ingestion API + Queue | Pending |
+| ADMIN-01 | Phase 5 — Admin Catalog | Pending |
+| ADMIN-02 | Phase 5 — Admin Catalog | Pending |
+| ADMIN-03 | Phase 5 — Admin Catalog | Pending |
+| ADMIN-04 | Phase 5 — Admin Catalog | Pending |
+| SEARCH-01 | Phase 7 — Camera UI | Pending |
+| SEARCH-02 | Phase 7 — Camera UI | Pending |
+| SEARCH-03 | Phase 8 — Results UI | Pending |
+| SEARCH-04 | Phase 8 — Results UI | Pending |
+| SEARCH-05 | Phase 8 — Results UI | Pending |
+| DETAIL-01 | Phase 9 — Part Detail | Pending |
+| DETAIL-02 | Phase 9 — Part Detail | Pending |
 
 **Abdeckung:**
 - v1-Anforderungen: 15 gesamt
-- Phasen zugeordnet: 0 (wird vom Roadmapper befüllt)
-- Nicht zugeordnet: 15 ⚠️
+- Phasen zugeordnet: 15 ✓
+- Nicht zugeordnet: 0 ✓
 
 ---
 *Anforderungen definiert: 2026-05-07*
-*Zuletzt aktualisiert: 2026-05-07 nach initialer Definition*
+*Zuletzt aktualisiert: 2026-05-07 nach Roadmap-Erstellung*
