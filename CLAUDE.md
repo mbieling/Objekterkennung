@@ -1,4 +1,34 @@
-# AI Coding Starter Kit
+# Bauteil-Finder (CAD Part Recognition)
+
+> Web-App für Ingenieure: STEP-Dateien hochladen, Bauteile per Handy-Kamera fotografieren, geometrisch ähnliche Teile in der Datenbank finden.
+
+## GSD Workflow
+
+Dieses Projekt verwendet Get-Shit-Done (GSD). Planungsdokumente liegen in `.planning/`.
+
+**Aktueller Status:** Projektinitialisierung abgeschlossen — 10 Phasen definiert.
+
+**Workflow-Befehle:**
+- `/gsd-discuss-phase 1` — Phase 1 besprechen (Database Foundation)
+- `/gsd-plan-phase 1` — Phase 1 planen (PLAN.md erstellen)
+- `/gsd-execute-phase 1` — Phase 1 ausführen
+- `/gsd-progress` — Aktuellen Stand prüfen
+
+**Planungsdateien:**
+- `.planning/PROJECT.md` — Projektkontext und Anforderungen
+- `.planning/REQUIREMENTS.md` — 15 v1-Anforderungen mit Traceability
+- `.planning/ROADMAP.md` — 10 Phasen mit Erfolgskriterien
+- `.planning/research/` — Domain-Recherche (Stack, Features, Architektur, Pitfalls)
+
+**Kritische Architektur-Entscheidungen (nicht ändern ohne Diskussion):**
+- Embedding: DINOv2 ViT-B/14, 768-dim, mean-pool aus 6–8 Views
+- Vektordatenbank: pgvector HNSW in Supabase (NIEMALS IVFFlat)
+- STEP-Verarbeitung: Python-Microservice (Docker), NICHT in Next.js/Vercel
+- Async-Queue: FastAPI + Celery + Redis
+
+---
+
+# AI Coding Starter Kit (Template-Basis)
 
 > A Next.js template with an AI-powered development workflow using specialized skills for Requirements, Architecture, Frontend, Backend, QA, and Deployment.
 
