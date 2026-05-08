@@ -66,7 +66,7 @@
 - [x] 02-02-PLAN.md — Renderer: renderer.py (STEP-Loading, Geometrievalidierung, 8-View-OSMesa-Rendering), test_renderer.py (isolierter Smoketest) *(completed 2026-05-08)*
 
 **Wave 3** *(blocked on Wave 2: RENDERER_OK muss bestätigt sein)*
-- [ ] 02-03-PLAN.md — Embedding + Pipeline: embedder.py (DINOv2 CLS-Token, mean_pool), process_step.py (vollständige S3→render→embed→S3→DB-Pipeline)
+- [x] 02-03-PLAN.md — Embedding + Pipeline: embedder.py (DINOv2 CLS-Token, mean_pool), process_step.py (vollständige S3→render→embed→S3→DB-Pipeline) *(completed 2026-05-08)*
 
 **Cross-cutting constraints:**
 - `VTK_DEFAULT_OPENGL_WINDOW=vtkOSOpenGLRenderWindow` muss in jedem Python-Skript vor allen OCC-Imports stehen
@@ -189,7 +189,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Database Foundation | 2/2 | Complete | 2026-05-08 |
-| 2. Python Worker Spike | 1/3 | In progress (Wave 1 done) | - |
+| 2. Python Worker Spike | 3/3 | Complete (alle Pläne done) | 2026-05-08 |
 | 3. Ingestion API + Queue | 0/? | Not started | - |
 | 4. Ingestion UI | 0/? | Not started | - |
 | 5. Admin Catalog | 0/? | Not started | - |

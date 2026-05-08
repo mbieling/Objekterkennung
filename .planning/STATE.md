@@ -9,7 +9,7 @@
 
 **Core Value:** Ein Ingenieur fotografiert ein Bauteil mit dem Handy und sieht in Sekunden, ob ein geometrisch ähnliches Teil bereits in der Datenbank existiert.
 
-**Current Focus:** Phase 2 planned — ready to execute
+**Current Focus:** Phase 2 abgeschlossen — Phase 3 (Ingestion API + Queue) als nächstes
 
 ---
 
@@ -18,11 +18,11 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 2 — Python Worker Spike |
-| Current Plan | 03 (02-01, 02-02 complete) |
-| Phase Status | Phase 2 in progress — Plan 2/3 complete |
-| Overall Progress | 1/10 phases complete |
+| Current Plan | Alle Pläne abgeschlossen |
+| Phase Status | Phase 2 complete — alle 3 Pläne abgeschlossen |
+| Overall Progress | 2/10 phases complete |
 
-**Progress:** █░░░░░░░░░ 10%
+**Progress:** ██░░░░░░░░ 20%
 
 ---
 
@@ -31,7 +31,7 @@
 | Phase | Name | Status |
 |-------|------|--------|
 | 1 | Database Foundation | ✓ Complete (2026-05-08) |
-| 2 | Python Worker Spike | Ready to execute (3 plans) |
+| 2 | Python Worker Spike | ✓ Complete (2026-05-08) |
 | 3 | Ingestion API + Queue | Not started |
 | 4 | Ingestion UI | Not started |
 | 5 | Admin Catalog | Not started |
@@ -99,9 +99,9 @@
 
 ### Next Action
 
-Phase 2 Plan 02 abgeschlossen: renderer.py (load_step, validate_geometry, render_views, VIEWS) und test_renderer.py (OSMesa-Smoketest mit 3 Subtests).
-Nächster Schritt: Plan 02-03 ausführen — embedder.py (DINOv2 CLS-Token, mean_pool) + process_step.py (vollständige S3→render→embed→S3→DB-Pipeline).
-Hinweis: Docker-Verifikation (docker run --rm bauteil-worker python test_renderer.py) muss vor Plan 03 manuell bestätigt werden.
+Phase 2 vollständig abgeschlossen: embedder.py (DINOv2 ViT-B/14 CLS-Token, mean_pool) und process_step.py (vollständige S3→render→embed→S3→DB-Pipeline) erstellt.
+Nächster Schritt: Phase 3 (Ingestion API + Queue) planen und ausführen.
+Hinweis: Docker-End-to-End-Verifikation (SC#2, SC#3) steht noch aus — erfordert Docker + Credentials in worker/.env.
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*
