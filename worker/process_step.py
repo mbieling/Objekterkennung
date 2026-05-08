@@ -55,12 +55,15 @@ BUCKET_THUMBNAILS = os.environ["AWS_S3_BUCKET_THUMBNAILS"]  # "parts-thumbnails"
 
 def get_s3_client():
     """Erstellt boto3 S3-Client aus Env-Vars (analog zu src/lib/s3.ts)."""
-    return boto3.client(
-        "s3",
+    kwargs = dict(
         region_name=os.environ["AWS_REGION"],
         aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
         aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
     )
+    endpoint = os.environ.get("AWS_ENDPOINT_URL")
+    if endpoint:
+        kwargs["endpoint_url"] = endpoint
+    return boto3.client("s3", **kwargs)
 
 
 def set_status(cur, part_id: str, status: str) -> None:
