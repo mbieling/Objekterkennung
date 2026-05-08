@@ -182,8 +182,9 @@ export function UploadForm() {
 
       // 6. Polling starten (D-04) — Hook reaktiviert sich über polledPartId
       setPhase('polling')
-    } catch {
-      setErrorMsg('Upload fehlgeschlagen. Bitte Verbindung prüfen und erneut versuchen.')
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      setErrorMsg(`Upload fehlgeschlagen: ${msg}`)
       setPhase('error')
     }
   }
