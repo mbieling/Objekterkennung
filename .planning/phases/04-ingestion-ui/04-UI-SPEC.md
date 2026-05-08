@@ -1,7 +1,8 @@
 ---
 phase: 4
 slug: ingestion-ui
-status: draft
+status: approved
+reviewed_at: 2026-05-08
 shadcn_initialized: true
 preset: style=default base-color=slate css-variables=true
 created: 2026-05-08
