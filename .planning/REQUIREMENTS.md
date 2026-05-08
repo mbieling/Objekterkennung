@@ -10,7 +10,7 @@
 - [ ] **INGEST-01**: Nutzer kann eine STEP-Datei (max. 100 MB) mit Metadaten hochladen (Name, Teilenummer, Projekt, Status)
 - [ ] **INGEST-02**: System zeigt nach dem Upload den Verarbeitungsstatus an (pending → processing → ready → failed)
 - [ ] **INGEST-03**: System erzeugt automatisch 6–8 orthographische 3D-Thumbnails beim Ingest
-- [ ] **INGEST-04**: System verhindert doppelte Uploads per SHA-256-Deduplizierung
+- [x] **INGEST-04**: System verhindert doppelte Uploads per SHA-256-Deduplizierung
 
 ### Admin-Katalog
 
@@ -70,7 +70,7 @@
 | INGEST-01 | Phase 4 — Ingestion UI | Pending |
 | INGEST-02 | Phase 4 — Ingestion UI | Pending |
 | INGEST-03 | Phase 2 — Python Worker Spike | Pending |
-| INGEST-04 | Phase 3 — Ingestion API + Queue | Pending |
+| INGEST-04 | Phase 3 — Ingestion API + Queue | Complete (03-03) |
 | ADMIN-01 | Phase 5 — Admin Catalog | Pending |
 | ADMIN-02 | Phase 5 — Admin Catalog | Pending |
 | ADMIN-03 | Phase 5 — Admin Catalog | Pending |
