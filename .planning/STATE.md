@@ -2,6 +2,7 @@
 
 **Last updated:** 2026-05-08
 **Milestone:** v1 — Core Search Experience
+**Planning status:** Phase 3 geplant — bereit zur Ausführung
 
 ---
 
@@ -9,7 +10,7 @@
 
 **Core Value:** Ein Ingenieur fotografiert ein Bauteil mit dem Handy und sieht in Sekunden, ob ein geometrisch ähnliches Teil bereits in der Datenbank existiert.
 
-**Current Focus:** Phase 2 abgeschlossen — Phase 3 (Ingestion API + Queue) als nächstes
+**Current Focus:** Phase 3 (Ingestion API + Queue) — geplant, bereit zur Ausführung
 
 ---
 
@@ -17,10 +18,10 @@
 
 | Field | Value |
 |-------|-------|
-| Current Phase | 2 — Python Worker Spike |
-| Current Plan | Alle Pläne abgeschlossen |
-| Phase Status | Phase 2 complete — alle 3 Pläne abgeschlossen |
-| Overall Progress | 2/10 phases complete |
+| Current Phase | 3 — Ingestion API + Queue |
+| Current Plan | Planung abgeschlossen — 6 Pläne in 4 Waves bereit |
+| Phase Status | Ready to execute |
+| Overall Progress | 2/10 phases complete (Phase 3 planned) |
 
 **Progress:** ██░░░░░░░░ 20%
 
@@ -32,7 +33,7 @@
 |-------|------|--------|
 | 1 | Database Foundation | ✓ Complete (2026-05-08) |
 | 2 | Python Worker Spike | ✓ Complete (2026-05-08) |
-| 3 | Ingestion API + Queue | Not started |
+| 3 | Ingestion API + Queue | ◷ Planned (6 plans, ready to execute) |
 | 4 | Ingestion UI | Not started |
 | 5 | Admin Catalog | Not started |
 | 6 | Search Pipeline | Not started |
@@ -99,9 +100,12 @@
 
 ### Next Action
 
-Phase 2 vollständig abgeschlossen: embedder.py (DINOv2 ViT-B/14 CLS-Token, mean_pool) und process_step.py (vollständige S3→render→embed→S3→DB-Pipeline) erstellt.
-Nächster Schritt: Phase 3 (Ingestion API + Queue) planen und ausführen.
-Hinweis: Docker-End-to-End-Verifikation (SC#2, SC#3) steht noch aus — erfordert Docker + Credentials in worker/.env.
+Phase 3 vollständig geplant: 6 Pläne in 4 Waves.
+- Wave 0 (03-01, 03-02): CR-01/CR-02/CR-03-Fixes + Test-Stubs + Env-Vars — parallel
+- Wave 1 (03-03, 03-04): POST /api/upload/init + POST /api/upload/confirm — parallel
+- Wave 2 (03-05): Worker-Microservice FastAPI + Celery
+- Wave 3 (03-06): Docker Compose + E2E-Checkpoint (manuell)
+Nächster Schritt: `/clear` dann `/gsd-execute-phase 3`
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*

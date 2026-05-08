@@ -723,17 +723,17 @@ redis://redis:6379/0
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **WORKER_URL in Vercel/Produktion**
    - Was wir wissen: Docker Compose nutzt internes Netzwerk (`worker:8000`); Vercel ist serverless und kann keinen internen Docker-Host erreichen.
-   - Was unklar ist: Wie wird der Worker in Produktion erreichbar gemacht? Railway/Fly.io als öffentliche URL?
-   - Empfehlung: Für Phase 3 mit lokalem Docker Compose und Upstash lösen. Produktions-Deployment (Railway/Fly.io) in Phase 3 als optional markieren; Phase 10 Hardening entscheidet.
+   - Was unklar war: Wie wird der Worker in Produktion erreichbar gemacht? Railway/Fly.io als öffentliche URL?
+   - **RESOLUTION:** Phase-3-Scope-Grenze: Lokaler Docker Compose ausreichend für Phase 3. Produktions-Routing (Railway/Fly.io) ist explizit Out of Scope bis Phase 10 (Hardening).
 
 2. **CR-03 (Embedding-Strategie CLS vs. Patch-Mean-Pool) — Fix-Scope**
    - Was wir wissen: 02-REVIEW.md identifiziert CR-03 als kritisch. Betrifft `embedder.py`.
-   - Was unklar ist: Wurde CR-03 bereits in Phase 2 behoben oder nicht? (Status nicht dokumentiert in REVIEW.md als "fixed")
-   - Empfehlung: Planner soll als Wave-0-Task "CR-03 verifizieren/beheben" aufnehmen.
+   - Was unklar war: Wurde CR-03 bereits in Phase 2 behoben oder nicht? (Status nicht dokumentiert in REVIEW.md als "fixed")
+   - **RESOLUTION:** Verifikation als Wave-0-Task in Plan 03-01 Task 4 aufgenommen. Fix wird während Ausführung bestätigt. Aktueller Stand von `worker/embedder.py` (geprüft beim Planning): CLS-Token (`last_hidden_state[:, 0]`) — Task 4 korrigiert zu `patch_tokens[:, 1:, :].mean(dim=1)`.
 
 ---
 

@@ -84,7 +84,26 @@
   2. A valid STEP upload immediately stores the file in Supabase Storage and inserts a `parts` row with status `pending`
   3. The API responds with HTTP 202 within 2 seconds regardless of file size (up to 100 MB)
   4. The Python worker picks up the queued job and updates part status to `processing`, then `ready` or `failed`
-**Plans**: TBD
+**Plans**: 6 plans
+
+**Wave 0** *(Blocker-Fixes und Test-Stubs — vor Wave 1 abschließen)*
+- [ ] 03-01-PLAN.md — CR-01 Fix (UUID-Validierung in process_step.py) + CR-02 Fix (Viewer3d-Cleanup in renderer.py) + pytest-Stubs
+- [ ] 03-02-PLAN.md — Vitest-Test-Stubs (init.test.ts + confirm.test.ts) + .env.local.example + worker/.env.example aktualisieren
+
+**Wave 1** *(parallel ausführbar, blocked on Wave 0)*
+- [ ] 03-03-PLAN.md — POST /api/upload/init: SHA-256-Dedup + DB-Insert + Presigned S3 URL
+- [ ] 03-04-PLAN.md — POST /api/upload/confirm: Worker-Enqueue via HTTP + HTTP 202
+
+**Wave 2** *(blocked on Wave 1: API-Design muss stabil sein)*
+- [ ] 03-05-PLAN.md — Worker-Erweiterung: celery_app.py + tasks.py + main.py (FastAPI /health + /enqueue) + requirements.txt
+
+**Wave 3** *(blocked on Wave 2: Worker-Module müssen existieren)*
+- [ ] 03-06-PLAN.md — Docker Compose (redis:7-alpine + worker-service) + worker/.dockerignore + E2E-Checkpoint
+
+**Cross-cutting constraints:**
+- `WORKER_URL` und alle AWS_*-Vars sind server-only ohne `NEXT_PUBLIC_`-Prefix
+- `VTK_DEFAULT_OPENGL_WINDOW` muss erste Zeile in tasks.py sein (transitiver OCC-Import)
+- `worker/.env` in `.gitignore` — nur `worker/.env.example` committen
 
 ---
 
@@ -190,7 +209,7 @@
 |-------|----------------|--------|-----------|
 | 1. Database Foundation | 2/2 | Complete | 2026-05-08 |
 | 2. Python Worker Spike | 3/3 | Complete (alle Pläne done) | 2026-05-08 |
-| 3. Ingestion API + Queue | 0/? | Not started | - |
+| 3. Ingestion API + Queue | 0/6 | Planned (2026-05-08) | - |
 | 4. Ingestion UI | 0/? | Not started | - |
 | 5. Admin Catalog | 0/? | Not started | - |
 | 6. Search Pipeline | 0/? | Not started | - |
@@ -229,3 +248,4 @@
 ---
 *Roadmap created: 2026-05-07*
 *Phase 2 plans created: 2026-05-08*
+*Phase 3 plans created: 2026-05-08*
