@@ -83,18 +83,26 @@ def render_views(shape, output_dir: str) -> list[str]:
     """
     viewer = Viewer3d()
     viewer.Create()
+    viewer.View.Window().SetSize(512, 512)  # IN-03 Fix: explizite Auflösung statt VTK-Default
     viewer.SetModeShaded()
     # Weißer Hintergrund (D-05): maximaler Kontrast für dunkle Metallbauteile
     viewer.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
     viewer.DisplayShape(shape, update=True)
 
     paths = []
-    for i, (name, orientation) in enumerate(VIEWS):
-        viewer.View.SetProj(orientation)
-        viewer.FitAll()  # Automatischer Kamera-Abstand aus Bounding-Box (Claude's Discretion)
-        path = os.path.join(output_dir, f"view_{i}.png")  # view_0..view_7 (S3-Pfadkonvention)
-        viewer.ExportToImage(path)
-        paths.append(path)
-        logger.info(f"View {i} ({name}): {path}")
+    try:
+        for i, (name, orientation) in enumerate(VIEWS):
+            viewer.View.SetProj(orientation)
+            viewer.FitAll()  # Automatischer Kamera-Abstand aus Bounding-Box
+            path = os.path.join(output_dir, f"view_{i}.png")  # view_0..view_7 (S3-Pfadkonvention)
+            viewer.ExportToImage(path)
+            paths.append(path)
+            logger.info(f"View {i} ({name}): {path}")
+    finally:
+        # CR-02 Fix: Nativen Render-Kontext explizit freigeben (verhindert Speicherleck bei Batch-Betrieb)
+        try:
+            viewer.Viewer.Remove()
+        except Exception:
+            pass
 
-    return paths  # 8 PNG-Pfade (512x512px via VTK-Default-Auflösung)
+    return paths  # 8 PNG-Pfade (512x512px explizit gesetzt)
