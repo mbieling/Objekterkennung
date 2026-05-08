@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-08 (Phase 4 geplant — 6 Pläne, bereit zur Ausführung)
+**Last updated:** 2026-05-08 (Phase 4 in Ausführung — Wave 0 abgeschlossen, Wave 1 bereit)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 4 geplant — bereit zur Ausführung
+**Planning status:** Phase 4 in Ausführung
 
 ---
 
@@ -19,8 +19,8 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 4 — Ingestion UI |
-| Current Plan | Phase 4 geplant — 6 Pläne in 5 Waves |
-| Phase Status | Phase 4 planned — Ready to execute |
+| Current Plan | 04-02 — GET /api/parts/[id]/status |
+| Phase Status | Phase 4 executing — Wave 1 ready |
 | Overall Progress | 3/10 phases complete |
 
 **Progress:** ███░░░░░░░ 30%
@@ -49,7 +49,7 @@
 | Metric | Value |
 |--------|-------|
 | Phases complete | 3/10 |
-| Plans complete | 11/? (Phase 1: 2, Phase 2: 3, Phase 3: 6) |
+| Plans complete | 12/? (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 1) |
 | Requirements covered | 15/15 |
 | v1 requirements done | 0/15 |
 
@@ -107,14 +107,14 @@
 Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) ist geplant und bereit zur Ausführung.
 
 **Phase 4 — Geplante Pläne (6 Pläne in 5 Waves):**
-- [ ] Wave 0 (04-01): Migration 002_add_thumbnail_count.sql + supabase db push [BLOCKING] + 5 Test-Stubs
+- [x] Wave 0 (04-01): Migration 002_add_thumbnail_count.sql + supabase db push [BLOCKING] + 5 Test-Stubs *(completed 2026-05-08)*
 - [ ] Wave 1 (04-02): GET /api/parts/[id]/status-Route (D-05)
 - [ ] Wave 1 (04-03): GET /api/parts/[id]/thumbnail-Route (D-08, HeadObject-Race-Mitigation)
 - [ ] Wave 2 (04-04): usePartStatus-Hook (D-04, D-06, variables Polling + 5-Min-Timeout)
 - [ ] Wave 3 (04-05): UploadForm.tsx (State-Machine, SHA-256 + XHR-PUT, Duplikat-Alert)
 - [ ] Wave 4 (04-06): /upload page + Homepage-Link + Human-Verify-Checkpoint
 
-**Nächster Schritt:** `/gsd-execute-phase 4` starten.
+**Nächster Schritt:** Wave 1 starten — Plan 04-02 (GET /api/parts/[id]/status) und 04-03 (GET /api/parts/[id]/thumbnail) können parallel ausgeführt werden.
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*

@@ -120,7 +120,7 @@
 **UI hint**: yes
 
 **Wave 0** *(Migration + Test-Stubs — vor Wave 1 abschließen)*
-- [ ] 04-01-PLAN.md — Migration 002_add_thumbnail_count.sql + supabase db push [BLOCKING] + 5 Test-Stubs (Vitest + Playwright)
+- [x] 04-01-PLAN.md — Migration 002_add_thumbnail_count.sql + supabase db push [BLOCKING] + 5 Test-Stubs (Vitest + Playwright) *(completed 2026-05-08)*
 
 **Wave 1** *(parallel ausführbar, blocked on Wave 0)*
 - [ ] 04-02-PLAN.md — GET /api/parts/[id]/status (D-05) + 3 Tests aktivieren
