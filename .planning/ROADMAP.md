@@ -60,7 +60,7 @@
 **Plans**: 3 plans
 
 **Wave 1**
-- [ ] 02-01-PLAN.md — Docker-Infrastruktur: Dockerfile (continuumio/miniconda3, OSMesa, pythonocc 7.9.3, DINOv2-Cache), .env.example, testdata/sample.step
+- [x] 02-01-PLAN.md — Docker-Infrastruktur: Dockerfile (continuumio/miniconda3, OSMesa, pythonocc 7.9.3, DINOv2-Cache), .env.example, testdata/sample.step *(completed 2026-05-08)*
 
 **Wave 2** *(blocked on Wave 1: Docker-Build muss erfolgreich sein)*
 - [ ] 02-02-PLAN.md — Renderer: renderer.py (STEP-Loading, Geometrievalidierung, 8-View-OSMesa-Rendering), test_renderer.py (isolierter Smoketest)
@@ -188,8 +188,8 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Database Foundation | 0/2 | Ready to execute | - |
-| 2. Python Worker Spike | 0/3 | Planned — ready to execute | - |
+| 1. Database Foundation | 2/2 | Complete | 2026-05-08 |
+| 2. Python Worker Spike | 1/3 | In progress (Wave 1 done) | - |
 | 3. Ingestion API + Queue | 0/? | Not started | - |
 | 4. Ingestion UI | 0/? | Not started | - |
 | 5. Admin Catalog | 0/? | Not started | - |

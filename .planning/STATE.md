@@ -18,8 +18,8 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 2 — Python Worker Spike |
-| Current Plan | — (not started) |
-| Phase Status | Phase 2 planned — 3 plans in 3 waves, ready to execute |
+| Current Plan | 02 (02-01 complete) |
+| Phase Status | Phase 2 in progress — Plan 1/3 complete |
 | Overall Progress | 1/10 phases complete |
 
 **Progress:** █░░░░░░░░░ 10%
@@ -48,7 +48,7 @@
 | Metric | Value |
 |--------|-------|
 | Phases complete | 1/10 |
-| Plans complete | 2/? |
+| Plans complete | 3/? (incl. Phase 2 Plan 1) |
 | Requirements covered | 15/15 |
 | v1 requirements done | 0/15 |
 
@@ -97,7 +97,8 @@
 
 ### Next Action
 
-Phase 1 abgeschlossen. Nächster Schritt: `/gsd-discuss-phase 2` — Python Worker Spike besprechen.
+Phase 2 Plan 01 abgeschlossen: Docker-Infrastruktur (Dockerfile, environment.yml, requirements.txt, .env.example, testdata/sample.step).
+Nächster Schritt: Plan 02-02 ausführen — renderer.py (STEP -> 8 PNG Views via pythonOCC+OSMesa).
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*
