@@ -8,6 +8,7 @@ import os
 os.environ["VTK_DEFAULT_OPENGL_WINDOW"] = "vtkOSOpenGLRenderWindow"
 
 import sys
+import re
 import tempfile
 import logging
 import numpy as np
@@ -29,6 +30,23 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
 )
 logger = logging.getLogger("process_step")
+
+UUID_RE = re.compile(
+    r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+    re.IGNORECASE
+)
+
+
+def validate_part_id(part_id: str) -> str:
+    """Path-Traversal-Schutz: stellt sicher, dass part_id ein gültiges UUID-Format hat.
+
+    Raises:
+        ValueError: bei ungültigem Format (z.B. '../../../etc/passwd')
+    """
+    if not UUID_RE.match(part_id):
+        raise ValueError(f"Ungültige part_id (kein UUID-Format): {part_id!r}")
+    return part_id
+
 
 # S3-Bucket-Konstanten (identisch mit src/lib/s3.ts BUCKET_STEPS / BUCKET_THUMBNAILS)
 BUCKET_STEPS = os.environ["AWS_S3_BUCKET_STEPS"]            # "parts-steps"
@@ -72,6 +90,7 @@ def process(part_id: str) -> None:
     Args:
         part_id: UUID des parts-Eintrags in der Datenbank (muss existieren mit status='pending')
     """
+    part_id = validate_part_id(part_id)  # CR-01 Fix: Path-Traversal-Schutz — vor jeder anderen Operation
     logger.info(f"[{part_id}] Pipeline gestartet")
 
     conn = None
