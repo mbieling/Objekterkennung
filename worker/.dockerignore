@@ -1,0 +1,24 @@
+# Verhindert ungewolltes Kopieren von lokalen Artefakten in das Docker-Image
+# IN-02-Fix: model_cache/ würde den Image-Build unnötig aufblähen (~330 MB doppelt)
+
+# Gecachtes DINOv2-Modell (wird beim Docker-Build heruntergeladen, nicht kopiert)
+model_cache/
+
+# Python-Bytecode und Caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Lokale Secrets (NIEMALS in Image kopieren)
+.env
+
+# Test-Artefakte
+testdata/
+tests/
+.pytest_cache/
+
+# Entwicklungs-Artefakte
+*.log
+.DS_Store

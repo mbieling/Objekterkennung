@@ -1,0 +1,53 @@
+# docker-compose.yml
+# Lokale Entwicklungsumgebung für Bauteil-Finder Worker
+# Startet: Redis (Message Broker) + Python Worker (FastAPI + Celery)
+#
+# Verwendung:
+#   docker compose up           # Startet Redis + Worker (detached: docker compose up -d)
+#   docker compose logs worker  # Worker-Logs anzeigen
+#   docker compose down         # Alle Services stoppen
+#
+# Next.js Dev-Server separat starten: npm run dev
+# WORKER_URL für Next.js: http://localhost:8000 (via Port-Mapping)
+#
+# Voraussetzungen:
+#   - worker/.env muss DATABASE_URL und AWS_* Variablen enthalten
+#   - S3-Bucket CORS-Konfiguration für PUT-Methode muss gesetzt sein (Pitfall 2)
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    # Startet FastAPI (Port 8000) und Celery Worker im gleichen Container
+    # Für Produktion: separate Services empfohlen (Railway/Fly.io)
+    command: >
+      sh -c "uvicorn worker.main:app --host 0.0.0.0 --port 8000 &
+             celery -A worker.tasks worker --loglevel=info --concurrency=1"
+    ports:
+      - "8000:8000"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    env_file:
+      - worker/.env    # DATABASE_URL, AWS_* Variablen — NICHT in git committen
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
