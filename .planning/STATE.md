@@ -47,7 +47,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Phases complete | 1/10 |
+| Phases complete | 2/10 |
 | Plans complete | 4/? (incl. Phase 2 Plans 1+2) |
 | Requirements covered | 15/15 |
 | v1 requirements done | 0/15 |

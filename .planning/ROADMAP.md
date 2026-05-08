@@ -10,7 +10,7 @@
 ## Phases
 
 - [x] **Phase 1: Database Foundation** — Schema, pgvector, HNSW index, Storage buckets locked before any code is written *(completed 2026-05-08)*
-- [ ] **Phase 2: Python Worker Spike** — STEP rendering + DINOv2 embedding pipeline validated as standalone Docker service
+- [x] **Phase 2: Python Worker Spike** — STEP rendering + DINOv2 embedding pipeline validated as standalone Docker service *(completed 2026-05-08)*
 - [ ] **Phase 3: Ingestion API + Queue** — Upload endpoint, job dispatch, SHA-256 deduplication, status tracking in place
 - [ ] **Phase 4: Ingestion UI** — Upload form, real-time status polling, thumbnail display wired to the ingestion API
 - [ ] **Phase 5: Admin Catalog** — Parts list with status and thumbnails, metadata edit, archive/delete, retry failed
