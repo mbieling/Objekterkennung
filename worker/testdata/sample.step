@@ -1,0 +1,134 @@
+ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION(('Open CASCADE Model'),'2;1');
+FILE_NAME('sample_cube','2026-05-08T00:00:00',(''),(''),'Open CASCADE STEP processor 7.9','Open CASCADE 7.9','Unknown');
+FILE_SCHEMA(('AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }'));
+ENDSEC;
+DATA;
+#1=PRODUCT_DEFINITION_CONTEXT('part definition',#2,'design');
+#2=APPLICATION_CONTEXT('core data for automotive mechanical design processes');
+#3=APPLICATION_PROTOCOL_DEFINITION('international standard','automotive_design',2000,#2);
+#4=PRODUCT('cube','cube','',(#5));
+#5=PRODUCT_CONTEXT('',#2,'mechanical');
+#6=PRODUCT_RELATED_PRODUCT_CATEGORY('part',$,(#4));
+#7=PRODUCT_DEFINITION_FORMATION('','',#4);
+#8=PRODUCT_DEFINITION('design','',#7,#1);
+#9=PRODUCT_DEFINITION_SHAPE('','',#8);
+#10=SHAPE_DEFINITION_REPRESENTATION(#9,#11);
+#11=ADVANCED_BREP_SHAPE_REPRESENTATION('',(#12),#119);
+#12=MANIFOLD_SOLID_BREP('',#13);
+#13=CLOSED_SHELL('',(#14,#40,#58,#76,#94,#112));
+/* Face 1: bottom (Z=0) */
+#14=ADVANCED_FACE('',(#15),#37,.F.);
+#15=FACE_BOUND('',#16,.F.);
+#16=EDGE_LOOP('',(#17,#22,#27,#32));
+#17=ORIENTED_EDGE('',*,*,#18,.F.);
+#18=EDGE_CURVE('',#19,#20,#21,.T.);
+#19=VERTEX_POINT('',#100);
+#20=VERTEX_POINT('',#101);
+#21=LINE('',#100,#105);
+#22=ORIENTED_EDGE('',*,*,#23,.T.);
+#23=EDGE_CURVE('',#20,#24,#25,.T.);
+#24=VERTEX_POINT('',#102);
+#25=LINE('',#101,#106);
+#26=VERTEX_POINT('',#103);
+#27=ORIENTED_EDGE('',*,*,#28,.T.);
+#28=EDGE_CURVE('',#24,#26,#29,.T.);
+#29=LINE('',#102,#107);
+#30=ORIENTED_EDGE('',*,*,#31,.F.);
+#31=EDGE_CURVE('',#19,#26,#33,.T.);
+#32=ORIENTED_EDGE('',*,*,#31,.T.);
+#33=LINE('',#100,#108);
+#37=PLANE('',#38);
+#38=AXIS2_PLACEMENT_3D('',#113,#117,#115);
+/* Face 2: top (Z=10) */
+#40=ADVANCED_FACE('',(#41),#55,.T.);
+#41=FACE_BOUND('',#42,.T.);
+#42=EDGE_LOOP('',(#43,#46,#49,#52));
+#43=ORIENTED_EDGE('',*,*,#44,.T.);
+#44=EDGE_CURVE('',#45,#47,#56,.T.);
+#45=VERTEX_POINT('',#104);
+#47=VERTEX_POINT('',#109);
+#46=ORIENTED_EDGE('',*,*,#44,.F.);
+#49=ORIENTED_EDGE('',*,*,#50,.T.);
+#50=EDGE_CURVE('',#45,#51,#53,.T.);
+#51=VERTEX_POINT('',#110);
+#52=ORIENTED_EDGE('',*,*,#50,.F.);
+#53=LINE('',#104,#106);
+#55=PLANE('',#39);
+#39=AXIS2_PLACEMENT_3D('',#118,#117,#115);
+#56=LINE('',#104,#105);
+/* Face 3: front (Y=0) */
+#58=ADVANCED_FACE('',(#59),#73,.F.);
+#59=FACE_BOUND('',#60,.T.);
+#60=EDGE_LOOP('',(#61,#64,#67,#70));
+#61=ORIENTED_EDGE('',*,*,#18,.T.);
+#64=ORIENTED_EDGE('',*,*,#65,.T.);
+#65=EDGE_CURVE('',#20,#47,#66,.T.);
+#66=LINE('',#101,#116);
+#67=ORIENTED_EDGE('',*,*,#44,.F.);
+#70=ORIENTED_EDGE('',*,*,#71,.F.);
+#71=EDGE_CURVE('',#19,#45,#72,.T.);
+#72=LINE('',#100,#116);
+#73=PLANE('',#74);
+#74=AXIS2_PLACEMENT_3D('',#100,#108,#115);
+/* Face 4: back (Y=10) */
+#76=ADVANCED_FACE('',(#77),#91,.T.);
+#77=FACE_BOUND('',#78,.T.);
+#78=EDGE_LOOP('',(#79,#82,#85,#88));
+#79=ORIENTED_EDGE('',*,*,#28,.T.);
+#82=ORIENTED_EDGE('',*,*,#83,.T.);
+#83=EDGE_CURVE('',#24,#51,#84,.T.);
+#84=LINE('',#102,#116);
+#85=ORIENTED_EDGE('',*,*,#50,.F.);
+#88=ORIENTED_EDGE('',*,*,#89,.F.);
+#89=EDGE_CURVE('',#26,#45,#90,.T.);
+#90=LINE('',#103,#116);
+#91=PLANE('',#92);
+#92=AXIS2_PLACEMENT_3D('',#101,#108,#115);
+/* Face 5: left (X=0) */
+#94=ADVANCED_FACE('',(#95),#109,.F.);
+#95=FACE_BOUND('',#96,.T.);
+#96=EDGE_LOOP('',(#97,#98,#99,#34));
+#97=ORIENTED_EDGE('',*,*,#31,.T.);
+#98=ORIENTED_EDGE('',*,*,#89,.T.);
+#99=ORIENTED_EDGE('',*,*,#50,.T.);
+#34=ORIENTED_EDGE('',*,*,#71,.F.);
+#109=PLANE('',#111);
+#111=AXIS2_PLACEMENT_3D('',#100,#105,#117);
+/* Face 6: right (X=10) */
+#112=ADVANCED_FACE('',(#35),#36,.T.);
+#35=FACE_BOUND('',#42,.F.);
+#36=PLANE('',#120);
+#120=AXIS2_PLACEMENT_3D('',#101,#105,#117);
+/* Points */
+#100=CARTESIAN_POINT('',(0.,0.,0.));
+#101=CARTESIAN_POINT('',(10.,0.,0.));
+#102=CARTESIAN_POINT('',(10.,10.,0.));
+#103=CARTESIAN_POINT('',(0.,10.,0.));
+#104=CARTESIAN_POINT('',(0.,0.,10.));
+#109=CARTESIAN_POINT('',(10.,0.,10.));
+#110=CARTESIAN_POINT('',(0.,10.,10.));
+/* Directions */
+#105=VECTOR('',#115,1.);
+#106=VECTOR('',#117,1.);
+#107=VECTOR('',#108,1.);
+#108=DIRECTION('',(0.,1.,0.));
+#115=DIRECTION('',(1.,0.,0.));
+#116=DIRECTION('',(0.,0.,1.));
+#117=DIRECTION('',(0.,0.,1.));
+#113=CARTESIAN_POINT('',(0.,0.,0.));
+#118=CARTESIAN_POINT('',(0.,0.,10.));
+/* Geometry Context */
+#119=(
+GEOMETRIC_REPRESENTATION_CONTEXT(3)
+GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT((#121))
+GLOBAL_UNIT_ASSIGNED_CONTEXT((#122,#124,#126))
+REPRESENTATION_CONTEXT('Context #1','3D Context with UNIT and UNCERTAINTY')
+);
+#121=UNCERTAINTY_MEASURE_WITH_UNIT(LENGTH_MEASURE(1.E-07),#122,'distance_accuracy_value','confusion accuracy');
+#122=(LENGTH_UNIT() NAMED_UNIT(*) SI_UNIT(.MILLI.,.METRE.));
+#124=(NAMED_UNIT(*) PLANE_ANGLE_UNIT() SI_UNIT($,.RADIAN.));
+#126=(NAMED_UNIT(*) SI_UNIT($,.STERADIAN.) SOLID_ANGLE_UNIT());
+ENDSEC;
+END-ISO-10303-21;

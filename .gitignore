@@ -28,6 +28,9 @@ yarn-error.log*
 # local env files
 .env*.local
 
+# worker credentials (nur .env.example committen — T-02-02)
+worker/.env
+
 # vercel
 .vercel
 
