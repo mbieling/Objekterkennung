@@ -92,10 +92,10 @@
 
 **Wave 1** *(parallel ausführbar, blocked on Wave 0)*
 - [x] 03-03-PLAN.md — POST /api/upload/init: SHA-256-Dedup + DB-Insert + Presigned S3 URL *(completed 2026-05-08)*
-- [ ] 03-04-PLAN.md — POST /api/upload/confirm: Worker-Enqueue via HTTP + HTTP 202
+- [x] 03-04-PLAN.md — POST /api/upload/confirm: Worker-Enqueue via HTTP + HTTP 202 *(completed 2026-05-08)*
 
 **Wave 2** *(blocked on Wave 1: API-Design muss stabil sein)*
-- [ ] 03-05-PLAN.md — Worker-Erweiterung: celery_app.py + tasks.py + main.py (FastAPI /health + /enqueue) + requirements.txt
+- [x] 03-05-PLAN.md — Worker-Erweiterung: celery_app.py + tasks.py + main.py (FastAPI /health + /enqueue) + requirements.txt *(completed 2026-05-08)*
 
 **Wave 3** *(blocked on Wave 2: Worker-Module müssen existieren)*
 - [ ] 03-06-PLAN.md — Docker Compose (redis:7-alpine + worker-service) + worker/.dockerignore + E2E-Checkpoint
@@ -209,7 +209,7 @@
 |-------|----------------|--------|-----------|
 | 1. Database Foundation | 2/2 | Complete | 2026-05-08 |
 | 2. Python Worker Spike | 3/3 | Complete (alle Pläne done) | 2026-05-08 |
-| 3. Ingestion API + Queue | 1/6 | In Progress | - |
+| 3. Ingestion API + Queue | 5/6 | In Progress | - |
 | 4. Ingestion UI | 0/? | Not started | - |
 | 5. Admin Catalog | 0/? | Not started | - |
 | 6. Search Pipeline | 0/? | Not started | - |
