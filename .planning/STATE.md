@@ -1,6 +1,6 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-08 (03-01 abgeschlossen)
+**Last updated:** 2026-05-08 (03-04 abgeschlossen)
 **Milestone:** v1 — Core Search Experience
 **Planning status:** Phase 3 geplant — bereit zur Ausführung
 
@@ -19,8 +19,8 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 3 — Ingestion API + Queue |
-| Current Plan | 03-03 abgeschlossen — 03-04 als nächstes (Wave 1) |
-| Phase Status | In Progress — 3/6 Pläne done |
+| Current Plan | 03-04 abgeschlossen — 03-05 als nächstes (Wave 2) |
+| Phase Status | In Progress — 4/6 Pläne done |
 | Overall Progress | 2/10 phases complete (Phase 3 in progress) |
 
 **Progress:** ██░░░░░░░░ 22%
@@ -108,10 +108,10 @@ Phase 3 in Ausführung: 1/6 Pläne abgeschlossen.
 - [x] Wave 0 (03-01): CR-01/CR-02/CR-03-Fixes + pytest-Tests — abgeschlossen 2026-05-08
 - [x] Wave 0 (03-02): Vitest-Test-Stubs + .env.local.example — abgeschlossen 2026-05-08
 - [x] Wave 1 (03-03): POST /api/upload/init — abgeschlossen 2026-05-08
-- [ ] Wave 1 (03-04): POST /api/upload/confirm — bereit zur Ausführung
+- [x] Wave 1 (03-04): POST /api/upload/confirm — abgeschlossen 2026-05-08
 - [ ] Wave 2 (03-05): Worker-Microservice FastAPI + Celery
 - [ ] Wave 3 (03-06): Docker Compose + E2E-Checkpoint (manuell)
-Nächster Schritt: `/gsd-execute-phase 3` (03-04 — Wave 1)
+Nächster Schritt: `/gsd-execute-phase 3` (03-05 — Wave 2: Worker-Microservice FastAPI + Celery)
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*
