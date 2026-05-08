@@ -2,7 +2,10 @@
 // Neon PostgreSQL-Client — server-only.
 // Darf NIEMALS in Client-Komponenten importiert werden.
 // Erlaubte Verwendungsorte: src/app/api/** (API Routes), Server Components, Server Actions.
-import { neon } from '@neondatabase/serverless'
+import { neon, neonConfig } from '@neondatabase/serverless'
+
+// Suppress browser-environment warning when running tests in jsdom
+neonConfig.disableWarningInBrowsers = true
 
 const databaseUrl = process.env.DATABASE_URL!
 
