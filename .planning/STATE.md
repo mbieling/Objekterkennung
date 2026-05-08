@@ -1,6 +1,6 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-08
+**Last updated:** 2026-05-08 (03-01 abgeschlossen)
 **Milestone:** v1 — Core Search Experience
 **Planning status:** Phase 3 geplant — bereit zur Ausführung
 
@@ -19,11 +19,11 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 3 — Ingestion API + Queue |
-| Current Plan | Planung abgeschlossen — 6 Pläne in 4 Waves bereit |
-| Phase Status | Ready to execute |
-| Overall Progress | 2/10 phases complete (Phase 3 planned) |
+| Current Plan | 03-01 abgeschlossen — 03-02 als nächstes (Wave 0) |
+| Phase Status | In Progress — 1/6 Pläne done |
+| Overall Progress | 2/10 phases complete (Phase 3 in progress) |
 
-**Progress:** ██░░░░░░░░ 20%
+**Progress:** ██░░░░░░░░ 22%
 
 ---
 
@@ -33,7 +33,7 @@
 |-------|------|--------|
 | 1 | Database Foundation | ✓ Complete (2026-05-08) |
 | 2 | Python Worker Spike | ✓ Complete (2026-05-08) |
-| 3 | Ingestion API + Queue | ◷ Planned (6 plans, ready to execute) |
+| 3 | Ingestion API + Queue | ◷ In Progress (1/6 plans done) |
 | 4 | Ingestion UI | Not started |
 | 5 | Admin Catalog | Not started |
 | 6 | Search Pipeline | Not started |
@@ -72,6 +72,10 @@
 | Storage | AWS S3 (2 buckets) | Replaces Supabase Storage; `parts-steps` + `parts-thumbnails`, both private |
 | PNG-Pfadkonvention | view_0..view_7.png (nicht view_{name}.png) | S3-Key-Format für process_step.py: `{part_id}/view_{i}.png` |
 | V3d_XnegYposZneg für iso_rear | Beibehalten — empirisch zu bestätigen | Open Question A3 aus RESEARCH.md; Fallback bei schwarzem Bild |
+| CR-01 Fix (03-01) | UUID_RE-Regex als erste Operation in process() | Path-Traversal-Schutz vor S3-Key-Konstruktion — BLOCKER-Status aufgelöst |
+| CR-02 Fix (03-01) | try/finally mit viewer.Viewer.Remove() in render_views() | Verhindert OSMesa-Ressourcenleck bei Batch-Betrieb |
+| CR-03 Fix (03-01) | Patch-Token Mean-Pool statt CLS-Token in get_embedding() | Bessere geometrische Ähnlichkeit — CLAUDE.md Architektur-Entscheidung umgesetzt |
+| IN-03 Fix (03-01) | viewer.View.Window().SetSize(512, 512) explizit | D-06-konform, nicht mehr von VTK-Default abhängig |
 
 ### Key Risks to Watch
 
@@ -100,12 +104,13 @@
 
 ### Next Action
 
-Phase 3 vollständig geplant: 6 Pläne in 4 Waves.
-- Wave 0 (03-01, 03-02): CR-01/CR-02/CR-03-Fixes + Test-Stubs + Env-Vars — parallel
-- Wave 1 (03-03, 03-04): POST /api/upload/init + POST /api/upload/confirm — parallel
-- Wave 2 (03-05): Worker-Microservice FastAPI + Celery
-- Wave 3 (03-06): Docker Compose + E2E-Checkpoint (manuell)
-Nächster Schritt: `/clear` dann `/gsd-execute-phase 3`
+Phase 3 in Ausführung: 1/6 Pläne abgeschlossen.
+- [x] Wave 0 (03-01): CR-01/CR-02/CR-03-Fixes + pytest-Tests — abgeschlossen 2026-05-08
+- [ ] Wave 0 (03-02): Vitest-Test-Stubs + .env.local.example — als nächstes
+- [ ] Wave 1 (03-03, 03-04): POST /api/upload/init + POST /api/upload/confirm — parallel nach Wave 0
+- [ ] Wave 2 (03-05): Worker-Microservice FastAPI + Celery
+- [ ] Wave 3 (03-06): Docker Compose + E2E-Checkpoint (manuell)
+Nächster Schritt: `/gsd-execute-phase 3` (03-02)
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*

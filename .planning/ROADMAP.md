@@ -87,7 +87,7 @@
 **Plans**: 6 plans
 
 **Wave 0** *(Blocker-Fixes und Test-Stubs — vor Wave 1 abschließen)*
-- [ ] 03-01-PLAN.md — CR-01 Fix (UUID-Validierung in process_step.py) + CR-02 Fix (Viewer3d-Cleanup in renderer.py) + pytest-Stubs
+- [x] 03-01-PLAN.md — CR-01 Fix (UUID-Validierung in process_step.py) + CR-02 Fix (Viewer3d-Cleanup in renderer.py) + pytest-Stubs *(completed 2026-05-08)*
 - [ ] 03-02-PLAN.md — Vitest-Test-Stubs (init.test.ts + confirm.test.ts) + .env.local.example + worker/.env.example aktualisieren
 
 **Wave 1** *(parallel ausführbar, blocked on Wave 0)*
@@ -209,7 +209,7 @@
 |-------|----------------|--------|-----------|
 | 1. Database Foundation | 2/2 | Complete | 2026-05-08 |
 | 2. Python Worker Spike | 3/3 | Complete (alle Pläne done) | 2026-05-08 |
-| 3. Ingestion API + Queue | 0/6 | Planned (2026-05-08) | - |
+| 3. Ingestion API + Queue | 1/6 | In Progress | - |
 | 4. Ingestion UI | 0/? | Not started | - |
 | 5. Admin Catalog | 0/? | Not started | - |
 | 6. Search Pipeline | 0/? | Not started | - |
