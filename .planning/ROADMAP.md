@@ -9,7 +9,7 @@
 
 ## Phases
 
-- [ ] **Phase 1: Database Foundation** — Schema, pgvector, HNSW index, Storage buckets locked before any code is written
+- [x] **Phase 1: Database Foundation** — Schema, pgvector, HNSW index, Storage buckets locked before any code is written *(completed 2026-05-08)*
 - [ ] **Phase 2: Python Worker Spike** — STEP rendering + DINOv2 embedding pipeline validated as standalone Docker service
 - [ ] **Phase 3: Ingestion API + Queue** — Upload endpoint, job dispatch, SHA-256 deduplication, status tracking in place
 - [ ] **Phase 4: Ingestion UI** — Upload form, real-time status polling, thumbnail display wired to the ingestion API
@@ -36,10 +36,10 @@
 **Plans**: 2 plans
 
 **Wave 1**
-- [ ] 01-01-PLAN.md — SQL-Migrationsdatei (parts-Tabelle, pgvector, HNSW-Index, Indexes, Trigger)
+- [x] 01-01-PLAN.md — SQL-Migrationsdatei (parts-Tabelle, pgvector, HNSW-Index, Indexes, Trigger)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 01-02-PLAN.md — Supabase-Client aktivieren, Admin-Client, .env.local.example, Integrations-Test, Nutzer-Checkpoint
+- [x] 01-02-PLAN.md — Neon-Client aktivieren, S3-Client, .env.local.example, Integrations-Test, Nutzer-Checkpoint
 
 **Cross-cutting constraints:**
 - `SUPABASE_SERVICE_ROLE_KEY` darf niemals im Client-Bundle landen (kein `NEXT_PUBLIC_` Prefix)
