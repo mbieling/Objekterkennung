@@ -88,7 +88,7 @@
 
 **Wave 0** *(Blocker-Fixes und Test-Stubs — vor Wave 1 abschließen)*
 - [x] 03-01-PLAN.md — CR-01 Fix (UUID-Validierung in process_step.py) + CR-02 Fix (Viewer3d-Cleanup in renderer.py) + pytest-Stubs *(completed 2026-05-08)*
-- [ ] 03-02-PLAN.md — Vitest-Test-Stubs (init.test.ts + confirm.test.ts) + .env.local.example + worker/.env.example aktualisieren
+- [x] 03-02-PLAN.md — Vitest-Test-Stubs (init.test.ts + confirm.test.ts) + .env.local.example + worker/.env.example aktualisieren *(completed 2026-05-08)*
 
 **Wave 1** *(parallel ausführbar, blocked on Wave 0)*
 - [ ] 03-03-PLAN.md — POST /api/upload/init: SHA-256-Dedup + DB-Insert + Presigned S3 URL
