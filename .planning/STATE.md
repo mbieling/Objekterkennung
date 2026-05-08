@@ -18,8 +18,8 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 2 — Python Worker Spike |
-| Current Plan | 02 (02-01 complete) |
-| Phase Status | Phase 2 in progress — Plan 1/3 complete |
+| Current Plan | 03 (02-01, 02-02 complete) |
+| Phase Status | Phase 2 in progress — Plan 2/3 complete |
 | Overall Progress | 1/10 phases complete |
 
 **Progress:** █░░░░░░░░░ 10%
@@ -48,7 +48,7 @@
 | Metric | Value |
 |--------|-------|
 | Phases complete | 1/10 |
-| Plans complete | 3/? (incl. Phase 2 Plan 1) |
+| Plans complete | 4/? (incl. Phase 2 Plans 1+2) |
 | Requirements covered | 15/15 |
 | v1 requirements done | 0/15 |
 
@@ -69,6 +69,8 @@
 | Deduplication | SHA-256 on file content | Prevents redundant processing before any work starts |
 | Database | Neon (PostgreSQL + pgvector) | Replaces Supabase; pure Postgres, pgvector built-in, no vendor lock-in |
 | Storage | AWS S3 (2 buckets) | Replaces Supabase Storage; `parts-steps` + `parts-thumbnails`, both private |
+| PNG-Pfadkonvention | view_0..view_7.png (nicht view_{name}.png) | S3-Key-Format für process_step.py: `{part_id}/view_{i}.png` |
+| V3d_XnegYposZneg für iso_rear | Beibehalten — empirisch zu bestätigen | Open Question A3 aus RESEARCH.md; Fallback bei schwarzem Bild |
 
 ### Key Risks to Watch
 
@@ -97,8 +99,9 @@
 
 ### Next Action
 
-Phase 2 Plan 01 abgeschlossen: Docker-Infrastruktur (Dockerfile, environment.yml, requirements.txt, .env.example, testdata/sample.step).
-Nächster Schritt: Plan 02-02 ausführen — renderer.py (STEP -> 8 PNG Views via pythonOCC+OSMesa).
+Phase 2 Plan 02 abgeschlossen: renderer.py (load_step, validate_geometry, render_views, VIEWS) und test_renderer.py (OSMesa-Smoketest mit 3 Subtests).
+Nächster Schritt: Plan 02-03 ausführen — embedder.py (DINOv2 CLS-Token, mean_pool) + process_step.py (vollständige S3→render→embed→S3→DB-Pipeline).
+Hinweis: Docker-Verifikation (docker run --rm bauteil-worker python test_renderer.py) muss vor Plan 03 manuell bestätigt werden.
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*

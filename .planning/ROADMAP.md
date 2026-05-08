@@ -63,7 +63,7 @@
 - [x] 02-01-PLAN.md — Docker-Infrastruktur: Dockerfile (continuumio/miniconda3, OSMesa, pythonocc 7.9.3, DINOv2-Cache), .env.example, testdata/sample.step *(completed 2026-05-08)*
 
 **Wave 2** *(blocked on Wave 1: Docker-Build muss erfolgreich sein)*
-- [ ] 02-02-PLAN.md — Renderer: renderer.py (STEP-Loading, Geometrievalidierung, 8-View-OSMesa-Rendering), test_renderer.py (isolierter Smoketest)
+- [x] 02-02-PLAN.md — Renderer: renderer.py (STEP-Loading, Geometrievalidierung, 8-View-OSMesa-Rendering), test_renderer.py (isolierter Smoketest) *(completed 2026-05-08)*
 
 **Wave 3** *(blocked on Wave 2: RENDERER_OK muss bestätigt sein)*
 - [ ] 02-03-PLAN.md — Embedding + Pipeline: embedder.py (DINOv2 CLS-Token, mean_pool), process_step.py (vollständige S3→render→embed→S3→DB-Pipeline)
