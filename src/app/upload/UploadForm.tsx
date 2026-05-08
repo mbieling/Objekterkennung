@@ -103,12 +103,14 @@ export function UploadForm() {
     if (polledStatus === 'ready' && phase === 'polling') {
       setPhase('ready')
       // Thumbnail fetchen nach status='ready' (D-07, D-08)
-      fetch(`/api/parts/${partId}/thumbnail`)
+      const controller = new AbortController()
+      fetch(`/api/parts/${partId}/thumbnail`, { signal: controller.signal })
         .then(r => r.ok ? r.json() : Promise.reject(new Error(`thumb HTTP ${r.status}`)))
         .then(({ url }: { url: string }) => setThumbnailUrl(url))
         .catch(() => {
           // UI-SPEC: Skeleton bleibt sichtbar, kein Fallback in Phase 4 (deferred to Phase 10)
         })
+      return () => controller.abort()
     }
     if (polledStatus === 'failed' && phase === 'polling') setPhase('failed')
     if (timedOut && phase === 'polling') setPhase('failed')

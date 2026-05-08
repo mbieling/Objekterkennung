@@ -52,11 +52,16 @@ export async function GET(
   }
 
   // 5. Presigned GET-URL — 60s Lifetime per D-08
-  const url = await getSignedUrl(
-    s3,
-    new GetObjectCommand({ Bucket: BUCKET_THUMBNAILS, Key: key }),
-    { expiresIn: 60 }
-  )
+  let url: string
+  try {
+    url = await getSignedUrl(
+      s3,
+      new GetObjectCommand({ Bucket: BUCKET_THUMBNAILS, Key: key }),
+      { expiresIn: 60 }
+    )
+  } catch {
+    return NextResponse.json({ error: 'Failed to generate thumbnail URL' }, { status: 500 })
+  }
 
   return NextResponse.json({ url })
 }

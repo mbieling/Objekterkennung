@@ -42,7 +42,8 @@ export function usePartStatus(partId: string | null): UsePartStatusResult {
 
     const startedAt = Date.now()
     let stopped = false
-    let intervalId: ReturnType<typeof setInterval> | null = null
+    let switched = false
+    const intervalRef = { id: null as ReturnType<typeof setInterval> | null }
     let timeoutId: ReturnType<typeof setTimeout> | null = null
     const controller = new AbortController()
 
@@ -59,7 +60,7 @@ export function usePartStatus(partId: string | null): UsePartStatusResult {
         // Stop-Bedingung — D-04
         if (data.status === 'ready' || data.status === 'failed') {
           stopped = true
-          if (intervalId) clearInterval(intervalId)
+          if (intervalRef.id) clearInterval(intervalRef.id)
           if (timeoutId) clearTimeout(timeoutId)
         }
       } catch (e) {
@@ -75,31 +76,30 @@ export function usePartStatus(partId: string | null): UsePartStatusResult {
     // Initial-Fetch sofort (bevor erstes Intervall feuert)
     fetchStatus()
 
-    // Intervall: feuert fetchStatus + entscheidet bei jedem Tick, ob Wechsel zu langsam nötig
+    // Intervall: feuert fetchStatus + One-Shot-Wechsel zu langsam nach 30s — D-04
     const tick = () => {
       if (stopped) return
-      const elapsed = Date.now() - startedAt
-      if (elapsed >= FAST_PHASE_DURATION_MS && intervalId) {
-        // Wechsel von schnell zu langsam — D-04
-        clearInterval(intervalId)
-        intervalId = setInterval(tick, SLOW_INTERVAL_MS)
+      if (!switched && Date.now() - startedAt >= FAST_PHASE_DURATION_MS) {
+        switched = true
+        if (intervalRef.id) clearInterval(intervalRef.id)
+        intervalRef.id = setInterval(tick, SLOW_INTERVAL_MS)
       }
       fetchStatus()
     }
-    intervalId = setInterval(tick, FAST_INTERVAL_MS)
+    intervalRef.id = setInterval(tick, FAST_INTERVAL_MS)
 
     // 5-Minuten-Timeout — D-06
     timeoutId = setTimeout(() => {
       stopped = true
       setTimedOut(true)
-      if (intervalId) clearInterval(intervalId)
+      if (intervalRef.id) clearInterval(intervalRef.id)
     }, TIMEOUT_MS)
 
     // Cleanup — verhindert Memory-Leak (Pitfall 2 aus RESEARCH.md)
     return () => {
       stopped = true
       controller.abort()
-      if (intervalId) clearInterval(intervalId)
+      if (intervalRef.id) clearInterval(intervalRef.id)
       if (timeoutId) clearTimeout(timeoutId)
     }
   }, [partId])
