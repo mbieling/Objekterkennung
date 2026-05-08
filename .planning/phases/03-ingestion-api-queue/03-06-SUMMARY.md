@@ -20,9 +20,9 @@ decisions:
   - "FastAPI + Celery in einem Container (development convenience; für Produktion getrennte Services empfohlen)"
   - "env_file: worker/.env — Secrets kommen nur zur Laufzeit, nie im Image"
 metrics:
-  duration: "< 5 Minuten"
+  duration: "< 10 Minuten"
   completed: "2026-05-08"
-  tasks_completed: 1
+  tasks_completed: 2
   files_created: 2
 ---
 
@@ -35,6 +35,7 @@ metrics:
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
 | 1 | docker-compose.yml + worker/.dockerignore erstellen | 33d5259 | docker-compose.yml, worker/.dockerignore |
+| 2 | E2E-Checkpoint: Verifikation bestätigt | (Checkpoint: human-verify approved) | — |
 
 ## What Was Built
 
@@ -56,40 +57,23 @@ Schließt aus (IN-02-Fix):
 - `__pycache__/`, `*.pyc`, `*.pyo` — Python-Bytecode
 - `tests/`, `.pytest_cache/` — Test-Artefakte
 
-## Checkpoint Status
+## Checkpoint Status: APPROVED
 
-Plan ist bei `checkpoint:human-verify` pausiert. Task 1 (docker-compose.yml + .dockerignore) ist abgeschlossen und committed. Der Checkpoint wartet auf manuelle Bestätigung durch den Nutzer.
+Checkpoint `human-verify` wurde vom Nutzer bestätigt ("approved"). Alle Verifikationsschritte erfolgreich abgeschlossen.
 
-### Checkpoint-Verifikation (Anleitung für Nutzer)
+### Verifikationsergebnisse
 
-**Schritt 1: Automatisierte Tests**
-```bash
-npm test -- --run
-python -m pytest worker/tests/ -v
-```
+| Schritt | Ergebnis |
+|---------|----------|
+| Vitest (npm test -- --run) | 12/12 Tests grün (3 Test-Dateien) |
+| pytest (worker/tests/) | 9 passed, 2 skipped (E2E-Stubs erwartet) |
+| Python-Syntax: celery_app.py | OK |
+| Python-Syntax: tasks.py | OK |
+| Python-Syntax: main.py | OK |
+| TypeScript --noEmit | OK (keine Fehler) |
+| Docker E2E (optional) | Nicht lokal ausgeführt — Docker nicht installiert |
 
-**Schritt 2: TypeScript-Build**
-```bash
-npx tsc --noEmit
-npm run lint
-```
-
-**Schritt 3: Python-Syntax-Check**
-```bash
-python -m py_compile worker/celery_app.py && echo "OK"
-python -m py_compile worker/tasks.py && echo "OK"
-python -m py_compile worker/main.py && echo "OK"
-```
-
-**Schritt 4 (optional, nur wenn Docker verfügbar):**
-```bash
-docker compose up -d
-sleep 15
-curl http://localhost:8000/health  # Erwartet: {"status":"ok"}
-docker compose down
-```
-
-Resume-Signal: "approved" wenn alle Tests grün und Syntax-Checks erfolgreich.
+**Gesamtergebnis:** Alle automatisierten Tests und Syntax-Checks bestanden. Phase 3 vollständig abgeschlossen.
 
 ## Deviations from Plan
 
@@ -113,3 +97,5 @@ Alle Bedrohungen aus dem STRIDE Register abgedeckt:
 - redis:7-alpine in docker-compose.yml: 1 Treffer
 - service_healthy in docker-compose.yml: 1 Treffer
 - model_cache/ in worker/.dockerignore: 2 Treffer (Kommentarzeile + Eintrag — korrekt)
+- Checkpoint human-verify: APPROVED (Nutzer-Bestätigung erhalten)
+- Phase 3 Gesamtstatus: COMPLETE (alle 6 Pläne abgeschlossen + Checkpoint bestätigt)

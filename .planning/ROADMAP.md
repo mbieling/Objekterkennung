@@ -11,7 +11,7 @@
 
 - [x] **Phase 1: Database Foundation** — Schema, pgvector, HNSW index, Storage buckets locked before any code is written *(completed 2026-05-08)*
 - [x] **Phase 2: Python Worker Spike** — STEP rendering + DINOv2 embedding pipeline validated as standalone Docker service *(completed 2026-05-08)*
-- [ ] **Phase 3: Ingestion API + Queue** — Upload endpoint, job dispatch, SHA-256 deduplication, status tracking in place
+- [x] **Phase 3: Ingestion API + Queue** — Upload endpoint, job dispatch, SHA-256 deduplication, status tracking in place *(completed 2026-05-08)*
 - [ ] **Phase 4: Ingestion UI** — Upload form, real-time status polling, thumbnail display wired to the ingestion API
 - [ ] **Phase 5: Admin Catalog** — Parts list with status and thumbnails, metadata edit, archive/delete, retry failed
 - [ ] **Phase 6: Search Pipeline** — Photo-to-embedding, pgvector cosine query, ranked results returned by API
@@ -98,7 +98,7 @@
 - [x] 03-05-PLAN.md — Worker-Erweiterung: celery_app.py + tasks.py + main.py (FastAPI /health + /enqueue) + requirements.txt *(completed 2026-05-08)*
 
 **Wave 3** *(blocked on Wave 2: Worker-Module müssen existieren)*
-- [x] 03-06-PLAN.md — Docker Compose (redis:7-alpine + worker-service) + worker/.dockerignore + E2E-Checkpoint *(committed 2026-05-08, human-verify ausstehend)*
+- [x] 03-06-PLAN.md — Docker Compose (redis:7-alpine + worker-service) + worker/.dockerignore + E2E-Checkpoint *(completed 2026-05-08, human-verify approved)*
 
 **Cross-cutting constraints:**
 - `WORKER_URL` und alle AWS_*-Vars sind server-only ohne `NEXT_PUBLIC_`-Prefix
@@ -209,7 +209,7 @@
 |-------|----------------|--------|-----------|
 | 1. Database Foundation | 2/2 | Complete | 2026-05-08 |
 | 2. Python Worker Spike | 3/3 | Complete (alle Pläne done) | 2026-05-08 |
-| 3. Ingestion API + Queue | 6/6 | In Progress (Checkpoint ausstehend) | - |
+| 3. Ingestion API + Queue | 6/6 | Complete | 2026-05-08 |
 | 4. Ingestion UI | 0/? | Not started | - |
 | 5. Admin Catalog | 0/? | Not started | - |
 | 6. Search Pipeline | 0/? | Not started | - |

@@ -1,6 +1,6 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-08 (03-05 abgeschlossen)
+**Last updated:** 2026-05-08 (03-06 abgeschlossen — Phase 3 complete)
 **Milestone:** v1 — Core Search Experience
 **Planning status:** Phase 3 geplant — bereit zur Ausführung
 
@@ -18,12 +18,12 @@
 
 | Field | Value |
 |-------|-------|
-| Current Phase | 3 — Ingestion API + Queue |
-| Current Plan | 03-06 abgeschlossen (Checkpoint: human-verify ausstehend) |
-| Phase Status | In Progress — 6/6 Pläne abgeschlossen, Checkpoint-Bestätigung ausstehend |
-| Overall Progress | 2/10 phases complete (Phase 3 Checkpoint ausstehend) |
+| Current Phase | 4 — Ingestion UI |
+| Current Plan | Bereit für Phase 4 |
+| Phase Status | Phase 3 complete — alle 6 Pläne + Checkpoint bestätigt |
+| Overall Progress | 3/10 phases complete |
 
-**Progress:** ██░░░░░░░░ 22%
+**Progress:** ███░░░░░░░ 30%
 
 ---
 
@@ -33,7 +33,7 @@
 |-------|------|--------|
 | 1 | Database Foundation | ✓ Complete (2026-05-08) |
 | 2 | Python Worker Spike | ✓ Complete (2026-05-08) |
-| 3 | Ingestion API + Queue | ◷ In Progress (6/6 plans done, Checkpoint ausstehend) |
+| 3 | Ingestion API + Queue | ✓ Complete (2026-05-08) |
 | 4 | Ingestion UI | Not started |
 | 5 | Admin Catalog | Not started |
 | 6 | Search Pipeline | Not started |
@@ -48,8 +48,8 @@
 
 | Metric | Value |
 |--------|-------|
-| Phases complete | 2/10 |
-| Plans complete | 4/? (incl. Phase 2 Plans 1+2) |
+| Phases complete | 3/10 |
+| Plans complete | 11/? (Phase 1: 2, Phase 2: 3, Phase 3: 6) |
 | Requirements covered | 15/15 |
 | v1 requirements done | 0/15 |
 
@@ -104,14 +104,17 @@
 
 ### Next Action
 
-Phase 3 in Ausführung: 5/6 Pläne abgeschlossen.
-- [x] Wave 0 (03-01): CR-01/CR-02/CR-03-Fixes + pytest-Tests — abgeschlossen 2026-05-08
-- [x] Wave 0 (03-02): Vitest-Test-Stubs + .env.local.example — abgeschlossen 2026-05-08
-- [x] Wave 1 (03-03): POST /api/upload/init — abgeschlossen 2026-05-08
-- [x] Wave 1 (03-04): POST /api/upload/confirm — abgeschlossen 2026-05-08
-- [x] Wave 2 (03-05): Worker-Microservice FastAPI + Celery — abgeschlossen 2026-05-08
-- [x] Wave 3 (03-06): Docker Compose (docker-compose.yml + worker/.dockerignore) — committed 2026-05-08
-Nächster Schritt: Checkpoint bestätigen (tippe "approved" wenn Tests grün sind), dann Phase 4 starten.
+Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) kann gestartet werden.
+
+**Phase 3 — Abgeschlossene Pläne:**
+- [x] Wave 0 (03-01): CR-01/CR-02/CR-03-Fixes + pytest-Tests
+- [x] Wave 0 (03-02): Vitest-Test-Stubs + .env.local.example
+- [x] Wave 1 (03-03): POST /api/upload/init (SHA-256-Dedup + Presigned URL)
+- [x] Wave 1 (03-04): POST /api/upload/confirm (Worker-Dispatch + HTTP 202)
+- [x] Wave 2 (03-05): Worker-Microservice (celery_app.py, tasks.py, main.py, requirements.txt)
+- [x] Wave 3 (03-06): Docker Compose + worker/.dockerignore — E2E-Checkpoint bestätigt
+
+**Nächster Schritt:** `/gsd-discuss-phase 4` oder `/gsd-plan-phase 4` starten.
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*
