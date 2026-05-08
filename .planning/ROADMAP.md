@@ -127,7 +127,7 @@
 - [x] 04-03-PLAN.md — GET /api/parts/[id]/thumbnail (D-08, HeadObject-Race-Mitigation) + 5 Tests aktivieren *(completed 2026-05-08)*
 
 **Wave 2** *(blocked on Wave 1)*
-- [ ] 04-04-PLAN.md — usePartStatus-Hook (D-04, D-06, variables Polling + 5-Min-Timeout) + 8 Tests aktivieren
+- [x] 04-04-PLAN.md — usePartStatus-Hook (D-04, D-06, variables Polling + 5-Min-Timeout) + 8 Tests aktivieren *(completed 2026-05-08)*
 
 **Wave 3** *(blocked on Wave 2 — UploadForm konsumiert usePartStatus-Hook)*
 - [ ] 04-05-PLAN.md — UploadForm.tsx (Phasen-State-Machine, SHA-256 + XHR-PUT, Duplikat-Inline-Alert) + 6 Tests aktivieren
@@ -233,7 +233,7 @@
 | 1. Database Foundation | 2/2 | Complete | 2026-05-08 |
 | 2. Python Worker Spike | 3/3 | Complete (alle Pläne done) | 2026-05-08 |
 | 3. Ingestion API + Queue | 6/6 | Complete | 2026-05-08 |
-| 4. Ingestion UI | 3/6 | In progress | - |
+| 4. Ingestion UI | 4/6 | In progress | - |
 | 5. Admin Catalog | 0/? | Not started | - |
 | 6. Search Pipeline | 0/? | Not started | - |
 | 7. Camera UI | 0/? | Not started | - |
