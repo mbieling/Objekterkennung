@@ -19,9 +19,9 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 3 — Ingestion API + Queue |
-| Current Plan | 03-05 abgeschlossen — 03-06 als nächstes (Wave 3) |
-| Phase Status | In Progress — 5/6 Pläne done |
-| Overall Progress | 2/10 phases complete (Phase 3 in progress) |
+| Current Plan | 03-06 abgeschlossen (Checkpoint: human-verify ausstehend) |
+| Phase Status | In Progress — 6/6 Pläne abgeschlossen, Checkpoint-Bestätigung ausstehend |
+| Overall Progress | 2/10 phases complete (Phase 3 Checkpoint ausstehend) |
 
 **Progress:** ██░░░░░░░░ 22%
 
@@ -33,7 +33,7 @@
 |-------|------|--------|
 | 1 | Database Foundation | ✓ Complete (2026-05-08) |
 | 2 | Python Worker Spike | ✓ Complete (2026-05-08) |
-| 3 | Ingestion API + Queue | ◷ In Progress (5/6 plans done) |
+| 3 | Ingestion API + Queue | ◷ In Progress (6/6 plans done, Checkpoint ausstehend) |
 | 4 | Ingestion UI | Not started |
 | 5 | Admin Catalog | Not started |
 | 6 | Search Pipeline | Not started |
@@ -110,8 +110,8 @@ Phase 3 in Ausführung: 5/6 Pläne abgeschlossen.
 - [x] Wave 1 (03-03): POST /api/upload/init — abgeschlossen 2026-05-08
 - [x] Wave 1 (03-04): POST /api/upload/confirm — abgeschlossen 2026-05-08
 - [x] Wave 2 (03-05): Worker-Microservice FastAPI + Celery — abgeschlossen 2026-05-08
-- [ ] Wave 3 (03-06): Docker Compose + E2E-Checkpoint (manuell)
-Nächster Schritt: `/gsd-execute-phase 3` (03-06 — Wave 3: Docker Compose + E2E-Checkpoint)
+- [x] Wave 3 (03-06): Docker Compose (docker-compose.yml + worker/.dockerignore) — committed 2026-05-08
+Nächster Schritt: Checkpoint bestätigen (tippe "approved" wenn Tests grün sind), dann Phase 4 starten.
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*

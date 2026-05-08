@@ -98,7 +98,7 @@
 - [x] 03-05-PLAN.md — Worker-Erweiterung: celery_app.py + tasks.py + main.py (FastAPI /health + /enqueue) + requirements.txt *(completed 2026-05-08)*
 
 **Wave 3** *(blocked on Wave 2: Worker-Module müssen existieren)*
-- [ ] 03-06-PLAN.md — Docker Compose (redis:7-alpine + worker-service) + worker/.dockerignore + E2E-Checkpoint
+- [x] 03-06-PLAN.md — Docker Compose (redis:7-alpine + worker-service) + worker/.dockerignore + E2E-Checkpoint *(committed 2026-05-08, human-verify ausstehend)*
 
 **Cross-cutting constraints:**
 - `WORKER_URL` und alle AWS_*-Vars sind server-only ohne `NEXT_PUBLIC_`-Prefix
@@ -209,7 +209,7 @@
 |-------|----------------|--------|-----------|
 | 1. Database Foundation | 2/2 | Complete | 2026-05-08 |
 | 2. Python Worker Spike | 3/3 | Complete (alle Pläne done) | 2026-05-08 |
-| 3. Ingestion API + Queue | 5/6 | In Progress | - |
+| 3. Ingestion API + Queue | 6/6 | In Progress (Checkpoint ausstehend) | - |
 | 4. Ingestion UI | 0/? | Not started | - |
 | 5. Admin Catalog | 0/? | Not started | - |
 | 6. Search Pipeline | 0/? | Not started | - |
