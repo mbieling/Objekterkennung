@@ -12,7 +12,7 @@
 - [x] **Phase 1: Database Foundation** — Schema, pgvector, HNSW index, Storage buckets locked before any code is written *(completed 2026-05-08)*
 - [x] **Phase 2: Python Worker Spike** — STEP rendering + DINOv2 embedding pipeline validated as standalone Docker service *(completed 2026-05-08)*
 - [x] **Phase 3: Ingestion API + Queue** — Upload endpoint, job dispatch, SHA-256 deduplication, status tracking in place *(completed 2026-05-08)*
-- [ ] **Phase 4: Ingestion UI** — Upload form, real-time status polling, thumbnail display wired to the ingestion API
+- [x] **Phase 4: Ingestion UI** — Upload form, real-time status polling, thumbnail display wired to the ingestion API *(completed 2026-05-08)*
 - [ ] **Phase 5: Admin Catalog** — Parts list with status and thumbnails, metadata edit, archive/delete, retry failed
 - [ ] **Phase 6: Search Pipeline** — Photo-to-embedding, pgvector cosine query, ranked results returned by API
 - [ ] **Phase 7: Camera UI** — Mobile camera capture and file upload fallback wired to search pipeline
@@ -130,10 +130,10 @@
 - [x] 04-04-PLAN.md — usePartStatus-Hook (D-04, D-06, variables Polling + 5-Min-Timeout) + 8 Tests aktivieren *(completed 2026-05-08)*
 
 **Wave 3** *(blocked on Wave 2 — UploadForm konsumiert usePartStatus-Hook)*
-- [ ] 04-05-PLAN.md — UploadForm.tsx (Phasen-State-Machine, SHA-256 + XHR-PUT, Duplikat-Inline-Alert) + 6 Tests aktivieren
+- [x] 04-05-PLAN.md — UploadForm.tsx (Phasen-State-Machine, SHA-256 + XHR-PUT, Duplikat-Inline-Alert) + 6 Tests aktivieren *(completed 2026-05-08)*
 
 **Wave 4** *(blocked on Wave 3)*
-- [ ] 04-06-PLAN.md — /upload Server Component + Homepage-Rewrite (D-01, D-02) + Human-Verify-Checkpoint gegen Roadmap-SC
+- [x] 04-06-PLAN.md — /upload Server Component + Homepage-Rewrite (D-01, D-02) + Human-Verify-Checkpoint gegen Roadmap-SC *(completed 2026-05-08)*
 
 **Cross-cutting constraints:**
 - Alle neuen API-Routes verwenden `z.string().uuid()` für `params.id`-Validierung (security_enforcement)
@@ -233,7 +233,7 @@
 | 1. Database Foundation | 2/2 | Complete | 2026-05-08 |
 | 2. Python Worker Spike | 3/3 | Complete (alle Pläne done) | 2026-05-08 |
 | 3. Ingestion API + Queue | 6/6 | Complete | 2026-05-08 |
-| 4. Ingestion UI | 4/6 | In progress | - |
+| 4. Ingestion UI | 6/6 | Complete | 2026-05-08 |
 | 5. Admin Catalog | 0/? | Not started | - |
 | 6. Search Pipeline | 0/? | Not started | - |
 | 7. Camera UI | 0/? | Not started | - |
