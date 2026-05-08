@@ -22,18 +22,19 @@ logger.info("DINOv2-Modell geladen")
 
 
 def get_embedding(image_path: str) -> np.ndarray:
-    """Berechnet CLS-Token-Embedding (768-dim) für ein Bild.
+    """Berechnet Patch-Token Mean-Pool Embedding (768-dim) für ein Bild.
 
     Args:
         image_path: Pfad zu einer PNG-Datei (512x512px aus renderer.py)
 
     Returns:
-        numpy-Array der Shape (768,) — DINOv2 ViT-B/14 CLS-Token
+        numpy-Array der Shape (768,) — DINOv2 ViT-B/14 Patch-Token Mean-Pool
 
-    Preprocessing (D-06, Claude's Discretion):
+    Preprocessing (D-06):
         - Resize auf 224x224 VOR AutoImageProcessor (verhindert unerwartete Skalierung)
-        - CLS-Token (Index 0 in last_hidden_state) — nicht mean-pool der Patch-Tokens
-        - RESEARCH.md A1: CLS-Token empfohlen für globale geometrische Ähnlichkeit
+        - Mean-Pool der Patch-Tokens (Index 1..256) — NICHT CLS-Token (Index 0)
+        - CR-03 Fix: Patch-Mean-Pool liefert bessere geometrische Ähnlichkeit als CLS-Token
+          Quelle: 02-REVIEW.md CR-03 + CLAUDE.md Architektur-Entscheidung
     """
     # Resize auf 224x224px (D-06: DINOv2 nativer Input) vor Processor
     img = Image.open(image_path).convert("RGB").resize((224, 224))
@@ -43,12 +44,14 @@ def get_embedding(image_path: str) -> np.ndarray:
     with torch.no_grad():
         outputs = _model(**inputs)
 
-    # CLS-Token: Shape [batch=1, seq_len=257, hidden=768] → Index 0 → (768,)
-    # 257 = 1 CLS-Token + 256 Patch-Tokens (16x16 Patches bei 224px Input)
-    cls_embedding = outputs.last_hidden_state[:, 0].squeeze().numpy()
+    # CR-03 Fix: Patch-Token Mean-Pool statt CLS-Token
+    # last_hidden_state: Shape [batch=1, seq_len=257, hidden=768]
+    # Index 0 = CLS-Token, Index 1..256 = 256 Patch-Tokens (16x16 Patches bei 224px)
+    patch_tokens = outputs.last_hidden_state[:, 1:, :]  # Shape: [1, 256, 768]
+    mean_embedding = patch_tokens.mean(dim=1).squeeze().numpy()  # Shape: (768,)
 
-    assert cls_embedding.shape == (768,), f"Unerwartete Embedding-Shape: {cls_embedding.shape}"
-    return cls_embedding
+    assert mean_embedding.shape == (768,), f"Unerwartete Embedding-Shape: {mean_embedding.shape}"
+    return mean_embedding
 
 
 def mean_pool(embeddings: list) -> np.ndarray:
