@@ -116,8 +116,31 @@
   2. After upload, the UI shows a status indicator that updates in real time: pending → processing → ready (or failed)
   3. When processing completes, at least one thumbnail of the part is visible in the UI without a page reload
   4. Duplicate upload attempt shows an inline error message identifying the existing part
-**Plans**: TBD
+**Plans**: 6 plans
 **UI hint**: yes
+
+**Wave 0** *(Migration + Test-Stubs — vor Wave 1 abschließen)*
+- [ ] 04-01-PLAN.md — Migration 002_add_thumbnail_count.sql + supabase db push [BLOCKING] + 5 Test-Stubs (Vitest + Playwright)
+
+**Wave 1** *(parallel ausführbar, blocked on Wave 0)*
+- [ ] 04-02-PLAN.md — GET /api/parts/[id]/status (D-05) + 3 Tests aktivieren
+- [ ] 04-03-PLAN.md — GET /api/parts/[id]/thumbnail (D-08, HeadObject-Race-Mitigation) + 5 Tests aktivieren
+
+**Wave 2** *(blocked on Wave 1)*
+- [ ] 04-04-PLAN.md — usePartStatus-Hook (D-04, D-06, variables Polling + 5-Min-Timeout) + 8 Tests aktivieren
+
+**Wave 3** *(blocked on Wave 2 — UploadForm konsumiert usePartStatus-Hook)*
+- [ ] 04-05-PLAN.md — UploadForm.tsx (Phasen-State-Machine, SHA-256 + XHR-PUT, Duplikat-Inline-Alert) + 6 Tests aktivieren
+
+**Wave 4** *(blocked on Wave 3)*
+- [ ] 04-06-PLAN.md — /upload Server Component + Homepage-Rewrite (D-01, D-02) + Human-Verify-Checkpoint gegen Roadmap-SC
+
+**Cross-cutting constraints:**
+- Alle neuen API-Routes verwenden `z.string().uuid()` für `params.id`-Validierung (security_enforcement)
+- Keine Server-Secrets im Client-Bundle (`NEXT_PUBLIC_`-frei in allen neuen Dateien)
+- shadcn/ui exklusiv — keine custom UI-Primitiven (Button, Input, Form, Badge, etc.)
+- Tagged-template-SQL via `db` aus `@/lib/db` (nicht `sql`)
+- Browser darf KEINEN Content-Type-Header beim S3-PUT setzen (Pitfall 4)
 
 ---
 
@@ -210,7 +233,7 @@
 | 1. Database Foundation | 2/2 | Complete | 2026-05-08 |
 | 2. Python Worker Spike | 3/3 | Complete (alle Pläne done) | 2026-05-08 |
 | 3. Ingestion API + Queue | 6/6 | Complete | 2026-05-08 |
-| 4. Ingestion UI | 0/? | Not started | - |
+| 4. Ingestion UI | 0/6 | Plans created | - |
 | 5. Admin Catalog | 0/? | Not started | - |
 | 6. Search Pipeline | 0/? | Not started | - |
 | 7. Camera UI | 0/? | Not started | - |

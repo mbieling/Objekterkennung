@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-08 (03-06 abgeschlossen — Phase 3 complete)
+**Last updated:** 2026-05-08 (Phase 4 geplant — 6 Pläne, bereit zur Ausführung)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 3 geplant — bereit zur Ausführung
+**Planning status:** Phase 4 geplant — bereit zur Ausführung
 
 ---
 
@@ -19,8 +19,8 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 4 — Ingestion UI |
-| Current Plan | Bereit für Phase 4 |
-| Phase Status | Phase 3 complete — alle 6 Pläne + Checkpoint bestätigt |
+| Current Plan | Phase 4 geplant — 6 Pläne in 5 Waves |
+| Phase Status | Phase 4 planned — Ready to execute |
 | Overall Progress | 3/10 phases complete |
 
 **Progress:** ███░░░░░░░ 30%
@@ -104,17 +104,17 @@
 
 ### Next Action
 
-Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) kann gestartet werden.
+Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) ist geplant und bereit zur Ausführung.
 
-**Phase 3 — Abgeschlossene Pläne:**
-- [x] Wave 0 (03-01): CR-01/CR-02/CR-03-Fixes + pytest-Tests
-- [x] Wave 0 (03-02): Vitest-Test-Stubs + .env.local.example
-- [x] Wave 1 (03-03): POST /api/upload/init (SHA-256-Dedup + Presigned URL)
-- [x] Wave 1 (03-04): POST /api/upload/confirm (Worker-Dispatch + HTTP 202)
-- [x] Wave 2 (03-05): Worker-Microservice (celery_app.py, tasks.py, main.py, requirements.txt)
-- [x] Wave 3 (03-06): Docker Compose + worker/.dockerignore — E2E-Checkpoint bestätigt
+**Phase 4 — Geplante Pläne (6 Pläne in 5 Waves):**
+- [ ] Wave 0 (04-01): Migration 002_add_thumbnail_count.sql + supabase db push [BLOCKING] + 5 Test-Stubs
+- [ ] Wave 1 (04-02): GET /api/parts/[id]/status-Route (D-05)
+- [ ] Wave 1 (04-03): GET /api/parts/[id]/thumbnail-Route (D-08, HeadObject-Race-Mitigation)
+- [ ] Wave 2 (04-04): usePartStatus-Hook (D-04, D-06, variables Polling + 5-Min-Timeout)
+- [ ] Wave 3 (04-05): UploadForm.tsx (State-Machine, SHA-256 + XHR-PUT, Duplikat-Alert)
+- [ ] Wave 4 (04-06): /upload page + Homepage-Link + Human-Verify-Checkpoint
 
-**Nächster Schritt:** `/gsd-discuss-phase 4` oder `/gsd-plan-phase 4` starten.
+**Nächster Schritt:** `/gsd-execute-phase 4` starten.
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*
