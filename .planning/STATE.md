@@ -19,8 +19,8 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 4 — Ingestion UI |
-| Current Plan | 04-02 — GET /api/parts/[id]/status |
-| Phase Status | Phase 4 executing — Wave 1 ready |
+| Current Plan | 04-03 — GET /api/parts/[id]/thumbnail |
+| Phase Status | Phase 4 executing — Wave 1 in progress |
 | Overall Progress | 3/10 phases complete |
 
 **Progress:** ███░░░░░░░ 30%
@@ -49,7 +49,7 @@
 | Metric | Value |
 |--------|-------|
 | Phases complete | 3/10 |
-| Plans complete | 12/? (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 1) |
+| Plans complete | 13/? (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 2) |
 | Requirements covered | 15/15 |
 | v1 requirements done | 0/15 |
 
@@ -108,13 +108,13 @@ Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) ist gepl
 
 **Phase 4 — Geplante Pläne (6 Pläne in 5 Waves):**
 - [x] Wave 0 (04-01): Migration 002_add_thumbnail_count.sql + supabase db push [BLOCKING] + 5 Test-Stubs *(completed 2026-05-08)*
-- [ ] Wave 1 (04-02): GET /api/parts/[id]/status-Route (D-05)
+- [x] Wave 1 (04-02): GET /api/parts/[id]/status-Route (D-05) *(completed 2026-05-08)*
 - [ ] Wave 1 (04-03): GET /api/parts/[id]/thumbnail-Route (D-08, HeadObject-Race-Mitigation)
 - [ ] Wave 2 (04-04): usePartStatus-Hook (D-04, D-06, variables Polling + 5-Min-Timeout)
 - [ ] Wave 3 (04-05): UploadForm.tsx (State-Machine, SHA-256 + XHR-PUT, Duplikat-Alert)
 - [ ] Wave 4 (04-06): /upload page + Homepage-Link + Human-Verify-Checkpoint
 
-**Nächster Schritt:** Wave 1 starten — Plan 04-02 (GET /api/parts/[id]/status) und 04-03 (GET /api/parts/[id]/thumbnail) können parallel ausgeführt werden.
+**Nächster Schritt:** Wave 1 fortsetzen — Plan 04-03 (GET /api/parts/[id]/thumbnail) ausführen.
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*

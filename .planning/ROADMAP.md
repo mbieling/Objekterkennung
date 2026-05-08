@@ -123,7 +123,7 @@
 - [x] 04-01-PLAN.md — Migration 002_add_thumbnail_count.sql + supabase db push [BLOCKING] + 5 Test-Stubs (Vitest + Playwright) *(completed 2026-05-08)*
 
 **Wave 1** *(parallel ausführbar, blocked on Wave 0)*
-- [ ] 04-02-PLAN.md — GET /api/parts/[id]/status (D-05) + 3 Tests aktivieren
+- [x] 04-02-PLAN.md — GET /api/parts/[id]/status (D-05) + 3 Tests aktivieren *(completed 2026-05-08)*
 - [ ] 04-03-PLAN.md — GET /api/parts/[id]/thumbnail (D-08, HeadObject-Race-Mitigation) + 5 Tests aktivieren
 
 **Wave 2** *(blocked on Wave 1)*
