@@ -23,7 +23,7 @@ Ein minimaler Python-Spike validiert die gesamte STEP→Rendering→Embedding-Pi
 
 - **D-04:** Anzahl Views: **8 pro STEP-Datei** — 6 orthografische (vorne, hinten, links, rechts, oben, unten) + 2 isometrische (vorne-rechts-oben, hinten-links-unten).
 - **D-05:** Hintergrundfarbe: **Weiß (#FFFFFF)** — maximaler Kontrast für dunkle/graue Metallbauteile.
-- **D-06:** Ausgabegröße: **Zwei separate Größen** — 512×512px für UI-Thumbnails (gespeichert in S3), 224×224px für DINOv2-Embedding-Input (entspricht dem nativen Input des Modells, keine Skalierungsverluste).
+- **D-06:** Ausgabegröße: **Zwei Verwendungsgrößen** — 512×512px für UI-Thumbnails (in S3 gespeichert), 224×224px für DINOv2-Embedding-Input. **Klarstellung (2026-05-08):** `renderer.py` rendert nur 512×512px. `get_embedding()` macht intern ein Pillow-Resize auf 224×224px — kein separates Speichern der 224px-Variante nötig.
 - **D-07:** Mean-Pool: Alle 8 Views werden zu einem einzigen 768-dim Embedding gemittelt (architektonisch gesperrt aus Phase 1).
 
 ### STEP-Validierung

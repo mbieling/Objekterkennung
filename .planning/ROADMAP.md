@@ -54,11 +54,24 @@
 **Success Criteria** (what must be TRUE):
   1. A sample STEP file fed into the Docker container produces 6–8 rendered orthographic PNG thumbnails
   2. DINOv2 ViT-B/14 produces a 768-dimensional embedding (mean-pooled from all views) for that STEP file
-  3. The embedding is written to Supabase and a pgvector cosine similarity query returns it correctly
+  3. The embedding is written to Neon and a pgvector cosine similarity query returns it correctly
   4. Empty or malformed STEP files are rejected with a clear error (bounding-box and face-count validation active)
-  5. FastAPI health endpoint returns 200; Celery worker processes a test job end-to-end via Redis queue
-**Plans**: TBD
-**UI hint**: no
+  5. FastAPI health endpoint + Celery queue deferred to Phase 3 (per D-10)
+**Plans**: 3 plans
+
+**Wave 1**
+- [ ] 02-01-PLAN.md — Docker-Infrastruktur: Dockerfile (continuumio/miniconda3, OSMesa, pythonocc 7.9.3, DINOv2-Cache), .env.example, testdata/sample.step
+
+**Wave 2** *(blocked on Wave 1: Docker-Build muss erfolgreich sein)*
+- [ ] 02-02-PLAN.md — Renderer: renderer.py (STEP-Loading, Geometrievalidierung, 8-View-OSMesa-Rendering), test_renderer.py (isolierter Smoketest)
+
+**Wave 3** *(blocked on Wave 2: RENDERER_OK muss bestätigt sein)*
+- [ ] 02-03-PLAN.md — Embedding + Pipeline: embedder.py (DINOv2 CLS-Token, mean_pool), process_step.py (vollständige S3→render→embed→S3→DB-Pipeline)
+
+**Cross-cutting constraints:**
+- `VTK_DEFAULT_OPENGL_WINDOW=vtkOSOpenGLRenderWindow` muss in jedem Python-Skript vor allen OCC-Imports stehen
+- Keine Secrets im Dockerfile — nur via `--env-file worker/.env` zur Laufzeit übergeben
+- `worker/.env` in `.gitignore`; nur `worker/.env.example` committen
 
 ---
 
@@ -176,7 +189,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Database Foundation | 0/2 | Ready to execute | - |
-| 2. Python Worker Spike | 0/? | Not started | - |
+| 2. Python Worker Spike | 0/3 | Planned — ready to execute | - |
 | 3. Ingestion API + Queue | 0/? | Not started | - |
 | 4. Ingestion UI | 0/? | Not started | - |
 | 5. Admin Catalog | 0/? | Not started | - |
@@ -215,3 +228,4 @@
 
 ---
 *Roadmap created: 2026-05-07*
+*Phase 2 plans created: 2026-05-08*
