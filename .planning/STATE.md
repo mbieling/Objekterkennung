@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-09 (Phase 7 Plan 02 abgeschlossen — Wave 1: CameraCapture.tsx vollständige State Machine + /search page.tsx)
+**Last updated:** 2026-05-09 (Phase 7 Plan 03 abgeschlossen — Wave 2: Homepage D-02 zweiter Button + CameraCapture Tests bestätigt)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 7 in progress — Plan 02 (Wave 1) complete, Plan 03 next
+**Planning status:** Phase 7 in progress — Plan 03 (Wave 2) complete, Plan 04 next
 
 ---
 
@@ -19,7 +19,7 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 7 — Camera UI |
-| Current Plan | 02 complete — 03 next |
+| Current Plan | 03 complete — 04 next |
 | Phase Status | In progress |
 | Overall Progress | 6/10 phases complete |
 
@@ -37,7 +37,7 @@
 | 4 | Ingestion UI | ✓ Complete (2026-05-08) |
 | 5 | Admin Catalog | ✓ Complete (2026-05-09) |
 | 6 | Search Pipeline | ✓ Complete (2026-05-09) |
-| 7 | Camera UI | In progress — Plan 02 done (Wave 1) |
+| 7 | Camera UI | In progress — Plan 03 done (Wave 2) |
 | 8 | Results UI | Not started |
 | 9 | Part Detail | Not started |
 | 10 | Hardening | Not started |
@@ -104,7 +104,7 @@
 
 ### Next Action
 
-Phase 7 Plan 02 (Wave 1) abgeschlossen (2026-05-09). Nächster Schritt: Plan 07-03 (Wave 2) — Homepage-Links + Navigation zur /search-Seite.
+Phase 7 Plan 03 (Wave 2) abgeschlossen (2026-05-09). Nächster Schritt: Plan 07-04 (Wave 3) — Playwright E2E Tests aktivieren + Human-Verify-Checkpoint.
 
 **Phase 4 — Geplante Pläne (6 Pläne in 5 Waves):**
 - [x] Wave 0 (04-01): Migration 002_add_thumbnail_count.sql + supabase db push [BLOCKING] + 5 Test-Stubs *(completed 2026-05-08)*

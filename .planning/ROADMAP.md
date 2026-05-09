@@ -225,7 +225,7 @@
 - [x] 07-02-PLAN.md — CameraCapture.tsx (vollstaendige State Machine) + src/app/search/page.tsx (Server Component) *(completed 2026-05-09)*
 
 **Wave 2** *(nach Wave 1)*
-- [ ] 07-03-PLAN.md — Homepage D-02 (zweiter Button) + CameraCapture.test.tsx Tests aktivieren
+- [x] 07-03-PLAN.md — Homepage D-02 (zweiter Button) + CameraCapture.test.tsx Tests aktivieren *(completed 2026-05-09)*
 
 **Wave 3** *(nach Wave 2)*
 - [ ] 07-04-PLAN.md — Playwright E2E Tests aktivieren + Human-Verify-Checkpoint
@@ -283,7 +283,7 @@
 | 4. Ingestion UI | 6/6 | Complete | 2026-05-08 |
 | 5. Admin Catalog | 5/5 | Complete | 2026-05-09 |
 | 6. Search Pipeline | 4/4 | Complete | 2026-05-09 |
-| 7. Camera UI | 1/4 | In Progress | - |
+| 7. Camera UI | 3/4 | In Progress | - |
 | 8. Results UI | 0/? | Not started | - |
 | 9. Part Detail | 0/? | Not started | - |
 | 10. Hardening | 0/? | Not started | - |
