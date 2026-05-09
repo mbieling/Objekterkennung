@@ -353,6 +353,7 @@ export function CatalogTable() {
     try {
       const res = await fetch(`/api/parts/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Delete failed')
+      toast.success('Bauteil gelöscht.')
     } catch {
       setParts(backup)
       toast.error('Löschen fehlgeschlagen. Bitte erneut versuchen.')
