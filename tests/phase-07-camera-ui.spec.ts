@@ -17,10 +17,9 @@ test.describe('Phase 7: Camera UI', () => {
     await expect(page.getByText('Foto aus Galerie wählen')).toBeVisible()
   })
 
-  // Phase 8 Wave 0: test.skip bis SearchResults-Komponente (Wave 1) existiert
-  test.skip('SEARCH-02: Datei-Upload via File-Input löst Suche aus (D-06)', async ({ page }) => {
+  test('SEARCH-02: Datei-Upload via File-Input löst Suche aus (D-06)', async ({ page }) => {
     // Route-Mock damit kein echter Worker nötig ist
-    await page.route('/api/search', async route => {
+    await page.route('**/api/search**', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -61,7 +60,7 @@ test.describe('Phase 7: Camera UI', () => {
 
   test('D-09: Spinner sichtbar während Suche läuft', async ({ page }) => {
     // Route-Mock mit künstlicher Verzögerung
-    await page.route('/api/search', async route => {
+    await page.route('**/api/search**', async route => {
       await new Promise(resolve => setTimeout(resolve, 2000))
       await route.fulfill({
         status: 200,
@@ -81,9 +80,8 @@ test.describe('Phase 7: Camera UI', () => {
     await expect(page.getByText('Suche läuft...')).toBeVisible({ timeout: 3_000 })
   })
 
-  // Phase 8 Wave 0: test.skip bis SearchResults-Komponente (Wave 1) existiert
-  test.skip('D-10: Ergebnis-Grid nach erfolgreicher Suche', async ({ page }) => {
-    await page.route('/api/search', async route => {
+  test('D-10: Ergebnis-Grid nach erfolgreicher Suche', async ({ page }) => {
+    await page.route('**/api/search**', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -103,7 +101,7 @@ test.describe('Phase 7: Camera UI', () => {
         }),
       })
     })
-    await page.route('/api/parts/*/thumbnail', async route => {
+    await page.route('**/api/parts/*/thumbnail**', async route => {
       await route.fulfill({ status: 404 })
     })
     await page.goto('/search')
