@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-09 (Phase 5 Plan 05 Task 1 abgeschlossen — Playwright E2E Smoke-Tests aktiviert; Human-Verify-Checkpoint ausstehend)
+**Last updated:** 2026-05-09 (Phase 5 abgeschlossen — alle 5 Pläne complete, Human-Verify approved)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 5 in progress — Plan 05 Task 1 complete (checkpoint pending)
+**Planning status:** Phase 5 complete — bereit für Phase 6 (Search Pipeline)
 
 ---
 
@@ -10,7 +10,7 @@
 
 **Core Value:** Ein Ingenieur fotografiert ein Bauteil mit dem Handy und sieht in Sekunden, ob ein geometrisch ähnliches Teil bereits in der Datenbank existiert.
 
-**Current Focus:** Phase 5 (Admin Catalog) — Plan 02 complete (GET /api/parts)
+**Current Focus:** Phase 6 (Search Pipeline) — nächste Phase
 
 ---
 
@@ -18,12 +18,12 @@
 
 | Field | Value |
 |-------|-------|
-| Current Phase | 5 — Admin Catalog |
-| Current Plan | 05 (Task 1 complete — Human-Verify-Checkpoint ausstehend) |
-| Phase Status | Phase 5 in progress — Plan 05 Task 1 complete |
-| Overall Progress | 4/10 phases complete |
+| Current Phase | 6 — Search Pipeline |
+| Current Plan | — |
+| Phase Status | Phase 5 complete ✓ — Phase 6 not started |
+| Overall Progress | 5/10 phases complete |
 
-**Progress:** ████░░░░░░ 40% (Phase 5 in progress)
+**Progress:** █████░░░░░ 50%
 
 ---
 
@@ -35,7 +35,7 @@
 | 2 | Python Worker Spike | ✓ Complete (2026-05-08) |
 | 3 | Ingestion API + Queue | ✓ Complete (2026-05-08) |
 | 4 | Ingestion UI | ✓ Complete (2026-05-08) |
-| 5 | Admin Catalog | In Progress — Plan 01 complete (Wave 0) |
+| 5 | Admin Catalog | ✓ Complete (2026-05-09) |
 | 6 | Search Pipeline | Not started |
 | 7 | Camera UI | Not started |
 | 8 | Results UI | Not started |
@@ -48,8 +48,8 @@
 
 | Metric | Value |
 |--------|-------|
-| Phases complete | 4/10 |
-| Plans complete | 20/? (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6, Phase 5: 3) |
+| Phases complete | 5/10 |
+| Plans complete | 22/? (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6, Phase 5: 5) |
 | Requirements covered | 15/15 |
 | v1 requirements done | 0/15 |
 

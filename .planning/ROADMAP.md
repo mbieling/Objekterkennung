@@ -13,7 +13,7 @@
 - [x] **Phase 2: Python Worker Spike** — STEP rendering + DINOv2 embedding pipeline validated as standalone Docker service *(completed 2026-05-08)*
 - [x] **Phase 3: Ingestion API + Queue** — Upload endpoint, job dispatch, SHA-256 deduplication, status tracking in place *(completed 2026-05-08)*
 - [x] **Phase 4: Ingestion UI** — Upload form, real-time status polling, thumbnail display wired to the ingestion API *(completed 2026-05-08)*
-- [ ] **Phase 5: Admin Catalog** — Parts list with status and thumbnails, metadata edit, archive/delete, retry failed
+- [x] **Phase 5: Admin Catalog** — Parts list with status and thumbnails, metadata edit, archive/delete, retry failed *(completed 2026-05-09)*
 - [ ] **Phase 6: Search Pipeline** — Photo-to-embedding, pgvector cosine query, ranked results returned by API
 - [ ] **Phase 7: Camera UI** — Mobile camera capture and file upload fallback wired to search pipeline
 - [ ] **Phase 8: Results UI** — Ranked results grid with match percentage, configurable threshold and result count
@@ -166,7 +166,7 @@
 - [x] 05-04-PLAN.md — /admin page.tsx + CatalogTable.tsx (Tabs, Suche, Pagination, Sheet, AlertDialog) *(completed 2026-05-09)*
 
 **Wave 3** *(blocked on Wave 2: UI muss vorhanden sein)*
-- [ ] 05-05-PLAN.md — Playwright E2E Smoke-Tests + Human-Verify-Checkpoint
+- [x] 05-05-PLAN.md — Playwright E2E Smoke-Tests + Human-Verify-Checkpoint *(completed 2026-05-09, human-verify approved)*
 
 **UI hint**: yes
 
@@ -250,7 +250,7 @@
 | 2. Python Worker Spike | 3/3 | Complete (alle Pläne done) | 2026-05-08 |
 | 3. Ingestion API + Queue | 6/6 | Complete | 2026-05-08 |
 | 4. Ingestion UI | 6/6 | Complete | 2026-05-08 |
-| 5. Admin Catalog | 4/5 | In Progress | - |
+| 5. Admin Catalog | 5/5 | Complete | 2026-05-09 |
 | 6. Search Pipeline | 0/? | Not started | - |
 | 7. Camera UI | 0/? | Not started | - |
 | 8. Results UI | 0/? | Not started | - |
