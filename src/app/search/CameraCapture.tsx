@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Camera, Upload, RotateCcw, Search, Loader2 } from 'lucide-react'
+import { SearchResults } from './SearchResults'
 
 // ---------------------------------------------------------------------------
 // Typen
@@ -80,6 +81,9 @@ function CameraCapture() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [searchResult, setSearchResult] = useState<SearchResponse | null>(null)
   const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null)
+  // Phase 8: Threshold + Limit für SearchResults (D-06, D-08)
+  const [displayThreshold, setDisplayThreshold] = useState<number>(0.5)
+  const [displayLimit, setDisplayLimit] = useState<number>(10)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -175,12 +179,44 @@ function CameraCapture() {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30_000)
     try {
-      const res = await fetch('/api/search', {
-        method: 'POST',
-        body: formData,
-        // KEIN Content-Type-Header — Browser setzt Boundary automatisch
-        signal: controller.signal,
-      })
+      const res = await fetch(
+        `/api/search?threshold=0&limit=${Math.max(50, displayLimit)}`,
+        {
+          method: 'POST',
+          body: formData,
+          // KEIN Content-Type-Header — Browser setzt multipart Boundary automatisch
+          signal: controller.signal,
+        }
+      )
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const data: SearchResponse = await res.json()
+      setSearchResult(data)
+      setPhase('result')
+    } catch (err) {
+      const msg = err instanceof DOMException && err.name === 'AbortError'
+        ? 'Suche hat zu lange gedauert. Bitte erneut versuchen.'
+        : 'Suche fehlgeschlagen. Bitte überprüfe deine Verbindung und versuche es erneut.'
+      setErrorMessage(msg)
+      setPhase('error')
+    } finally {
+      clearTimeout(timeoutId)
+    }
+  }
+
+  // D-08: Limit-Wechsel triggert neue API-Anfrage
+  async function handleSearchWithLimit(newLimit: number) {
+    if (!capturedBlob) return
+    setPhase('searching')
+    setErrorMessage(null)
+    const formData = new FormData()
+    formData.append('image', capturedBlob, 'capture.jpg')
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 30_000)
+    try {
+      const res = await fetch(
+        `/api/search?threshold=0&limit=${Math.max(50, newLimit)}`,
+        { method: 'POST', body: formData, signal: controller.signal }
+      )
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data: SearchResponse = await res.json()
       setSearchResult(data)
@@ -296,31 +332,48 @@ function CameraCapture() {
         </div>
       )}
 
-      {/* searching-State (D-09: Spinner, kein File-Input-Trigger) */}
+      {/* searching-State (D-11: Overlay über altem Grid wenn Re-Suche; reiner Spinner bei Erst-Suche) */}
       {phase === 'searching' && (
-        <div className="flex flex-col items-center gap-4 py-8" aria-live="polite">
-          <Loader2 className="animate-spin h-8 w-8" aria-label="Suche läuft" />
-          <p className="text-sm text-muted-foreground">Suche läuft...</p>
-        </div>
+        searchResult ? (
+          // Re-Suche: Grid bleibt sichtbar, Spinner-Overlay darüber
+          <div className="flex flex-col gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-background/70 flex items-center justify-center rounded-lg z-10">
+                <Loader2 className="animate-spin h-8 w-8" aria-label="Neue Suche läuft" />
+              </div>
+              <SearchResults
+                searchResult={searchResult}
+                displayThreshold={displayThreshold}
+                displayLimit={displayLimit}
+                onThresholdChange={setDisplayThreshold}
+                onLimitChange={() => {}}
+              />
+            </div>
+          </div>
+        ) : (
+          // Erst-Suche: reiner Spinner
+          <div className="flex flex-col items-center gap-4 py-8" aria-live="polite">
+            <Loader2 className="animate-spin h-8 w-8" aria-label="Suche läuft" />
+            <p className="text-sm text-muted-foreground">Suche läuft...</p>
+          </div>
+        )
       )}
 
-      {/* result-State (D-10 Placeholder — Phase 8 ersetzt dies durch echte Results UI) */}
-      {phase === 'result' && (
+      {/* result-State — SearchResults ersetzt den pre-JSON-Placeholder (Phase 8) */}
+      {phase === 'result' && searchResult && (
         <div className="flex flex-col gap-4">
-          <pre className="text-xs overflow-auto bg-muted p-4 rounded-lg max-h-96">
-            {JSON.stringify(searchResult, null, 2)}
-          </pre>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => {
-              setPhase('idle')
-              setSearchResult(null)
-              if (previewUrl) URL.revokeObjectURL(previewUrl)
-              setPreviewUrl(null)
-              setCapturedBlob(null)
+          <SearchResults
+            searchResult={searchResult}
+            displayThreshold={displayThreshold}
+            displayLimit={displayLimit}
+            onThresholdChange={setDisplayThreshold}
+            onLimitChange={(newLimit) => {
+              setDisplayLimit(newLimit)
+              // D-08: Limit-Wechsel triggert neue API-Anfrage
+              handleSearchWithLimit(newLimit)
             }}
-          >
+          />
+          <Button variant="outline" className="w-full" onClick={handleRetry}>
             <RotateCcw className="mr-2 h-4 w-4" />
             Neu aufnehmen
           </Button>
