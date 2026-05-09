@@ -273,8 +273,20 @@
   1. Clicking any result opens a detail view showing all metadata: name, part number, project, status, and upload date
   2. The detail view displays all generated thumbnails (all 6–8 orthographic views)
   3. A download button delivers the original STEP file to the user's device with the correct filename and MIME type
-**Plans**: TBD
+**Plans**: 4 plans
 **UI hint**: yes
+
+**Wave 0** *(Test-Stubs + Verzeichnisse — vor Wave 1 abschließen)*
+- [ ] 09-01-PLAN.md — Vitest-Stubs (PartDetail.test.tsx + usePartDetail.test.ts) + Playwright-Stubs + API-Verzeichnisse
+
+**Wave 1** *(parallel ausführbar, blocked on Wave 0)*
+- [ ] 09-02-PLAN.md — GET /api/parts/[id] (D-12) + GET /api/parts/[id]/thumbnails (D-13) + GET /api/parts/[id]/download (D-14)
+
+**Wave 2** *(blocked on Wave 1: API-Kontrakt muss stabil sein)*
+- [ ] 09-03-PLAN.md — usePartDetail.ts + PartDetail.tsx (vollständiges UI D-01..D-11) + page.tsx + Wave-0-Stubs aktivieren
+
+**Wave 3** *(blocked on Wave 2)*
+- [ ] 09-04-PLAN.md — Playwright E2E-Tests aktivieren + Human-Verify gegen Roadmap SC1/SC2/SC3
 
 ---
 
@@ -304,7 +316,7 @@
 | 6. Search Pipeline | 4/4 | Complete | 2026-05-09 |
 | 7. Camera UI | 4/4 | Complete | 2026-05-09 |
 | 8. Results UI | 0/4 | Not started | - |
-| 9. Part Detail | 0/? | Not started | - |
+| 9. Part Detail | 0/4 | Not started | - |
 | 10. Hardening | 0/? | Not started | - |
 
 ---
