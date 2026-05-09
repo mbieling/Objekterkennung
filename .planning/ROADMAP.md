@@ -156,7 +156,7 @@
 **Plans**: 5 plans
 
 **Wave 0** *(Toaster-Fix + Test-Stubs — vor Wave 1 abschließen)*
-- [ ] 05-01-PLAN.md — Toaster in layout.tsx mounten + 5 Vitest/Playwright-Test-Stubs
+- [x] 05-01-PLAN.md — Toaster in layout.tsx mounten + 5 Vitest/Playwright-Test-Stubs *(completed 2026-05-09)*
 
 **Wave 1** *(parallel ausführbar, blocked on Wave 0)*
 - [ ] 05-02-PLAN.md — GET /api/parts (alle Teile, kein embedding)

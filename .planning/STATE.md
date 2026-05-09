@@ -19,11 +19,11 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 5 — Admin Catalog |
-| Current Plan | — |
-| Phase Status | Phase 5 planned ✓ — Ready to execute |
+| Current Plan | 01 complete — Wave 0 done |
+| Phase Status | Phase 5 in progress — Plan 01 complete |
 | Overall Progress | 4/10 phases complete |
 
-**Progress:** ████░░░░░░ 40%
+**Progress:** ████░░░░░░ 40% (Phase 5 in progress)
 
 ---
 
@@ -35,7 +35,7 @@
 | 2 | Python Worker Spike | ✓ Complete (2026-05-08) |
 | 3 | Ingestion API + Queue | ✓ Complete (2026-05-08) |
 | 4 | Ingestion UI | ✓ Complete (2026-05-08) |
-| 5 | Admin Catalog | Planned (5 plans) — Ready to execute |
+| 5 | Admin Catalog | In Progress — Plan 01 complete (Wave 0) |
 | 6 | Search Pipeline | Not started |
 | 7 | Camera UI | Not started |
 | 8 | Results UI | Not started |
@@ -49,7 +49,7 @@
 | Metric | Value |
 |--------|-------|
 | Phases complete | 4/10 |
-| Plans complete | 17/? (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6) |
+| Plans complete | 18/? (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6, Phase 5: 1) |
 | Requirements covered | 15/15 |
 | v1 requirements done | 0/15 |
 
@@ -114,7 +114,10 @@ Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) ist gepl
 - [x] Wave 3 (04-05): UploadForm.tsx (State-Machine, SHA-256 + XHR-PUT, Duplikat-Alert) *(completed 2026-05-08)*
 - [x] Wave 4 (04-06): /upload page + Homepage-Link + Human-Verify-Checkpoint *(completed 2026-05-08)*
 
-**Nächster Schritt:** Phase 4 vollständig abgeschlossen. Phase 5 (Admin Catalog) beginnen: `/gsd-discuss-phase 5` oder `/gsd-plan-phase 5`.
+**Nächster Schritt:** Phase 5 Plan 01 (Wave 0) abgeschlossen. Plan 02 (GET /api/parts) und Plan 03 (PATCH/DELETE/archive/retry) können parallel ausgeführt werden.
+
+### Entscheidung (05-01):
+- Playwright `test.skip()` statt `test.todo()` verwenden — Playwright 1.58.2 hat keine `test.todo()` API; `test.skip()` mit leerer async-Funktion ist das etablierte Muster im Projekt (vgl. `tests/phase-04-upload.spec.ts`)
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*
