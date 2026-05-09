@@ -2,9 +2,10 @@
 
 // src/app/admin/CatalogTable.tsx
 // Phase 5 — Admin-Katalog Client Component (ADMIN-01 bis ADMIN-04).
+// Phase 10 — SC-4: Serverseitige Pagination refactored.
 // Tabs + Suche + Pagination + Edit-Sheet + Archive/Delete/Retry-Actions.
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -157,6 +158,8 @@ export function CatalogTable() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
   const [editPart, setEditPart] = useState<Part | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Part | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -170,16 +173,38 @@ export function CatalogTable() {
     defaultValues: { name: '', part_number: '', project: '', status: 'pending' },
   })
 
-  // --- Initialer Fetch ---
+  // --- Zentraler Fetch — wird bei Seiten-, Tab- und Suchwechsel aufgerufen ---
+
+  const fetchParts = useCallback(
+    async (page: number, tab: TabValue, search: string) => {
+      setIsLoading(true)
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(ROWS_PER_PAGE),
+      })
+      if (tab !== 'all') params.set('status', tab)
+      if (search) params.set('search', search)
+      try {
+        const res = await fetch(`/api/parts?${params.toString()}`)
+        if (!res.ok) throw new Error('Fetch failed')
+        const data = await res.json()
+        setParts(data.parts ?? [])
+        setTotalCount(data.total_count ?? 0)
+        setTotalPages(data.total_pages ?? 1)
+      } catch {
+        toast.error('Katalog konnte nicht geladen werden.')
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    []
+  )
+
+  // --- Re-Fetch bei Parameterwechsel (Seite, Tab, Suche) ---
 
   useEffect(() => {
-    setIsLoading(true)
-    fetch('/api/parts')
-      .then(res => res.json())
-      .then(data => setParts(data.parts ?? []))
-      .catch(() => toast.error('Katalog konnte nicht geladen werden.'))
-      .finally(() => setIsLoading(false))
-  }, [])
+    fetchParts(currentPage, activeTab, searchQuery)
+  }, [currentPage, activeTab, searchQuery, fetchParts])
 
   // --- Thumbnail-Fetch (nur für ready-Parts, gecacht) ---
 
@@ -201,37 +226,6 @@ export function CatalogTable() {
     // thumbnailUrls aus Deps entfernen um Endlosschleife zu vermeiden
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parts])
-
-  // --- Computed: filteredParts (Tab + Suche composable) ---
-
-  const filteredParts = parts
-    .filter(p => (activeTab === 'all' ? true : p.status === activeTab))
-    .filter(p => {
-      if (!searchQuery) return true
-      const q = searchQuery.toLowerCase()
-      return (
-        p.name.toLowerCase().includes(q) ||
-        (p.part_number ?? '').toLowerCase().includes(q)
-      )
-    })
-
-  // --- Computed: Pagination ---
-
-  const totalPages = Math.max(1, Math.ceil(filteredParts.length / ROWS_PER_PAGE))
-  const paginatedParts = filteredParts.slice(
-    (currentPage - 1) * ROWS_PER_PAGE,
-    currentPage * ROWS_PER_PAGE
-  )
-
-  // --- Computed: Tab-Counts ---
-
-  const tabCounts = {
-    all: parts.length,
-    ready: parts.filter(p => p.status === 'ready').length,
-    pending: parts.filter(p => p.status === 'pending').length,
-    failed: parts.filter(p => p.status === 'failed').length,
-    archived: parts.filter(p => p.status === 'archived').length,
-  }
 
   // --- Handler ---
 
@@ -361,39 +355,14 @@ export function CatalogTable() {
         </Button>
       </div>
 
-      {/* Tabs */}
+      {/* Tabs — ohne Tab-Counts (serverseitige Pagination: nur 20 Einträge geladen) */}
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList>
-          <TabsTrigger value="all">
-            Alle{' '}
-            <Badge variant="secondary" className="ml-1.5" aria-label={`${tabCounts.all} Teile`}>
-              {tabCounts.all}
-            </Badge>
-          </TabsTrigger>
-          <TabsTrigger value="ready">
-            Bereit{' '}
-            <Badge variant="secondary" className="ml-1.5" aria-label={`${tabCounts.ready} Teile`}>
-              {tabCounts.ready}
-            </Badge>
-          </TabsTrigger>
-          <TabsTrigger value="pending">
-            Ausstehend{' '}
-            <Badge variant="secondary" className="ml-1.5" aria-label={`${tabCounts.pending} Teile`}>
-              {tabCounts.pending}
-            </Badge>
-          </TabsTrigger>
-          <TabsTrigger value="failed">
-            Fehler{' '}
-            <Badge variant="secondary" className="ml-1.5" aria-label={`${tabCounts.failed} Teile`}>
-              {tabCounts.failed}
-            </Badge>
-          </TabsTrigger>
-          <TabsTrigger value="archived">
-            Archiviert{' '}
-            <Badge variant="secondary" className="ml-1.5" aria-label={`${tabCounts.archived} Teile`}>
-              {tabCounts.archived}
-            </Badge>
-          </TabsTrigger>
+          <TabsTrigger value="all">Alle</TabsTrigger>
+          <TabsTrigger value="ready">Bereit</TabsTrigger>
+          <TabsTrigger value="pending">Ausstehend</TabsTrigger>
+          <TabsTrigger value="failed">Fehler</TabsTrigger>
+          <TabsTrigger value="archived">Archiviert</TabsTrigger>
         </TabsList>
 
         {/* Suchfeld */}
@@ -435,10 +404,6 @@ export function CatalogTable() {
                 <Link href="/upload">Erstes Bauteil hochladen</Link>
               </Button>
             </div>
-          ) : filteredParts.length === 0 ? (
-            <p className="text-center py-8 text-muted-foreground">
-              Keine Teile gefunden
-            </p>
           ) : (
             <Table>
               <TableHeader>
@@ -453,7 +418,7 @@ export function CatalogTable() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedParts.map(part => (
+                {parts.map(part => (
                   <TableRow key={part.id}>
                     {/* Thumbnail */}
                     <TableCell>
@@ -541,43 +506,55 @@ export function CatalogTable() {
           )}
         </div>
 
-        {/* Pagination */}
-        {filteredParts.length > 0 && totalPages > 1 && (
+        {/* Pagination — fensterbasiert: max 5 Seitennummern um aktuelle Seite */}
+        {totalPages > 1 && parts.length > 0 && (
           <div className="mt-4 space-y-2">
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
                   <PaginationPrevious
                     href="#"
-                    onClick={e => {
-                      e.preventDefault()
-                      if (currentPage > 1) setCurrentPage(p => p - 1)
-                    }}
+                    onClick={e => { e.preventDefault(); if (currentPage > 1) setCurrentPage(p => p - 1) }}
                     aria-disabled={currentPage <= 1}
                     className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
                   />
                 </PaginationItem>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      href="#"
-                      isActive={page === currentPage}
-                      onClick={e => {
-                        e.preventDefault()
-                        setCurrentPage(page)
-                      }}
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
+                {/* Immer Seite 1 zeigen wenn weit genug weg */}
+                {currentPage > 3 && (
+                  <>
+                    <PaginationItem>
+                      <PaginationLink href="#" onClick={e => { e.preventDefault(); setCurrentPage(1) }}>1</PaginationLink>
+                    </PaginationItem>
+                    {currentPage > 4 && <PaginationItem><span className="px-2 text-muted-foreground">…</span></PaginationItem>}
+                  </>
+                )}
+                {/* Fensterpages: max 5 um currentPage */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(p => p >= Math.max(1, currentPage - 2) && p <= Math.min(totalPages, currentPage + 2))
+                  .map(page => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        href="#"
+                        isActive={page === currentPage}
+                        onClick={e => { e.preventDefault(); setCurrentPage(page) }}
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                {/* Immer letzte Seite zeigen wenn weit genug weg */}
+                {currentPage < totalPages - 2 && (
+                  <>
+                    {currentPage < totalPages - 3 && <PaginationItem><span className="px-2 text-muted-foreground">…</span></PaginationItem>}
+                    <PaginationItem>
+                      <PaginationLink href="#" onClick={e => { e.preventDefault(); setCurrentPage(totalPages) }}>{totalPages}</PaginationLink>
+                    </PaginationItem>
+                  </>
+                )}
                 <PaginationItem>
                   <PaginationNext
                     href="#"
-                    onClick={e => {
-                      e.preventDefault()
-                      if (currentPage < totalPages) setCurrentPage(p => p + 1)
-                    }}
+                    onClick={e => { e.preventDefault(); if (currentPage < totalPages) setCurrentPage(p => p + 1) }}
                     aria-disabled={currentPage >= totalPages}
                     className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}
                   />
@@ -585,10 +562,7 @@ export function CatalogTable() {
               </PaginationContent>
             </Pagination>
             <p className="text-xs text-muted-foreground text-center">
-              Zeige{' '}
-              {Math.min((currentPage - 1) * ROWS_PER_PAGE + 1, filteredParts.length)}–
-              {Math.min(currentPage * ROWS_PER_PAGE, filteredParts.length)} von{' '}
-              {filteredParts.length} Teilen
+              Zeige {Math.min((currentPage - 1) * ROWS_PER_PAGE + 1, totalCount)}–{Math.min(currentPage * ROWS_PER_PAGE, totalCount)} von {totalCount} Teilen
             </p>
           </div>
         )}
