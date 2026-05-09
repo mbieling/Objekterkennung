@@ -291,19 +291,22 @@ export function CatalogTable() {
 
   const handleSave = async (values: EditValues) => {
     if (!editPart) return
+    // Snapshot vor dem ersten await — verhindert Stale-Closure wenn editPart
+    // sich während des In-Flight-Requests ändert (Nutzer öffnet anderes Edit-Sheet).
+    const snapshot = editPart
     // Optimistic update
     const updatedPart: Part = {
-      ...editPart,
+      ...snapshot,
       name: values.name,
       part_number: values.part_number || null,
       project: values.project || null,
       status: values.status,
     }
     setParts(prev =>
-      prev.map(p => (p.id === editPart.id ? updatedPart : p))
+      prev.map(p => (p.id === snapshot.id ? updatedPart : p))
     )
     try {
-      const res = await fetch(`/api/parts/${editPart.id}`, {
+      const res = await fetch(`/api/parts/${snapshot.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -317,8 +320,8 @@ export function CatalogTable() {
       toast.success('Änderungen gespeichert.')
       // Sheet bleibt offen (D-09) — kein setSheetOpen(false)
     } catch {
-      // Rollback
-      setParts(prev => prev.map(p => (p.id === editPart.id ? editPart : p)))
+      // Rollback auf snapshot — nicht auf ggf. veraltetes editPart
+      setParts(prev => prev.map(p => (p.id === snapshot.id ? snapshot : p)))
       form.setError('root', {
         message: 'Speichern fehlgeschlagen. Bitte erneut versuchen.',
       })
