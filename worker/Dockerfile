@@ -27,4 +27,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Download erfolgt beim ersten Start (~330 MB), danach aus dem Volume geladen.
 ENV HF_HOME=/app/model_cache
 
-COPY . .
+# Dateien als worker/-Paket kopieren, damit uvicorn/celery worker.main finden
+COPY . ./worker/
