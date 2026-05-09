@@ -1,99 +1,128 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Bauteil-Finder (CAD Part Recognition)
 
-> Web-App für Ingenieure: STEP-Dateien hochladen, Bauteile per Handy-Kamera fotografieren, geometrisch ähnliche Teile in der Datenbank finden.
+Web-App für Ingenieure: STEP-Dateien hochladen, Bauteile per Handy-Kamera fotografieren, geometrisch ähnliche Teile in der Datenbank finden.
 
 ## GSD Workflow
 
 Dieses Projekt verwendet Get-Shit-Done (GSD). Planungsdokumente liegen in `.planning/`.
 
-**Aktueller Status:** Projektinitialisierung abgeschlossen — 10 Phasen definiert.
-
 **Workflow-Befehle:**
-- `/gsd-discuss-phase 1` — Phase 1 besprechen (Database Foundation)
-- `/gsd-plan-phase 1` — Phase 1 planen (PLAN.md erstellen)
-- `/gsd-execute-phase 1` — Phase 1 ausführen
 - `/gsd-progress` — Aktuellen Stand prüfen
+- `/gsd-discuss-phase N` — Phase N besprechen
+- `/gsd-plan-phase N` — Phase N planen
+- `/gsd-execute-phase N` — Phase N ausführen
 
-**Planungsdateien:**
-- `.planning/PROJECT.md` — Projektkontext und Anforderungen
-- `.planning/REQUIREMENTS.md` — 15 v1-Anforderungen mit Traceability
-- `.planning/ROADMAP.md` — 10 Phasen mit Erfolgskriterien
-- `.planning/research/` — Domain-Recherche (Stack, Features, Architektur, Pitfalls)
+**Planungsdateien:** `.planning/PROJECT.md`, `.planning/ROADMAP.md`, `.planning/research/`
 
-**Kritische Architektur-Entscheidungen (nicht ändern ohne Diskussion):**
-- Embedding: DINOv2 ViT-B/14, 768-dim, mean-pool aus 6–8 Views
-- Vektordatenbank: pgvector HNSW in Supabase (NIEMALS IVFFlat)
-- STEP-Verarbeitung: Python-Microservice (Docker), NICHT in Next.js/Vercel
-- Async-Queue: FastAPI + Celery + Redis
+## Architektur: Zwei Services
 
----
+### 1. Next.js Frontend + API (`src/`)
+- Next.js 16 App Router, TypeScript, Tailwind CSS, shadcn/ui
+- Datenbankzugriff ausschließlich über **Neon PostgreSQL** (`src/lib/db.ts`) — `db` ist ein tagged-template-literal-Client
+- S3-Zugriff über `src/lib/s3.ts` — zwei Buckets: `BUCKET_STEPS` (STEP-Dateien) und `BUCKET_THUMBNAILS` (Thumbnails + Search-Temp)
+- `src/components/ui/` sind shadcn/ui-Komponenten — **niemals neu erstellen, nur importieren**
 
-# AI Coding Starter Kit (Template-Basis)
+### 2. Python Worker (`worker/`)
+- FastAPI + Celery + Redis
+- DINOv2 ViT-B/14 für Embeddings (`worker/embedder.py`)
+- STEP → Thumbnails via OCC/PythonOCC (`worker/process_step.py`, `worker/renderer.py`)
+- Läuft als Docker-Container: `docker compose up`
 
-> A Next.js template with an AI-powered development workflow using specialized skills for Requirements, Architecture, Frontend, Backend, QA, and Deployment.
-
-## Tech Stack
-
-- **Framework:** Next.js 16 (App Router), TypeScript
-- **Styling:** Tailwind CSS + shadcn/ui (copy-paste components)
-- **Backend:** Supabase (PostgreSQL + Auth + Storage) - optional
-- **Deployment:** Vercel
-- **Validation:** Zod + react-hook-form
-- **State:** React useState / Context API
-
-## Project Structure
-
-```
-src/
-  app/              Pages (Next.js App Router)
-  components/
-    ui/             shadcn/ui components (NEVER recreate these)
-  hooks/            Custom React hooks
-  lib/              Utilities (supabase.ts, utils.ts)
-features/           Feature specifications (PROJ-X-name.md)
-  INDEX.md          Feature status overview
-docs/
-  PRD.md            Product Requirements Document
-  production/       Production guides (Sentry, security, performance)
-```
-
-## Development Workflow
-
-1. `/requirements` - Create feature spec from idea
-2. `/architecture` - Design tech architecture (PM-friendly, no code)
-3. `/frontend` - Build UI components (shadcn/ui first!)
-4. `/backend` - Build APIs, database, RLS policies
-5. `/qa` - Test against acceptance criteria + security audit
-6. `/deploy` - Deploy to Vercel + production-ready checks
-
-## Feature Tracking
-
-All features tracked in `features/INDEX.md`. Every skill reads it at start and updates it when done. Feature specs live in `features/PROJ-X-name.md`.
-
-## Key Conventions
-
-- **Feature IDs:** PROJ-1, PROJ-2, etc. (sequential)
-- **Commits:** `feat(PROJ-X): description`, `fix(PROJ-X): description`
-- **Single Responsibility:** One feature per spec file
-- **shadcn/ui first:** NEVER create custom versions of installed shadcn components
-- **Human-in-the-loop:** All workflows have user approval checkpoints
-- **Tests:** Unit tests co-located next to source files (`useHook.test.ts` next to `useHook.ts`). E2E tests in `tests/`.
-
-## Build & Test Commands
+## Build & Test
 
 ```bash
-npm run dev          # Development server (localhost:3000)
-npm run build        # Production build
-npm run lint         # ESLint
-npm run start        # Production server
-npm test             # Vitest unit/integration tests
-npm run test:e2e     # Playwright E2E tests
-npm run test:all     # Both test suites
+# Next.js
+npm run dev          # localhost:3000
+npm run build
+npm run lint
+npm test             # Vitest (unit + integration, jsdom)
+npm run test:watch   # Vitest watch mode
+npm run test:e2e     # Playwright (Chromium + Mobile Safari)
+npm run test:all     # beide Suites
+
+# Python Worker
+docker compose up               # Redis + Worker starten
+docker compose logs -f worker   # Worker-Logs
+docker compose down
+
+# Python Worker-Tests direkt (conda env aktivieren)
+cd worker && python -m pytest tests/
 ```
 
-## Product Context
+**Einzelnen Vitest-Test ausführen:**
+```bash
+npm test -- src/app/api/parts/route.test.ts
+```
 
-@docs/PRD.md
+**Vitest-Konfiguration:** Lädt `.env.local` via dotenv — Integration-Tests brauchen `DATABASE_URL`.
+
+## Upload-Flow (2-Schritt)
+
+1. `POST /api/upload/init` — SHA-256-Duplikatprüfung → `parts`-Eintrag anlegen (status=`pending`) → Presigned S3 PUT-URL zurückgeben
+2. Client lädt STEP-Datei direkt per PUT in S3
+3. `POST /api/upload/confirm` — status=`processing` → Worker `POST /enqueue` → Celery-Task
+
+## Worker-Pipeline
+
+`process_step_task` (Celery) → `process()` (`process_step.py`):
+1. STEP-Datei aus S3 herunterladen
+2. 8 Thumbnails rendern (OCC → VTK → PNG, 512×512px)
+3. Jedes Thumbnail per `GET /embed`-ähnlichem Aufruf embedden
+4. Mean-Pool über alle 8 View-Embeddings → 768-dim Vektor
+5. `embedding`, `thumbnail_urls`, `thumbnail_count`, status=`ready` in DB schreiben
+
+**Embedding-Details (`worker/embedder.py`):**
+- Modell: `facebook/dinov2-base` (gecacht in `/app/model_cache` via Dockerfile)
+- **Patch-Token Mean-Pool** (Indizes 1..256 aus `last_hidden_state`) — **KEIN CLS-Token** (Index 0)
+- Input: 224×224px (Resize VOR AutoImageProcessor)
+- Output: `np.ndarray` Shape `(768,)`
+
+## Kritische Nicht-Offensichtlichkeiten
+
+**pgvector-Query-Format:** Neon serialisiert `number[]` als PG-Array `{0.1,...}`, pgvector erwartet `[0.1,...]::vector`. Embedding immer als String übergeben:
+```typescript
+const embeddingLiteral = `[${embedding.join(',')}]`
+await db`... WHERE embedding <=> ${embeddingLiteral}::vector ...`
+```
+
+**pgvector Threshold-Filter:** Alias im WHERE ist verboten (Pitfall 3) — Cosine-Similarity-Ausdruck im WHERE vollständig wiederholen, nicht aliasieren.
+
+**VTK-Crash verhindern:** `os.environ["VTK_DEFAULT_OPENGL_WINDOW"] = "vtkOSOpenGLRenderWindow"` muss in `tasks.py` **vor allen anderen Imports** stehen.
+
+**S3 Presigned URL:** `ContentType` **nicht** in `signableHeaders` angeben — sonst Content-Type-Mismatch beim Browser-Upload.
+
+**Search-Route Timeout:** `export const maxDuration = 30` muss als Module-Level-Export in `route.ts` stehen (Next.js liest beim Build). Worker-Fetch mit `AbortSignal.timeout(28_000)`.
+
+## Datenbankschema (Neon PostgreSQL + pgvector)
+
+Tabelle `parts` — wichtigste Felder:
+- `id UUID`, `status text` (`pending`|`processing`|`ready`|`failed`|`archived`)
+- `sha256 text` — Deduplizierung beim Upload
+- `embedding vector(768)` — NULLABLE bis Worker fertig
+- `thumbnail_urls text[]`, `thumbnail_count integer`
+- `is_archived boolean` — Admin-Aktion, unabhängig von `status`
+
+**Index:** HNSW mit `vector_cosine_ops` — **NIEMALS IVFFlat ersetzen** (IVFFlat erfordert Rebuild bei wachsendem Corpus).
+
+Migration-Dateien in `supabase/migrations/` — manuell im Neon Dashboard oder via `supabase db push` einspielen. RLS ist **bewusst deaktiviert** (kein direkter Client-Zugriff auf DB).
+
+## Kritische Architektur-Entscheidungen (nicht ändern ohne Diskussion)
+
+- Embedding: DINOv2 ViT-B/14, 768-dim, Patch-Token Mean-Pool, 8 Views
+- Vektordatenbank: pgvector **HNSW** (NIEMALS IVFFlat)
+- STEP-Verarbeitung: Python-Microservice (Docker), NICHT in Next.js/Vercel
+- Async-Queue: FastAPI + Celery + Redis
+- DB-Client: Neon (`@neondatabase/serverless`), **nicht** Supabase-Client — `src/lib/db.ts` ist server-only
+
+## Tests
+
+- Unit-Tests co-located neben Quelldateien (z.B. `route.test.ts` neben `route.ts`)
+- E2E-Tests in `tests/` (Playwright)
+- Vitest mit `environment: 'jsdom'`, globals aktiv, Setup in `src/test/setup.ts`
 
 ## Feature Overview
 
