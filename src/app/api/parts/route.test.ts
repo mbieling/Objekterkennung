@@ -3,10 +3,15 @@
 // Wave 1: Implementierungen aktiviert (ersetzt Wave-0-Stubs)
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { GET } from './route'
 
-const mockDb = vi.fn()
-vi.mock('@/lib/db', () => ({ db: mockDb }))
+vi.mock('@/lib/db', () => ({
+  db: vi.fn(),
+}))
+
+import { GET } from './route'
+import { db } from '@/lib/db'
+
+const mockDb = vi.mocked(db)
 
 describe('GET /api/parts', () => {
   beforeEach(() => { mockDb.mockReset() })
