@@ -14,10 +14,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Label } from '@/components/ui/label'
 import { AlertCircle, Loader2, Upload, CheckCircle2, XCircle, RefreshCw } from 'lucide-react'
+import Link from 'next/link'
 import { usePartStatus } from '@/hooks/use-part-status'
 
 // Phasen-Zustandsautomat (RESEARCH.md Pattern 1)
@@ -184,9 +185,8 @@ export function UploadForm() {
 
       // 6. Polling starten (D-04) — Hook reaktiviert sich über polledPartId
       setPhase('polling')
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err)
-      setErrorMsg(`Upload fehlgeschlagen: ${msg}`)
+    } catch {
+      setErrorMsg('Upload fehlgeschlagen. Bitte Verbindung prüfen und erneut versuchen.')
       setPhase('error')
     }
   }
@@ -238,7 +238,13 @@ export function UploadForm() {
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Diese Datei existiert bereits — Teil-ID: {duplicateId}
+                Diese Datei wurde bereits hochgeladen.{' '}
+                <Link
+                  href={`/parts/${duplicateId}`}
+                  className="underline font-medium hover:no-underline"
+                >
+                  Zum vorhandenen Eintrag
+                </Link>
               </AlertDescription>
             </Alert>
           )}
@@ -392,10 +398,30 @@ export function UploadForm() {
                 Verarbeitung abgeschlossen. Vorschau wird geladen…
               </p>
             )}
-            {polledStatus === 'failed' && (
-              <p className="text-sm text-destructive">
-                Die Verarbeitung ist fehlgeschlagen. Bitte prüfe die STEP-Datei und versuche es erneut.
-              </p>
+            {polledStatus === 'failed' && partId && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Verarbeitung fehlgeschlagen</AlertTitle>
+                <AlertDescription>
+                  <p>Die STEP-Datei konnte nicht verarbeitet werden. Mögliche Ursachen: leere Geometrie, nicht unterstütztes STEP-Format, oder korrupte Datei.</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch(`/api/parts/${partId}/retry`, { method: 'POST' })
+                        if (!res.ok) throw new Error('Retry failed')
+                        setPhase('polling')
+                      } catch {
+                        // Fehler still ignorieren — Nutzer kann es erneut versuchen
+                      }
+                    }}
+                  >
+                    Erneut versuchen
+                  </Button>
+                </AlertDescription>
+              </Alert>
             )}
 
             {/* Verarbeitungsphasen ohne polledStatus (hashing, initializing, confirming) */}
