@@ -42,27 +42,25 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   // 3. Celery-Job über Worker-FastAPI /enqueue auslösen (D-04)
   // Worker läuft als separater Service (Docker Compose lokal / Railway prod)
-  const workerUrl = process.env.WORKER_URL ?? 'http://localhost:8000'
-  let workerResponse: Response
-  try {
-    workerResponse = await fetch(`${workerUrl}/enqueue`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ part_id }),
-    })
-  } catch (networkError) {
-    // Netzwerkfehler: Worker nicht erreichbar
-    return NextResponse.json(
-      { error: 'Worker enqueue failed', detail: 'Worker unreachable' },
-      { status: 502 }
-    )
-  }
-
-  if (!workerResponse.ok) {
-    return NextResponse.json(
-      { error: 'Worker enqueue failed' },
-      { status: 502 }
-    )
+  // Dev-Bypass: wenn WORKER_URL nicht gesetzt, Worker-Aufruf überspringen
+  const workerUrl = process.env.WORKER_URL
+  if (workerUrl) {
+    let workerResponse: Response
+    try {
+      workerResponse = await fetch(`${workerUrl}/enqueue`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ part_id }),
+      })
+    } catch {
+      return NextResponse.json(
+        { error: 'Worker enqueue failed', detail: 'Worker unreachable' },
+        { status: 502 }
+      )
+    }
+    if (!workerResponse.ok) {
+      return NextResponse.json({ error: 'Worker enqueue failed' }, { status: 502 })
+    }
   }
 
   // 4. HTTP 202 Accepted — Job ist in der Queue, Verarbeitung läuft asynchron
