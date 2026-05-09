@@ -37,6 +37,31 @@ type UploadPhase =
 const MAX_FILE_BYTES = 100 * 1024 * 1024        // 100 MB
 const STEP_EXT_RE = /\.(step|stp)$/i
 
+/**
+ * Validates that a thumbnail URL originates from an expected Supabase storage origin.
+ * Prevents rendering of attacker-controlled URLs from compromised DB records.
+ */
+function isSafeImageUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url)
+    if (parsed.protocol !== 'https:') return false
+    if (parsed.hostname.endsWith('.supabase.co')) return true
+    if (parsed.hostname.endsWith('.supabase.in')) return true
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    if (supabaseUrl) {
+      try {
+        const supabaseHost = new URL(supabaseUrl).hostname
+        if (parsed.hostname === supabaseHost) return true
+      } catch {
+        // ignore malformed env value
+      }
+    }
+    return false
+  } catch {
+    return false
+  }
+}
+
 // Zod-Schema (UI-SPEC Copywriting Contract + OQ2 RESOLVED — kein status-Feld)
 // KEIN status-Feld in Phase 4 — Init-Endpoint hardcoded 'pending'.
 // Status-Editierung kommt in Phase 5 (Admin-Katalog, ADMIN-Scope).
@@ -451,7 +476,7 @@ export function UploadForm() {
             {/* Thumbnail (D-07, D-08) — Skeleton bis URL geladen, dann <img> */}
             {phase === 'ready' && (
               <div>
-                {thumbnailUrl ? (
+                {thumbnailUrl && isSafeImageUrl(thumbnailUrl) ? (
                   <img
                     src={thumbnailUrl}
                     alt="Frontansicht"

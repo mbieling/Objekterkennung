@@ -102,6 +102,34 @@ type EditValues = z.infer<typeof editSchema>
 
 // --- Hilfsfunktionen ---
 
+/**
+ * Validates that a thumbnail URL originates from an expected Supabase storage origin.
+ * Prevents rendering of attacker-controlled URLs from compromised DB records.
+ * Allowed origins are derived from NEXT_PUBLIC_SUPABASE_URL if available.
+ */
+function isSafeImageUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url)
+    if (parsed.protocol !== 'https:') return false
+    // Allow Supabase storage CDN hostnames
+    if (parsed.hostname.endsWith('.supabase.co')) return true
+    if (parsed.hostname.endsWith('.supabase.in')) return true
+    // Allow same-origin storage if SUPABASE_URL is configured (runtime check)
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    if (supabaseUrl) {
+      try {
+        const supabaseHost = new URL(supabaseUrl).hostname
+        if (parsed.hostname === supabaseHost) return true
+      } catch {
+        // ignore malformed env value
+      }
+    }
+    return false
+  } catch {
+    return false
+  }
+}
+
 function StatusBadge({ status }: { status: Part['status'] }) {
   if (status === 'ready') {
     return (
@@ -422,7 +450,7 @@ export function CatalogTable() {
                   <TableRow key={part.id}>
                     {/* Thumbnail */}
                     <TableCell>
-                      {part.status === 'ready' && thumbnailUrls[part.id] ? (
+                      {part.status === 'ready' && thumbnailUrls[part.id] && isSafeImageUrl(thumbnailUrls[part.id]) ? (
                         <img
                           src={thumbnailUrls[part.id]}
                           alt={part.name}
@@ -578,7 +606,7 @@ export function CatalogTable() {
           {/* Thumbnail im Sheet */}
           {editPart && (
             <div className="flex justify-center py-4">
-              {editPart.status === 'ready' && thumbnailUrls[editPart.id] ? (
+              {editPart.status === 'ready' && thumbnailUrls[editPart.id] && isSafeImageUrl(thumbnailUrls[editPart.id]) ? (
                 <img
                   src={thumbnailUrls[editPart.id]}
                   alt={`Vorschau: ${editPart.name}`}
