@@ -517,7 +517,7 @@ export async function GET(
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Download-URL TTL für große Dateien**
    - Was wir wissen: STEP-Dateien bis 100MB; thumbnail/route.ts verwendet 60s
