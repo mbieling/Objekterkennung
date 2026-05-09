@@ -103,27 +103,18 @@ type EditValues = z.infer<typeof editSchema>
 // --- Hilfsfunktionen ---
 
 /**
- * Validates that a thumbnail URL originates from an expected Supabase storage origin.
+ * Validates that a thumbnail URL originates from an expected storage origin.
  * Prevents rendering of attacker-controlled URLs from compromised DB records.
- * Allowed origins are derived from NEXT_PUBLIC_SUPABASE_URL if available.
+ * Allowed: Supabase CDN, AWS S3 (prod), localhost/MinIO (dev).
  */
 function isSafeImageUrl(url: string): boolean {
   try {
     const parsed = new URL(url)
-    if (parsed.protocol !== 'https:') return false
-    // Allow Supabase storage CDN hostnames
+    if (parsed.protocol !== 'https:' && !(parsed.protocol === 'http:' && parsed.hostname === 'localhost')) return false
     if (parsed.hostname.endsWith('.supabase.co')) return true
     if (parsed.hostname.endsWith('.supabase.in')) return true
-    // Allow same-origin storage if SUPABASE_URL is configured (runtime check)
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    if (supabaseUrl) {
-      try {
-        const supabaseHost = new URL(supabaseUrl).hostname
-        if (parsed.hostname === supabaseHost) return true
-      } catch {
-        // ignore malformed env value
-      }
-    }
+    if (parsed.hostname.endsWith('.amazonaws.com')) return true
+    if (parsed.hostname === 'localhost') return true
     return false
   } catch {
     return false

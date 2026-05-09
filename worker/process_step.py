@@ -153,13 +153,14 @@ def process(part_id: str) -> None:
             assert mean_embedding.shape == (768,), f"Embedding-Shape: {mean_embedding.shape}"
             logger.info(f"[{part_id}] Mean-Embedding: shape={mean_embedding.shape}, norm={np.linalg.norm(mean_embedding):.4f}")
 
-            # Schritt 7: DB schreiben (embedding, thumbnail_urls, status='ready')
+            # Schritt 7: DB schreiben (embedding, thumbnail_urls, thumbnail_count, status='ready')
             cur.execute("""
                 UPDATE parts SET
                     embedding = %s,
                     embedding_model = %s,
                     embedding_version = %s,
                     thumbnail_urls = %s,
+                    thumbnail_count = %s,
                     status = 'ready'
                 WHERE id = %s
             """, (
@@ -167,6 +168,7 @@ def process(part_id: str) -> None:
                 "dinov2-base",           # embedding_model
                 "facebook/dinov2-base",  # embedding_version
                 thumbnail_urls,          # list[str] → text[]
+                len(png_paths),          # thumbnail_count — benötigt von /api/parts/[id]/thumbnails
                 part_id
             ))
             conn.commit()
