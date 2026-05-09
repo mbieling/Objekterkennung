@@ -219,10 +219,10 @@
 **UI hint**: yes
 
 **Wave 0** *(Test-Stubs — vor Wave 1 abschliessen)*
-- [ ] 07-01-PLAN.md — Vitest-Stubs (CameraCapture.test.tsx) + Playwright-Stubs (phase-07-camera-ui.spec.ts)
+- [x] 07-01-PLAN.md — Vitest-Stubs (CameraCapture.test.tsx) + Playwright-Stubs (phase-07-camera-ui.spec.ts) *(completed 2026-05-09)*
 
 **Wave 1** *(parallel nach Wave 0)*
-- [ ] 07-02-PLAN.md — CameraCapture.tsx (vollstaendige State Machine) + src/app/search/page.tsx (Server Component)
+- [x] 07-02-PLAN.md — CameraCapture.tsx (vollstaendige State Machine) + src/app/search/page.tsx (Server Component) *(completed 2026-05-09)*
 
 **Wave 2** *(nach Wave 1)*
 - [ ] 07-03-PLAN.md — Homepage D-02 (zweiter Button) + CameraCapture.test.tsx Tests aktivieren

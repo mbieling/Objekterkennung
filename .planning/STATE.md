@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-09 (Phase 7 Plan 01 abgeschlossen — Wave 0 Testgerüst: CameraCapture.test.tsx + phase-07-camera-ui.spec.ts)
+**Last updated:** 2026-05-09 (Phase 7 Plan 02 abgeschlossen — Wave 1: CameraCapture.tsx vollständige State Machine + /search page.tsx)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 7 in progress — Plan 01 (Wave 0) complete, Plan 02 (Wave 1: CameraCapture.tsx) ist nächste Phase
+**Planning status:** Phase 7 in progress — Plan 02 (Wave 1) complete, Plan 03 next
 
 ---
 
@@ -19,7 +19,7 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 7 — Camera UI |
-| Current Plan | 01 complete — 02 next |
+| Current Plan | 02 complete — 03 next |
 | Phase Status | In progress |
 | Overall Progress | 6/10 phases complete |
 
@@ -37,7 +37,7 @@
 | 4 | Ingestion UI | ✓ Complete (2026-05-08) |
 | 5 | Admin Catalog | ✓ Complete (2026-05-09) |
 | 6 | Search Pipeline | ✓ Complete (2026-05-09) |
-| 7 | Camera UI | In progress — Plan 01 done (Wave 0) |
+| 7 | Camera UI | In progress — Plan 02 done (Wave 1) |
 | 8 | Results UI | Not started |
 | 9 | Part Detail | Not started |
 | 10 | Hardening | Not started |
@@ -104,7 +104,7 @@
 
 ### Next Action
 
-Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) ist geplant und bereit zur Ausführung.
+Phase 7 Plan 02 (Wave 1) abgeschlossen (2026-05-09). Nächster Schritt: Plan 07-03 (Wave 2) — Homepage-Links + Navigation zur /search-Seite.
 
 **Phase 4 — Geplante Pläne (6 Pläne in 5 Waves):**
 - [x] Wave 0 (04-01): Migration 002_add_thumbnail_count.sql + supabase db push [BLOCKING] + 5 Test-Stubs *(completed 2026-05-08)*
@@ -146,6 +146,11 @@ Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) ist gepl
 - `it.todo()` statt `test.skip` für Vitest-Stubs — korrekte todo-Semantik, Tests werden als "todo" markiert ohne zu fehlschlagen oder übersprungen zu werden.
 - `Object.defineProperty(global.navigator, 'mediaDevices', { value: { getUserMedia: vi.fn() }, writable: true, configurable: true })` — jsdom hat kein `navigator.mediaDevices`; direkte Eigenschaftszuweisung würde TypeError werfen.
 - `HTMLCanvasElement.prototype.toBlob = vi.fn(callback => callback(blob))` — jsdom implementiert `toBlob` nicht; synchroner Mock triggert den Callback sofort.
+
+### Entscheidung (07-02):
+- `HTMLCanvasElement.prototype.getContext = vi.fn(() => ({ drawImage: vi.fn() }))` — jsdom gibt `null` für `getContext('2d')` zurück; Mock erforderlich damit `captureFrame()` nicht mit TypeError crasht.
+- Named export `{ CameraCapture }` (nicht default) — konsistent mit UploadForm-Pattern und CameraCapture.test.tsx-Import.
+- result-State zeigt JSON in `<pre>` als expliziter D-10 Placeholder — Phase 8 (Results UI) ersetzt dies durch echte Ergebnisdarstellung.
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*
