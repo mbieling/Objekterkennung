@@ -46,7 +46,7 @@ async function setupMocks(page: import('@playwright/test').Page) {
 }
 
 test.describe('Phase 9: Part Detail', () => {
-  test.skip('DETAIL-01: Detailseite zeigt alle Metadatenfelder', async ({ page }) => {
+  test('DETAIL-01: Detailseite zeigt alle Metadatenfelder', async ({ page }) => {
     await setupMocks(page)
     await page.goto(`/parts/${TEST_PART_ID}`)
     await expect(page.getByText('Flansch M12')).toBeVisible({ timeout: 10_000 })
@@ -55,13 +55,13 @@ test.describe('Phase 9: Part Detail', () => {
     await expect(page.getByText('Bereit')).toBeVisible()
   })
 
-  test.skip('DETAIL-01: "← Zurück zur Suche"-Link sichtbar', async ({ page }) => {
+  test('DETAIL-01: "← Zurück zur Suche"-Link sichtbar', async ({ page }) => {
     await setupMocks(page)
     await page.goto(`/parts/${TEST_PART_ID}`)
     await expect(page.getByText('Zurück zur Suche')).toBeVisible({ timeout: 10_000 })
   })
 
-  test.skip('DETAIL-02: Download-Button für ready-Part aktiviert', async ({ page }) => {
+  test('DETAIL-02: Download-Button für ready-Part aktiviert', async ({ page }) => {
     await setupMocks(page)
     await page.goto(`/parts/${TEST_PART_ID}`)
     const downloadBtn = page.getByRole('button', { name: /STEP herunterladen/i })
@@ -69,13 +69,27 @@ test.describe('Phase 9: Part Detail', () => {
     await expect(downloadBtn).not.toBeDisabled()
   })
 
-  test.skip('DETAIL-02: Download-Button ruft /download-Endpunkt auf bei Klick', async ({ page }) => {
+  test('DETAIL-02: Download-Button ruft /download-Endpunkt auf bei Klick', async ({ page }) => {
     await setupMocks(page)
+
+    // Download-Endpoint-Call tracken
+    let downloadCalled = false
+    await page.route(`**/api/parts/${TEST_PART_ID}/download`, async route => {
+      downloadCalled = true
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ url: 'https://s3.example.com/test.step', filename: 'Flansch_M12.step' }),
+      })
+    })
+
     await page.goto(`/parts/${TEST_PART_ID}`)
     const downloadBtn = page.getByRole('button', { name: /STEP herunterladen/i })
     await expect(downloadBtn).toBeVisible({ timeout: 10_000 })
-    // Download-Klick — window.location.href-Redirect passiert in Test-Umgebung nicht,
-    // aber der Fetch-Call ist verifizierbar via Route-Interception
     await downloadBtn.click()
+
+    // Kurz warten damit fetch() abgeschlossen werden kann
+    await page.waitForTimeout(500)
+    expect(downloadCalled).toBe(true)
   })
 })
