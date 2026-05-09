@@ -590,7 +590,9 @@ export function CatalogTable() {
               </PaginationContent>
             </Pagination>
             <p className="text-xs text-muted-foreground text-center">
-              Zeige {Math.min((currentPage - 1) * ROWS_PER_PAGE + 1, totalCount)}–{Math.min(currentPage * ROWS_PER_PAGE, totalCount)} von {totalCount} Teilen
+              {totalCount === 0
+                ? 'Keine Teile gefunden'
+                : `Zeige ${Math.min((currentPage - 1) * ROWS_PER_PAGE + 1, totalCount)}–${Math.min(currentPage * ROWS_PER_PAGE, totalCount)} von ${totalCount} Teilen`}
             </p>
           </div>
         )}
