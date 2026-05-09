@@ -17,7 +17,7 @@
 - [x] **Phase 6: Search Pipeline** — Photo-to-embedding, pgvector cosine query, ranked results returned by API *(completed 2026-05-09)*
 - [x] **Phase 7: Camera UI** — Mobile camera capture and file upload fallback wired to search pipeline *(completed 2026-05-09)*
 - [x] **Phase 8: Results UI** — Ranked results grid with match percentage, configurable threshold and result count *(completed 2026-05-09)*
-- [ ] **Phase 9: Part Detail** — Full metadata view and STEP file download
+- [x] **Phase 9: Part Detail** — Full metadata view and STEP file download *(completed 2026-05-09)*
 - [ ] **Phase 10: Hardening** — Error handling, edge cases, mobile polish, performance validation
 
 ---
@@ -277,16 +277,16 @@
 **UI hint**: yes
 
 **Wave 0** *(Test-Stubs + Verzeichnisse — vor Wave 1 abschließen)*
-- [ ] 09-01-PLAN.md — Vitest-Stubs (PartDetail.test.tsx + usePartDetail.test.ts) + Playwright-Stubs + API-Verzeichnisse
+- [x] 09-01-PLAN.md — Vitest-Stubs (PartDetail.test.tsx + usePartDetail.test.ts) + Playwright-Stubs + API-Verzeichnisse *(completed 2026-05-09)*
 
 **Wave 1** *(parallel ausführbar, blocked on Wave 0)*
-- [ ] 09-02-PLAN.md — GET /api/parts/[id] (D-12) + GET /api/parts/[id]/thumbnails (D-13) + GET /api/parts/[id]/download (D-14)
+- [x] 09-02-PLAN.md — GET /api/parts/[id] (D-12) + GET /api/parts/[id]/thumbnails (D-13) + GET /api/parts/[id]/download (D-14) *(completed 2026-05-09)*
 
 **Wave 2** *(blocked on Wave 1: API-Kontrakt muss stabil sein)*
-- [ ] 09-03-PLAN.md — usePartDetail.ts + PartDetail.tsx (vollständiges UI D-01..D-11) + page.tsx + Wave-0-Stubs aktivieren
+- [x] 09-03-PLAN.md — usePartDetail.ts + PartDetail.tsx (vollständiges UI D-01..D-11) + page.tsx + Wave-0-Stubs aktivieren *(completed 2026-05-09)*
 
 **Wave 3** *(blocked on Wave 2)*
-- [ ] 09-04-PLAN.md — Playwright E2E-Tests aktivieren + Human-Verify gegen Roadmap SC1/SC2/SC3
+- [x] 09-04-PLAN.md — Playwright E2E-Tests aktivieren + Human-Verify gegen Roadmap SC1/SC2/SC3 *(completed 2026-05-09, human-verify approved)*
 
 ---
 
@@ -315,8 +315,8 @@
 | 5. Admin Catalog | 5/5 | Complete | 2026-05-09 |
 | 6. Search Pipeline | 4/4 | Complete | 2026-05-09 |
 | 7. Camera UI | 4/4 | Complete | 2026-05-09 |
-| 8. Results UI | 0/4 | Not started | - |
-| 9. Part Detail | 0/4 | Not started | - |
+| 8. Results UI | 4/4 | Complete | 2026-05-09 |
+| 9. Part Detail | 4/4 | Complete | 2026-05-09 |
 | 10. Hardening | 0/? | Not started | - |
 
 ---

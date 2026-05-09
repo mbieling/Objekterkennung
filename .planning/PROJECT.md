@@ -17,6 +17,8 @@ Ein Ingenieur fotografiert ein Bauteil mit dem Handy und sieht in Sekunden, ob e
 - [x] Treffer werden mit Metadaten angezeigt (Name, Teilenummer, Projekt) — Validated in Phase 8: Results UI
 - [x] Ähnlichkeitsschwellwert ist konfigurierbar — Validated in Phase 8: Results UI
 - [x] Anzahl der angezeigten Treffer ist konfigurierbar — Validated in Phase 8: Results UI
+- [x] Vollständige Metadaten eines Treffers einsehbar (Name, Teilenummer, Projekt, Status, Datum, alle Thumbnail-Views) — Validated in Phase 9: Part Detail
+- [x] Original-STEP-Datei herunterladbar (Presigned URL, korrekter Dateiname) — Validated in Phase 9: Part Detail
 
 ### Active
 
@@ -80,4 +82,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-09 — Phase 8 complete (Results UI — ranked grid, threshold slider, limit select)*
+*Last updated: 2026-05-09 — Phase 9 complete (Part Detail — metadata view, thumbnail gallery, STEP download)*

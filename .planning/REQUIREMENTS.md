@@ -31,8 +31,8 @@
 
 ### Bauteil-Detailseite
 
-- [ ] **DETAIL-01**: Nutzer kann die vollständigen Metadaten eines gefundenen Bauteils einsehen
-- [ ] **DETAIL-02**: Nutzer kann die Original-STEP-Datei herunterladen
+- [x] **DETAIL-01**: Nutzer kann die vollständigen Metadaten eines gefundenen Bauteils einsehen
+- [x] **DETAIL-02**: Nutzer kann die Original-STEP-Datei herunterladen
 
 ## v2 Anforderungen
 
@@ -82,8 +82,8 @@
 | SEARCH-03 | Phase 8 — Results UI | Pending |
 | SEARCH-04 | Phase 8 — Results UI | Pending |
 | SEARCH-05 | Phase 8 — Results UI | Pending |
-| DETAIL-01 | Phase 9 — Part Detail | Pending |
-| DETAIL-02 | Phase 9 — Part Detail | Pending |
+| DETAIL-01 | Phase 9 — Part Detail | ✓ Validated |
+| DETAIL-02 | Phase 9 — Part Detail | ✓ Validated |
 
 **Abdeckung:**
 - v1-Anforderungen: 15 gesamt
