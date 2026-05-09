@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-09 (Phase 4 abgeschlossen — Human-Verify approved)
+**Last updated:** 2026-05-09 (Phase 5 geplant — 5 Pläne erstellt, bereit zur Ausführung)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 4 abgeschlossen — Phase 5 bereit
+**Planning status:** Phase 5 geplant — bereit zur Ausführung
 
 ---
 
@@ -10,7 +10,7 @@
 
 **Core Value:** Ein Ingenieur fotografiert ein Bauteil mit dem Handy und sieht in Sekunden, ob ein geometrisch ähnliches Teil bereits in der Datenbank existiert.
 
-**Current Focus:** Phase 3 (Ingestion API + Queue) — geplant, bereit zur Ausführung
+**Current Focus:** Phase 5 (Admin Catalog) — geplant, bereit zur Ausführung
 
 ---
 
@@ -20,7 +20,7 @@
 |-------|-------|
 | Current Phase | 5 — Admin Catalog |
 | Current Plan | — |
-| Phase Status | Phase 4 complete ✓ — Phase 5 not started |
+| Phase Status | Phase 5 planned ✓ — Ready to execute |
 | Overall Progress | 4/10 phases complete |
 
 **Progress:** ████░░░░░░ 40%
@@ -35,7 +35,7 @@
 | 2 | Python Worker Spike | ✓ Complete (2026-05-08) |
 | 3 | Ingestion API + Queue | ✓ Complete (2026-05-08) |
 | 4 | Ingestion UI | ✓ Complete (2026-05-08) |
-| 5 | Admin Catalog | Not started |
+| 5 | Admin Catalog | Planned (5 plans) — Ready to execute |
 | 6 | Search Pipeline | Not started |
 | 7 | Camera UI | Not started |
 | 8 | Results UI | Not started |

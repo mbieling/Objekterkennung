@@ -153,8 +153,24 @@
   2. Admin can click any part and edit its name, part number, project, and status fields, with changes persisted on save
   3. Admin can archive or delete a part; archived parts no longer appear in search results
   4. Admin can trigger a retry for any part in `failed` status, which re-enqueues the job and resets the status to `pending`
-**Plans**: TBD
+**Plans**: 5 plans
+
+**Wave 0** *(Toaster-Fix + Test-Stubs — vor Wave 1 abschließen)*
+- [ ] 05-01-PLAN.md — Toaster in layout.tsx mounten + 5 Vitest/Playwright-Test-Stubs
+
+**Wave 1** *(parallel ausführbar, blocked on Wave 0)*
+- [ ] 05-02-PLAN.md — GET /api/parts (alle Teile, kein embedding)
+- [ ] 05-03-PLAN.md — PATCH + DELETE /api/parts/[id] + POST /archive + POST /retry
+
+**Wave 2** *(blocked on Wave 1: API-Design muss stabil sein)*
+- [ ] 05-04-PLAN.md — /admin page.tsx + CatalogTable.tsx (Tabs, Suche, Pagination, Sheet, AlertDialog)
+
+**Wave 3** *(blocked on Wave 2: UI muss vorhanden sein)*
+- [ ] 05-05-PLAN.md — Playwright E2E Smoke-Tests + Human-Verify-Checkpoint
+
 **UI hint**: yes
+
+**Downstream-Constraint für Phase 6:** Phase 6 MUSS `WHERE status = 'ready'` als Filter verwenden. Das `is_archived`-Boolean-Feld wird in Phase 5 NICHT beschrieben — Phase 6 darf NICHT `WHERE is_archived = false` nutzen.
 
 ---
 
