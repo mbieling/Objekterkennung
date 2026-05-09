@@ -1,5 +1,5 @@
 // src/app/page.tsx
-// Phase 4 — minimale Landing-Page (D-02). Späterer Dashboard-Ausbau in Phase 5+.
+// Phase 4 — Landing-Page. Phase 7 — zweiter Button "Teil suchen" (D-02).
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -7,9 +7,14 @@ import { Button } from '@/components/ui/button'
 export default function Home() {
   return (
     <main className="min-h-screen flex items-center justify-center p-8">
-      <Button asChild>
-        <Link href="/upload">Teil hochladen</Link>
-      </Button>
+      <div className="flex gap-4 flex-wrap justify-center">
+        <Button asChild>
+          <Link href="/upload">Teil hochladen</Link>
+        </Button>
+        <Button variant="outline" asChild>
+          <Link href="/search">Teil suchen</Link>
+        </Button>
+      </div>
     </main>
   )
 }
