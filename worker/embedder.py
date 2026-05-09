@@ -1,7 +1,7 @@
 # worker/embedder.py
 # DINOv2 ViT-B/14 Inferenz für CAD-Part-Embeddings.
 # Modell wird beim Modulimport einmalig geladen (~3s).
-# TRANSFORMERS_CACHE=/app/model_cache (Dockerfile) — kein HuggingFace-Download zur Laufzeit.
+# HF_HOME=/app/model_cache (Dockerfile) — kein HuggingFace-Download zur Laufzeit.
 
 import logging
 import numpy as np
