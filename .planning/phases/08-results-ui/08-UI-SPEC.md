@@ -54,6 +54,7 @@ Deklarierte Werte (Vielfache von 4 — konsistent mit CameraCapture.tsx):
 | 3xl | 64px | — (nicht verwendet in dieser Phase) |
 
 Ausnahmen:
+- **12px (`gap-3`):** Karten-Gap im Ergebnis-Grid — leicht kompakter als `gap-4`, da Karten selbst bereits Höhe haben. Auch intern im Karten-Flex-Layout (`flex gap-3`).
 - Touch-Target für Karten-Links: mindestens 44px Klickfläche (durch volle Kartenbreite erfüllt)
 - Slider-Thumb: Radix-Standard 20px, per Tailwind auf 20px belassen (kein Override nötig)
 
@@ -90,8 +91,10 @@ Ausnahmen:
 
 ### Ergebnis-Grid (D-01, D-02)
 
-- `flex flex-col gap-3` — 12px zwischen Karten (leicht kompakter als Standard-gap-4, da Karten selbst bereits Höhe haben)
+- `flex flex-col gap-3` — 12px zwischen Karten (deklarierte Ausnahme, siehe Spacing Scale)
 - Jede Karte: volle Breite, `<Link href="/parts/[id]">` als Wrapper
+
+**Primärer Fokuspunkt:** Match-%-Badge auf der führenden Trefferkarte (höchste Ähnlichkeit, erste Position im Grid).
 
 ---
 
@@ -170,12 +173,12 @@ Quelle: Bestehende Tailwind-Token aus globals.css (Slate-Basis, CSS-Variablen).
 
 | Role | Size | Weight | Line Height | Tailwind |
 |------|------|--------|-------------|---------|
-| Body | 14px | 400 (regular) | 1.5 | `text-sm` |
-| Label | 14px | 500 (medium) | 1.5 | `text-sm font-medium` |
-| Card-Titel (Name) | 14px | 500 (medium) | 1.25 (tight) | `text-sm font-medium leading-tight` |
-| Seitenüberschrift | 24px | 600 (semibold) | 1.2 | `text-2xl font-semibold` |
+| Body / Muted Labels | 14px | 400 (regular) | 1.5 | `text-sm` |
+| Card-Titel, Controls-Wert | 14px | 500 (medium) | 1.25 (tight) | `text-sm font-medium` |
 
-Zwei Gewichte: 400 (regular) + 500 (medium) für kompakte Karten. 600 (semibold) nur für die Seitenüberschrift (erbt von page.tsx — wird nicht neu definiert).
+Zwei Gewichte: 400 (regular) + 500 (medium).
+
+¹ Die Seitenüberschrift (`text-2xl font-semibold`) erbt `font-semibold` aus dem bestehenden `page.tsx`-Layout — dieses Gewicht (600) wird in Phase 8 nicht neu eingeführt und erscheint daher nicht in dieser Tabelle.
 
 ---
 
@@ -187,7 +190,7 @@ Quelle: CSS-Variablen aus globals.css — Slate-Palette, kein Dark-Mode-Toggle i
 |------|-------------|------------|-------|
 | Dominant (60%) | `--background` | #ffffff | Seitenhintergrund, Karten-Hintergrund |
 | Secondary (30%) | `--muted` | #f1f5f9 | Thumbnail-Placeholder, Skeleton, leerer Thumbnail-Slot |
-| Accent (10%) | `--primary` | #0f172a | Primär-Buttons ("Suchen", "Kamera starten") |
+| Accent (10%) | `--primary` | #0f172a | Primär-Buttons ("Bauteil suchen", "Kamera starten") |
 | Destructive | `--destructive` | #ef4444 | Nicht in dieser Phase verwendet |
 
 Accent (primary) reserviert für: primäre Action-Buttons. Slider-Thumb und Select-Focus-Ring erben `--ring` (Slate).
@@ -208,8 +211,8 @@ Diese Farben sind ausschließlich für Match-%-Badges reserviert.
 
 | Element | Copy |
 |---------|------|
-| Primäre CTA (Suche starten) | "Suchen" (Button mit Search-Icon) |
-| CTA (neue Suche) | "Neu aufnehmen" (Button mit RotateCcw-Icon) — bereits in Phase 7 |
+| Primäre CTA (Suche starten) | "Bauteil suchen" (Button mit Search-Icon) |
+| CTA (neue Suche) | "Neu aufnehmen" (Button mit RotateCcw-Icon) — geerbt aus Phase 7, nicht neu definiert |
 | Controls-Label Slider | "Ähnlichkeit" |
 | Controls-Label Select | "Ergebnisse" |
 | Slider-Wert-Anzeige | "{N}%" (z.B. "50%") |
