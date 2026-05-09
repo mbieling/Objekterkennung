@@ -13,6 +13,31 @@ const ParamsSchema = z.object({
   id: z.string().uuid('id muss eine gültige UUID sein'),
 })
 
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
+  const { id } = await params
+
+  const parsed = ParamsSchema.safeParse({ id })
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Invalid id', details: parsed.error.flatten() },
+      { status: 400 }
+    )
+  }
+
+  const rows = await db`
+    SELECT id, name, part_number, project, status, thumbnail_count, created_at
+    FROM parts WHERE id = ${id} LIMIT 1
+  `
+  if (rows.length === 0) {
+    return NextResponse.json({ error: 'Part not found' }, { status: 404 })
+  }
+
+  return NextResponse.json({ part: rows[0] })
+}
+
 // 'archived' bewusst NICHT in der Enum — Archivierung nur via /archive-Route (D-10, Pitfall 4)
 const PatchSchema = z.object({
   name: z.string().min(1).max(200).optional(),
