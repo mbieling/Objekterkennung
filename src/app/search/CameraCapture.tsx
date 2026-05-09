@@ -161,7 +161,7 @@ function CameraCapture() {
     if (!file) return
     // T-7-01: MIME-Typ-Check (Threat Modell: Tampering)
     if (!file.type.startsWith('image/')) {
-      setErrorMessage('Nur Bilddateien erlaubt.')
+      setErrorMessage('Nur Bilddateien (JPEG, PNG) erlaubt.')
       return
     }
     setCapturedBlob(file)
@@ -193,9 +193,14 @@ function CameraCapture() {
       setSearchResult(data)
       setPhase('result')
     } catch (err) {
-      const msg = err instanceof DOMException && err.name === 'AbortError'
-        ? 'Suche hat zu lange gedauert. Bitte erneut versuchen.'
-        : 'Suche fehlgeschlagen. Bitte überprüfe deine Verbindung und versuche es erneut.'
+      let msg: string
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        msg = 'Suche hat zu lange gedauert. Bitte erneut versuchen.'
+      } else if (err instanceof Error && err.message.startsWith('HTTP ')) {
+        msg = 'Suche fehlgeschlagen (Server-Fehler). Bitte erneut versuchen.'
+      } else {
+        msg = 'Suche fehlgeschlagen. Bitte überprüfe deine Verbindung und versuche es erneut.'
+      }
       setErrorMessage(msg)
       setPhase('error')
     } finally {
@@ -222,9 +227,14 @@ function CameraCapture() {
       setSearchResult(data)
       setPhase('result')
     } catch (err) {
-      const msg = err instanceof DOMException && err.name === 'AbortError'
-        ? 'Suche hat zu lange gedauert. Bitte erneut versuchen.'
-        : 'Suche fehlgeschlagen. Bitte überprüfe deine Verbindung und versuche es erneut.'
+      let msg: string
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        msg = 'Suche hat zu lange gedauert. Bitte erneut versuchen.'
+      } else if (err instanceof Error && err.message.startsWith('HTTP ')) {
+        msg = 'Suche fehlgeschlagen (Server-Fehler). Bitte erneut versuchen.'
+      } else {
+        msg = 'Suche fehlgeschlagen. Bitte überprüfe deine Verbindung und versuche es erneut.'
+      }
       setErrorMessage(msg)
       setPhase('error')
     } finally {
@@ -236,7 +246,7 @@ function CameraCapture() {
   // Wiederverwendbarer File-Input-Trigger (D-06: in allen States außer searching)
   // ---------------------------------------------------------------------------
   const FileInputTrigger = (
-    <Button variant="ghost" className="w-full" onClick={() => fileInputRef.current?.click()}>
+    <Button variant="ghost" className="w-full min-h-[44px]" onClick={() => fileInputRef.current?.click()}>
       <Upload className="mr-2 h-4 w-4" />
       Foto aus Galerie wählen
     </Button>
@@ -265,7 +275,7 @@ function CameraCapture() {
                 <AlertDescription>{errorMessage}</AlertDescription>
               </Alert>
             )}
-            <Button className="w-full" onClick={handleStartCamera}>
+            <Button className="w-full min-h-[44px]" onClick={handleStartCamera}>
               <Camera className="mr-2 h-4 w-4" />
               Kamera starten
             </Button>
@@ -319,11 +329,11 @@ function CameraCapture() {
             />
           )}
           <div className="flex gap-4">
-            <Button className="flex-1" onClick={handleSearch}>
+            <Button className="flex-1 min-h-[44px]" onClick={handleSearch}>
               <Search className="mr-2 h-4 w-4" />
               Suchen
             </Button>
-            <Button variant="outline" className="flex-1" onClick={handleRetry}>
+            <Button variant="outline" className="flex-1 min-h-[44px]" onClick={handleRetry}>
               <RotateCcw className="mr-2 h-4 w-4" />
               Wiederholen
             </Button>
@@ -373,7 +383,7 @@ function CameraCapture() {
               handleSearchWithLimit(newLimit)
             }}
           />
-          <Button variant="outline" className="w-full" onClick={handleRetry}>
+          <Button variant="outline" className="w-full min-h-[44px]" onClick={handleRetry}>
             <RotateCcw className="mr-2 h-4 w-4" />
             Neu aufnehmen
           </Button>
@@ -388,7 +398,7 @@ function CameraCapture() {
           </Alert>
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full min-h-[44px]"
             onClick={() => {
               setPhase('idle')
               setErrorMessage(null)
