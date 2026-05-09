@@ -45,16 +45,11 @@ interface SearchResponse {
 // ---------------------------------------------------------------------------
 
 // D-04: facingMode ideal (nicht exact) — fällt auf Frontkamera zurück statt Hard-Error
-async function startCamera(videoRef: React.RefObject<HTMLVideoElement | null>): Promise<MediaStream> {
-  const stream = await navigator.mediaDevices.getUserMedia({
+async function startCamera(): Promise<MediaStream> {
+  return navigator.mediaDevices.getUserMedia({
     video: { facingMode: { ideal: 'environment' } },
     audio: false,
   })
-  if (videoRef.current) {
-    videoRef.current.srcObject = stream
-    await videoRef.current.play()
-  }
-  return stream
 }
 
 // Claude's Discretion: max 1024px Breite, JPEG 0.85
@@ -90,6 +85,21 @@ function CameraCapture() {
   const streamRef = useRef<MediaStream | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Stream → video-Element verbinden, sobald 'previewing' aktiv ist und das DOM-Element existiert.
+  // Ohne diesen Effect wäre videoRef.current null (video nicht gerendert während 'requesting').
+  useEffect(() => {
+    if (phase === 'previewing' && streamRef.current && videoRef.current) {
+      try {
+        videoRef.current.srcObject = streamRef.current
+      } catch {
+        // jsdom unterstützt srcObject nicht — in Tests ignorieren
+      }
+      videoRef.current.play().catch(() => {
+        // play() kann fehlschlagen wenn der Nutzer navigiert oder in Tests — ignorieren
+      })
+    }
+  }, [phase])
+
   // Stream-Cleanup beim Unmount (Pattern 4 aus RESEARCH.md)
   useEffect(() => {
     return () => {
@@ -109,9 +119,9 @@ function CameraCapture() {
   async function handleStartCamera() {
     setPhase('requesting')
     try {
-      const stream = await startCamera(videoRef)
+      const stream = await startCamera()
       streamRef.current = stream
-      setPhase('previewing')
+      setPhase('previewing')  // löst den useEffect aus, der srcObject setzt
     } catch (err) {
       const isDomException = err instanceof DOMException
       const isNotAllowed = isDomException && err.name === 'NotAllowedError'

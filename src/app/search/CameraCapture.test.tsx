@@ -27,6 +27,11 @@ function mockGetUserMedia(success: boolean) {
 }
 
 // ---------------------------------------------------------------------------
+// HTMLVideoElement.prototype.play Mock (jsdom implementiert play() nicht)
+// ---------------------------------------------------------------------------
+HTMLVideoElement.prototype.play = vi.fn().mockResolvedValue(undefined)
+
+// ---------------------------------------------------------------------------
 // canvas.toBlob Mock + getContext Mock (jsdom implementiert beides nicht vollständig)
 // ---------------------------------------------------------------------------
 const fakeBlob = new Blob(['fake-image'], { type: 'image/jpeg' })
