@@ -14,7 +14,7 @@
 - [x] **Phase 3: Ingestion API + Queue** — Upload endpoint, job dispatch, SHA-256 deduplication, status tracking in place *(completed 2026-05-08)*
 - [x] **Phase 4: Ingestion UI** — Upload form, real-time status polling, thumbnail display wired to the ingestion API *(completed 2026-05-08)*
 - [x] **Phase 5: Admin Catalog** — Parts list with status and thumbnails, metadata edit, archive/delete, retry failed *(completed 2026-05-09)*
-- [ ] **Phase 6: Search Pipeline** — Photo-to-embedding, pgvector cosine query, ranked results returned by API
+- [x] **Phase 6: Search Pipeline** — Photo-to-embedding, pgvector cosine query, ranked results returned by API *(completed 2026-05-09)*
 - [ ] **Phase 7: Camera UI** — Mobile camera capture and file upload fallback wired to search pipeline
 - [ ] **Phase 8: Results UI** — Ranked results grid with match percentage, configurable threshold and result count
 - [ ] **Phase 9: Part Detail** — Full metadata view and STEP file download
@@ -186,16 +186,16 @@
 **Plans**: 4 plans
 
 **Wave 0** *(Vitest-Stubs — vor Wave 1 abschließen)*
-- [ ] 06-01-PLAN.md — Vitest-Stubs für route.test.ts (9 it.todo, alle SEARCH-03/04/05)
+- [x] 06-01-PLAN.md — Vitest-Stubs für route.test.ts (9 it.todo, alle SEARCH-03/04/05) *(completed 2026-05-09)*
 
 **Wave 1** *(parallel ausführbar, blocked on Wave 0)*
-- [ ] 06-02-PLAN.md — /embed-Endpunkt in worker/main.py (sync FastAPI, S3-Download, get_embedding())
+- [x] 06-02-PLAN.md — /embed-Endpunkt in worker/main.py (sync FastAPI, S3-Download, get_embedding()) *(completed 2026-05-09)*
 
 **Wave 2** *(blocked on Wave 1)*
-- [ ] 06-03-PLAN.md — POST /api/search Route (multipart, S3 temp upload, Worker-Call, pgvector, Cleanup)
+- [x] 06-03-PLAN.md — POST /api/search Route (multipart, S3 temp upload, Worker-Call, pgvector, Cleanup) *(completed 2026-05-09)*
 
 **Wave 3** *(blocked on Wave 2)*
-- [ ] 06-04-PLAN.md — route.test.ts Tests implementieren + vollständige Suite grün
+- [x] 06-04-PLAN.md — route.test.ts Tests implementieren + vollständige Suite grün *(completed 2026-05-09)*
 
 **Cross-cutting constraints:**
 - embeddingLiteral als String mit ::vector-Cast (Neon Pitfall — kein number[]-Parameter)

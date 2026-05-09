@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-09 (Phase 5 abgeschlossen — alle 5 Pläne complete, Human-Verify approved)
+**Last updated:** 2026-05-09 (Phase 6 abgeschlossen — 4/4 Pläne, Verification human-approved)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 5 complete — bereit für Phase 6 (Search Pipeline)
+**Planning status:** Phase 6 complete — Phase 7 (Camera UI) ist nächste Phase
 
 ---
 
@@ -18,12 +18,12 @@
 
 | Field | Value |
 |-------|-------|
-| Current Phase | 6 — Search Pipeline |
+| Current Phase | 7 — Camera UI |
 | Current Plan | — |
-| Phase Status | Phase 5 complete ✓ — Phase 6 not started |
-| Overall Progress | 5/10 phases complete |
+| Phase Status | Not started |
+| Overall Progress | 6/10 phases complete |
 
-**Progress:** █████░░░░░ 50%
+**Progress:** ██████░░░░ 60%
 
 ---
 
@@ -36,7 +36,7 @@
 | 3 | Ingestion API + Queue | ✓ Complete (2026-05-08) |
 | 4 | Ingestion UI | ✓ Complete (2026-05-08) |
 | 5 | Admin Catalog | ✓ Complete (2026-05-09) |
-| 6 | Search Pipeline | Not started |
+| 6 | Search Pipeline | ✓ Complete (2026-05-09) |
 | 7 | Camera UI | Not started |
 | 8 | Results UI | Not started |
 | 9 | Part Detail | Not started |
@@ -48,8 +48,8 @@
 
 | Metric | Value |
 |--------|-------|
-| Phases complete | 5/10 |
-| Plans complete | 22/? (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6, Phase 5: 5) |
+| Phases complete | 6/10 |
+| Plans complete | 26/26 (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6, Phase 5: 5, Phase 6: 4) |
 | Requirements covered | 15/15 |
 | v1 requirements done | 0/15 |
 
