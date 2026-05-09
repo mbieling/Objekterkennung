@@ -14,6 +14,11 @@ const querySchema = z.object({
   search: z.string().max(200).optional(),
 })
 
+/** Escapes ILIKE metacharacters (%, _) so user input is treated as literal text. */
+function escapeLike(s: string): string {
+  return s.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_')
+}
+
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const { searchParams } = req.nextUrl
   const parsed = querySchema.safeParse({
@@ -39,7 +44,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   let countResult: Record<string, unknown>[]
 
   if (status && status !== 'all' && search) {
-    const searchPattern = `%${search}%`
+    const searchPattern = `%${escapeLike(search)}%`
     rows = await db`
       SELECT id, name, part_number, project, status, thumbnail_count, created_at
       FROM parts
@@ -66,7 +71,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       SELECT COUNT(*)::int AS total FROM parts WHERE status = ${status}
     `
   } else if (search) {
-    const searchPattern = `%${search}%`
+    const searchPattern = `%${escapeLike(search)}%`
     rows = await db`
       SELECT id, name, part_number, project, status, thumbnail_count, created_at
       FROM parts
