@@ -12,7 +12,11 @@ Ein Ingenieur fotografiert ein Bauteil mit dem Handy und sieht in Sekunden, ob e
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Ingenieur kann per Handy-Kamera ein Bauteil abfotografieren — Validated in Phase 7: Camera UI
+- [x] Foto wird gegen die Datenbank verglichen (Geometrie-Ähnlichkeit via Embeddings) — Validated in Phase 6: Search Pipeline
+- [x] Treffer werden mit Metadaten angezeigt (Name, Teilenummer, Projekt) — Validated in Phase 8: Results UI
+- [x] Ähnlichkeitsschwellwert ist konfigurierbar — Validated in Phase 8: Results UI
+- [x] Anzahl der angezeigten Treffer ist konfigurierbar — Validated in Phase 8: Results UI
 
 ### Active
 
@@ -76,4 +80,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-09 — Phase 6 complete (Search Pipeline)*
+*Last updated: 2026-05-09 — Phase 8 complete (Results UI — ranked grid, threshold slider, limit select)*
