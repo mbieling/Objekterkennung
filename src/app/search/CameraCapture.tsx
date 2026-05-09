@@ -53,6 +53,9 @@ async function startCamera(): Promise<MediaStream> {
   })
 }
 
+// Maximale Upload-Größe für Kamera-Aufnahmen und Galerie-Uploads (5 MB)
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+
 // Claude's Discretion: max 1024px Breite, JPEG 0.85
 function captureFrame(video: HTMLVideoElement): Promise<Blob> {
   const MAX_WIDTH = 1024
@@ -140,6 +143,10 @@ function CameraCapture() {
   async function handleCapture() {
     if (!videoRef.current) return
     const blob = await captureFrame(videoRef.current)
+    if (blob.size > MAX_IMAGE_BYTES) {
+      setErrorMessage('Aufnahme ist zu groß. Bitte Umgebungsbeleuchtung verbessern und erneut versuchen.')
+      return
+    }
     // Stream stoppen nach Aufnahme
     streamRef.current?.getTracks().forEach(t => t.stop())
     streamRef.current = null
@@ -162,6 +169,10 @@ function CameraCapture() {
     // T-7-01: MIME-Typ-Check (Threat Modell: Tampering)
     if (!file.type.startsWith('image/')) {
       setErrorMessage('Nur Bilddateien (JPEG, PNG) erlaubt.')
+      return
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setErrorMessage(`Datei ist zu groß (${Math.round(file.size / 1024 / 1024)} MB). Maximal: 5 MB.`)
       return
     }
     setCapturedBlob(file)
