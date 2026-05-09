@@ -1,24 +1,46 @@
 # docker-compose.yml
-# Lokale Entwicklungsumgebung für Bauteil-Finder Worker
-# Startet: Redis (Message Broker) + Python Worker (FastAPI + Celery)
+# Produktions-Stack für Bauteil-Finder (Traefik-Deployment)
+# Startet: Next.js App + Python Worker (FastAPI + Celery) + Redis
 #
 # Verwendung:
-#   docker compose up           # Startet Redis + Worker (detached: docker compose up -d)
-#   docker compose logs worker  # Worker-Logs anzeigen
-#   docker compose down         # Alle Services stoppen
-#
-# Next.js Dev-Server separat starten: npm run dev
-# WORKER_URL für Next.js: http://localhost:8000 (via Port-Mapping)
+#   docker compose up -d          # Alle Services starten
+#   docker compose logs -f app    # Next.js Logs
+#   docker compose logs -f worker # Worker-Logs
+#   docker compose down
 #
 # Voraussetzungen:
+#   - .env muss DATABASE_URL, AWS_* und WORKER_URL=http://worker:8000 enthalten
 #   - worker/.env muss DATABASE_URL und AWS_* Variablen enthalten
-#   - S3-Bucket CORS-Konfiguration für PUT-Methode muss gesetzt sein (Pitfall 2)
+#   - Traefik proxy-Netzwerk muss existieren: docker network create proxy
 
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: objekterkennung
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - proxy
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.objekterkennung.rule=Host(`objekt.bielingserver.de`)"
+      - "traefik.http.routers.objekterkennung.entrypoints=websecure"
+      - "traefik.http.routers.objekterkennung.tls=true"
+      - "traefik.http.routers.objekterkennung.tls.certresolver=tls_resolver"
+      - "traefik.http.routers.objekterkennung.service=objekterkennung"
+      - "traefik.http.services.objekterkennung.loadbalancer.server.port=3000"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.objekterkennung.middlewares=default@file"
+    depends_on:
+      worker:
+        condition: service_healthy
+
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -30,18 +52,16 @@ services:
     build:
       context: ./worker
       dockerfile: Dockerfile
-    # Startet FastAPI (Port 8000) und Celery Worker im gleichen Container
-    # Für Produktion: separate Services empfohlen (Railway/Fly.io)
+    container_name: objekterkennung-worker
+    restart: unless-stopped
     command: >
       sh -c "uvicorn worker.main:app --host 0.0.0.0 --port 8000 &
              celery -A worker.tasks worker --loglevel=info --concurrency=1"
-    ports:
-      - "8000:8000"
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     env_file:
-      - worker/.env    # DATABASE_URL, AWS_* Variablen — NICHT in git committen
+      - worker/.env
     depends_on:
       redis:
         condition: service_healthy
@@ -51,3 +71,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 15s
+
+networks:
+  default:
+  proxy:
+    external: true
