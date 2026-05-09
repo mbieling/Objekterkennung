@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-09 (Phase 5 Plan 04 abgeschlossen — CatalogTable Admin-UI implementiert)
+**Last updated:** 2026-05-09 (Phase 5 Plan 05 Task 1 abgeschlossen — Playwright E2E Smoke-Tests aktiviert; Human-Verify-Checkpoint ausstehend)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 5 in progress — Plan 04 complete
+**Planning status:** Phase 5 in progress — Plan 05 Task 1 complete (checkpoint pending)
 
 ---
 
@@ -19,8 +19,8 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 5 — Admin Catalog |
-| Current Plan | 04 complete — CatalogTable Admin-UI implementiert |
-| Phase Status | Phase 5 in progress — Plan 04 complete |
+| Current Plan | 05 (Task 1 complete — Human-Verify-Checkpoint ausstehend) |
+| Phase Status | Phase 5 in progress — Plan 05 Task 1 complete |
 | Overall Progress | 4/10 phases complete |
 
 **Progress:** ████░░░░░░ 40% (Phase 5 in progress)
@@ -119,9 +119,9 @@ Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) ist gepl
 - [x] Wave 1 (05-02): GET /api/parts (ADMIN-01) *(completed 2026-05-09)*
 - [x] Wave 1 (05-03): PATCH/DELETE/archive/retry Routes (ADMIN-02/03/04) *(completed 2026-05-09)*
 - [x] Wave 2 (05-04): CatalogTable-Komponente (ADMIN-01/02/03/04) *(completed 2026-05-09)*
-- [ ] Wave 3 (05-05): /admin/catalog Page + E2E-Checkpoint
+- [x] Wave 3 (05-05): E2E Smoke-Tests aktiviert (Task 1 done) — Human-Verify-Checkpoint ausstehend
 
-**Nächster Schritt:** Plan 05 (E2E-Checkpoint) ausführen.
+**Nächster Schritt:** Human-Verify-Checkpoint für Phase 5 Success Criteria (Plan 05 Task 2).
 
 ### Entscheidung (05-01):
 - Playwright `test.skip()` statt `test.todo()` verwenden — Playwright 1.58.2 hat keine `test.todo()` API; `test.skip()` mit leerer async-Funktion ist das etablierte Muster im Projekt (vgl. `tests/phase-04-upload.spec.ts`)
@@ -136,6 +136,11 @@ Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) ist gepl
 - Header (h1 + Upload-Link) gehört in CatalogTable, nicht in page.tsx — CatalogTable ist die einzige Client-Komponente und kennt den Sheet-State.
 - `archived` nicht im Edit-Schema-Enum (nur pending/processing/ready/failed) — Archivierung bleibt dedizierter /archive-Route vorbehalten (D-10).
 - Thumbnail-useEffect mit eslint-disable für thumbnailUrls in Deps-Array — verhindert Endlosschleifen bei URL-Updates im Cache.
+
+### Entscheidung (05-05):
+- test.skip-Guard mit hasRows-Check (Timeout 3000ms) statt harter DB-Voraussetzung — ADMIN-02/03-Tests überspringen sich selbst wenn keine Teile in DB vorhanden; CI-kompatibel ohne Testdaten-Setup.
+- Suchfeld-Test akzeptiert beide Empty-States (kein Teil vs. kein Treffer) — robuste CI-Kompatibilität unabhängig vom DB-Füllungsgrad.
+- Downstream-Constraint für Phase 6: WHERE status = 'ready' als Filter verwenden — NICHT WHERE is_archived = false (is_archived-Boolean wird in Phase 5 nicht geschrieben).
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*
