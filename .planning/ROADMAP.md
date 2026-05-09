@@ -15,7 +15,7 @@
 - [x] **Phase 4: Ingestion UI** — Upload form, real-time status polling, thumbnail display wired to the ingestion API *(completed 2026-05-08)*
 - [x] **Phase 5: Admin Catalog** — Parts list with status and thumbnails, metadata edit, archive/delete, retry failed *(completed 2026-05-09)*
 - [x] **Phase 6: Search Pipeline** — Photo-to-embedding, pgvector cosine query, ranked results returned by API *(completed 2026-05-09)*
-- [ ] **Phase 7: Camera UI** — Mobile camera capture and file upload fallback wired to search pipeline
+- [x] **Phase 7: Camera UI** — Mobile camera capture and file upload fallback wired to search pipeline *(completed 2026-05-09)*
 - [ ] **Phase 8: Results UI** — Ranked results grid with match percentage, configurable threshold and result count
 - [ ] **Phase 9: Part Detail** — Full metadata view and STEP file download
 - [ ] **Phase 10: Hardening** — Error handling, edge cases, mobile polish, performance validation
@@ -228,7 +228,7 @@
 - [x] 07-03-PLAN.md — Homepage D-02 (zweiter Button) + CameraCapture.test.tsx Tests aktivieren *(completed 2026-05-09)*
 
 **Wave 3** *(nach Wave 2)*
-- [ ] 07-04-PLAN.md — Playwright E2E Tests aktivieren + Human-Verify-Checkpoint
+- [x] 07-04-PLAN.md — Playwright E2E Tests aktivieren + Human-Verify-Checkpoint *(completed 2026-05-09)*
 
 ---
 
@@ -283,7 +283,7 @@
 | 4. Ingestion UI | 6/6 | Complete | 2026-05-08 |
 | 5. Admin Catalog | 5/5 | Complete | 2026-05-09 |
 | 6. Search Pipeline | 4/4 | Complete | 2026-05-09 |
-| 7. Camera UI | 3/4 | In Progress | - |
+| 7. Camera UI | 4/4 | Complete | 2026-05-09 |
 | 8. Results UI | 0/? | Not started | - |
 | 9. Part Detail | 0/? | Not started | - |
 | 10. Hardening | 0/? | Not started | - |

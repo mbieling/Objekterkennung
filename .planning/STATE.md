@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-09 (Phase 7 Plan 03 abgeschlossen — Wave 2: Homepage D-02 zweiter Button + CameraCapture Tests bestätigt)
+**Last updated:** 2026-05-09 (Phase 7 abgeschlossen — Plan 04: Playwright E2E-Tests aktiviert + Human-Verify approved, alle 4 Success-Criteria erfüllt)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 7 in progress — Plan 03 (Wave 2) complete, Plan 04 next
+**Planning status:** Phase 7 complete — Phase 8 (Results UI) als nächstes
 
 ---
 
@@ -18,12 +18,12 @@
 
 | Field | Value |
 |-------|-------|
-| Current Phase | 7 — Camera UI |
-| Current Plan | 03 complete — 04 next |
-| Phase Status | In progress |
-| Overall Progress | 6/10 phases complete |
+| Current Phase | 8 — Results UI |
+| Current Plan | 01 (noch nicht gestartet) |
+| Phase Status | Phase 7 complete, Phase 8 next |
+| Overall Progress | 7/10 phases complete |
 
-**Progress:** ██████░░░░ 60%
+**Progress:** ███████░░░ 70%
 
 ---
 
@@ -37,7 +37,7 @@
 | 4 | Ingestion UI | ✓ Complete (2026-05-08) |
 | 5 | Admin Catalog | ✓ Complete (2026-05-09) |
 | 6 | Search Pipeline | ✓ Complete (2026-05-09) |
-| 7 | Camera UI | In progress — Plan 03 done (Wave 2) |
+| 7 | Camera UI | ✓ Complete (2026-05-09) |
 | 8 | Results UI | Not started |
 | 9 | Part Detail | Not started |
 | 10 | Hardening | Not started |
@@ -48,8 +48,8 @@
 
 | Metric | Value |
 |--------|-------|
-| Phases complete | 6/10 |
-| Plans complete | 26/26 (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6, Phase 5: 5, Phase 6: 4) |
+| Phases complete | 7/10 |
+| Plans complete | 30/30 (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6, Phase 5: 5, Phase 6: 4, Phase 7: 4) |
 | Requirements covered | 15/15 |
 | v1 requirements done | 0/15 |
 
@@ -104,7 +104,13 @@
 
 ### Next Action
 
-Phase 7 Plan 03 (Wave 2) abgeschlossen (2026-05-09). Nächster Schritt: Plan 07-04 (Wave 3) — Playwright E2E Tests aktivieren + Human-Verify-Checkpoint.
+Phase 7 vollständig abgeschlossen (2026-05-09) — alle 4 Pläne done, Human-Verify approved. Nächster Schritt: Phase 8 (Results UI) starten — /gsd-plan-phase 8.
+
+**Phase 7 — Abgeschlossen (4 Pläne in 4 Waves):**
+- [x] Wave 0 (07-01): Vitest-Stubs (CameraCapture.test.tsx) + Playwright-Stubs *(completed 2026-05-09)*
+- [x] Wave 1 (07-02): CameraCapture.tsx (State Machine) + /search page.tsx *(completed 2026-05-09)*
+- [x] Wave 2 (07-03): Homepage D-02 zweiter Button + CameraCapture.test.tsx Tests aktiviert *(completed 2026-05-09)*
+- [x] Wave 3 (07-04): Playwright E2E Tests aktiviert + Human-Verify approved *(completed 2026-05-09)*
 
 **Phase 4 — Geplante Pläne (6 Pläne in 5 Waves):**
 - [x] Wave 0 (04-01): Migration 002_add_thumbnail_count.sql + supabase db push [BLOCKING] + 5 Test-Stubs *(completed 2026-05-08)*
