@@ -18,8 +18,8 @@ from pgvector.psycopg2 import register_vector
 from dotenv import load_dotenv
 
 # Worker-Module (aus worker/-Verzeichnis)
-from renderer import load_step, validate_geometry, render_views
-from embedder import get_embedding, mean_pool
+from worker.renderer import load_step, validate_geometry, render_views
+from worker.embedder import get_embedding, mean_pool
 
 # .env-Datei laden wenn vorhanden (lokale Entwicklung)
 load_dotenv()
