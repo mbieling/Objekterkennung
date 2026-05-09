@@ -1,7 +1,8 @@
 ---
 phase: 9
 slug: part-detail
-status: draft
+status: approved
+reviewed_at: 2026-05-09
 shadcn_initialized: true
 preset: default/slate/cssVariables
 created: 2026-05-09
@@ -174,11 +175,11 @@ No truncation — wrap freely (names can be multi-word, mobile width allows wrap
 <dl className="space-y-3 mb-6">
   <div className="flex justify-between items-baseline gap-4">
     <dt className="text-sm text-muted-foreground shrink-0">Teilenummer</dt>
-    <dd className="text-sm font-medium text-right">{part_number ?? '—'}</dd>
+    <dd className="text-sm font-normal text-right">{part_number ?? '—'}</dd>
   </div>
   <div className="flex justify-between items-baseline gap-4">
     <dt className="text-sm text-muted-foreground shrink-0">Projekt</dt>
-    <dd className="text-sm font-medium text-right">{project ?? '—'}</dd>
+    <dd className="text-sm font-normal text-right">{project ?? '—'}</dd>
   </div>
   <div className="flex justify-between items-baseline gap-4">
     <dt className="text-sm text-muted-foreground shrink-0">Status</dt>
@@ -186,7 +187,7 @@ No truncation — wrap freely (names can be multi-word, mobile width allows wrap
   </div>
   <div className="flex justify-between items-baseline gap-4">
     <dt className="text-sm text-muted-foreground shrink-0">Hochgeladen</dt>
-    <dd className="text-sm font-medium text-right">{formatDate(created_at)}</dd>
+    <dd className="text-sm font-normal text-right">{formatDate(created_at)}</dd>
   </div>
 </dl>
 ```
@@ -287,12 +288,12 @@ When `GET /api/parts/[id]` returns 404 or network error:
 
 | Role | Size | Tailwind | Weight | Tailwind | Line Height | Usage |
 |------|------|----------|--------|----------|-------------|-------|
-| Body | 14px | `text-sm` | 400 Regular | `font-normal` | 1.43 (Tailwind default) | Metadata labels, metadata values, hint text |
-| Label | 14px | `text-sm` | 500 Medium | `font-medium` | 1.43 | Metadata values (right side), back link |
+| Body | 14px | `text-sm` | 400 Regular | `font-normal` | 1.43 (Tailwind default) | Metadata labels, metadata values, back link, hint text |
 | Heading | 24px | `text-2xl` | 600 Semibold | `font-semibold` | 1.25 (`leading-tight`) | H1 part name |
 | Hint | 12px | `text-xs` | 400 Regular | `font-normal` | 1.33 | Download disabled hint, thumbnail count |
 
 Source: `text-2xl font-semibold` is the established heading pattern in upload and search pages.
+Font weights: 2 declared (font-normal 400, font-semibold 600). font-medium (500) not used.
 
 ---
 
