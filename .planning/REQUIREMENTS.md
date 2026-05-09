@@ -19,6 +19,8 @@
 - [ ] **ADMIN-03**: Nutzer kann ein Bauteil archivieren oder löschen (aus Suche entfernen)
 - [ ] **ADMIN-04**: Nutzer kann die Verarbeitung für fehlerhafte Bauteile erneut starten
 
+<!-- API-Backend für ADMIN-02/03/04 implementiert in Plan 05-03 — UI noch ausstehend (Plan 05-04) -->
+
 ### Suche
 
 - [ ] **SEARCH-01**: Nutzer kann ein Bauteil direkt mit der Handy-Kamera im Browser fotografieren
@@ -72,9 +74,9 @@
 | INGEST-03 | Phase 2 — Python Worker Spike | Pending |
 | INGEST-04 | Phase 3 — Ingestion API + Queue | Complete (03-03) |
 | ADMIN-01 | Phase 5 — Admin Catalog | Pending |
-| ADMIN-02 | Phase 5 — Admin Catalog | Pending |
-| ADMIN-03 | Phase 5 — Admin Catalog | Pending |
-| ADMIN-04 | Phase 5 — Admin Catalog | Pending |
+| ADMIN-02 | Phase 5 — Admin Catalog | API complete (05-03) — UI pending (05-04) |
+| ADMIN-03 | Phase 5 — Admin Catalog | API complete (05-03) — UI pending (05-04) |
+| ADMIN-04 | Phase 5 — Admin Catalog | API complete (05-03) — UI pending (05-04) |
 | SEARCH-01 | Phase 7 — Camera UI | Pending |
 | SEARCH-02 | Phase 7 — Camera UI | Pending |
 | SEARCH-03 | Phase 8 — Results UI | Pending |

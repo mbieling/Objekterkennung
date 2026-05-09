@@ -160,7 +160,7 @@
 
 **Wave 1** *(parallel ausführbar, blocked on Wave 0)*
 - [x] 05-02-PLAN.md — GET /api/parts (alle Teile, kein embedding) *(completed 2026-05-09)*
-- [ ] 05-03-PLAN.md — PATCH + DELETE /api/parts/[id] + POST /archive + POST /retry
+- [x] 05-03-PLAN.md — PATCH + DELETE /api/parts/[id] + POST /archive + POST /retry *(completed 2026-05-09)*
 
 **Wave 2** *(blocked on Wave 1: API-Design muss stabil sein)*
 - [ ] 05-04-PLAN.md — /admin page.tsx + CatalogTable.tsx (Tabs, Suche, Pagination, Sheet, AlertDialog)

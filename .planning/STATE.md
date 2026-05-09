@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-09 (Phase 5 Plan 02 abgeschlossen — GET /api/parts implementiert)
+**Last updated:** 2026-05-09 (Phase 5 Plan 03 abgeschlossen — PATCH/DELETE/archive/retry Routes implementiert)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 5 in progress — Plan 02 complete
+**Planning status:** Phase 5 in progress — Plan 03 complete
 
 ---
 
@@ -19,8 +19,8 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 5 — Admin Catalog |
-| Current Plan | 02 complete — GET /api/parts implementiert |
-| Phase Status | Phase 5 in progress — Plan 02 complete |
+| Current Plan | 03 complete — PATCH/DELETE/archive/retry implementiert |
+| Phase Status | Phase 5 in progress — Plan 03 complete |
 | Overall Progress | 4/10 phases complete |
 
 **Progress:** ████░░░░░░ 40% (Phase 5 in progress)
@@ -117,17 +117,20 @@ Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) ist gepl
 **Phase 5 — Fortschritt:**
 - [x] Wave 0 (05-01): Toaster-Mount + 5 Test-Stubs *(completed 2026-05-09)*
 - [x] Wave 1 (05-02): GET /api/parts (ADMIN-01) *(completed 2026-05-09)*
-- [ ] Wave 1 (05-03): PATCH/DELETE/archive/retry Routes (ADMIN-02/03/04)
+- [x] Wave 1 (05-03): PATCH/DELETE/archive/retry Routes (ADMIN-02/03/04) *(completed 2026-05-09)*
 - [ ] Wave 2 (05-04): CatalogTable-Komponente (ADMIN-01/02/03/04)
 - [ ] Wave 3 (05-05): /admin/catalog Page + E2E-Checkpoint
 
-**Nächster Schritt:** Plan 03 (PATCH/DELETE/archive/retry Routes) ausführen.
+**Nächster Schritt:** Plan 04 (CatalogTable-Komponente) ausführen.
 
 ### Entscheidung (05-01):
 - Playwright `test.skip()` statt `test.todo()` verwenden — Playwright 1.58.2 hat keine `test.todo()` API; `test.skip()` mit leerer async-Funktion ist das etablierte Muster im Projekt (vgl. `tests/phase-04-upload.spec.ts`)
 
 ### Entscheidung (05-02):
 - `vi.mocked(db)` statt top-level `mockDb = vi.fn()` — Vitest hostet `vi.mock()` ans Dateianfang; Variable noch nicht initialisiert → ReferenceError. Fix: Factory in `vi.mock()`, Import danach, `vi.mocked()` für typisierten Zugriff.
+
+### Entscheidung (05-03):
+- Constructor-kompatibles Mock für AWS SDK Konstruktoren: `vi.fn().mockImplementation(function(this, args) { return Object.assign(this, { ...args }) })` statt arrow function — arrow functions können nicht mit `new` aufgerufen werden (TypeError: is not a constructor).
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*
