@@ -41,7 +41,7 @@ completed: 2026-05-09
 
 # Phase 9 Plan 04: E2E-Tests Wave 3 Summary
 
-**Alle 4 Playwright-E2E-Tests aktiviert (test.skip → test). Tests grün im Worktree. Checkpoint für Human-Verify (SC1, SC2, SC3) ausstehend.**
+**Alle 4 Playwright-E2E-Tests aktiviert (test.skip → test). Tests grün im Worktree. Human-Verify bestätigt: SC1 (Metadaten), SC2 (Thumbnail-Galerie), SC3 (STEP-Download) — alle 3 Success Criteria approved.**
 
 ## Performance
 
@@ -89,7 +89,13 @@ npm test (aus Worktree)
 
 ## Human-Verify-Status
 
-**AUSSTEHEND** — Checkpoint erreicht. Benutzer muss SC1, SC2, SC3 manuell verifizieren.
+**APPROVED** — Alle 3 ROADMAP-Phase-9-Success-Criteria vom Benutzer bestätigt:
+
+| Success Criterion | Status |
+|-------------------|--------|
+| SC1: Metadaten-Anzeige (Name, Teilenummer, Projekt, Status-Badge, Datum) | APPROVED |
+| SC2: Thumbnail-Galerie (Hauptbild + Miniaturleiste, aktive Miniatur mit Ring-Rahmen) | APPROVED |
+| SC3: STEP-Download (Button enabled für ready-Parts, Browser-Save-Dialog mit korrektem Dateinamen) | APPROVED |
 
 ## Decisions Made
 
