@@ -18,6 +18,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Label } from '@/components/ui/label'
 import { AlertCircle, Loader2, Upload, CheckCircle2, XCircle, RefreshCw } from 'lucide-react'
+import Link from 'next/link'
 import { usePartStatus } from '@/hooks/use-part-status'
 
 // Phasen-Zustandsautomat (RESEARCH.md Pattern 1)
@@ -184,9 +185,8 @@ export function UploadForm() {
 
       // 6. Polling starten (D-04) — Hook reaktiviert sich über polledPartId
       setPhase('polling')
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err)
-      setErrorMsg(`Upload fehlgeschlagen: ${msg}`)
+    } catch {
+      setErrorMsg('Upload fehlgeschlagen. Bitte Verbindung prüfen und erneut versuchen.')
       setPhase('error')
     }
   }
@@ -238,7 +238,13 @@ export function UploadForm() {
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Diese Datei existiert bereits — Teil-ID: {duplicateId}
+                Diese Datei wurde bereits hochgeladen.{' '}
+                <Link
+                  href={`/parts/${duplicateId}`}
+                  className="underline font-medium hover:no-underline"
+                >
+                  Zum vorhandenen Eintrag
+                </Link>
               </AlertDescription>
             </Alert>
           )}
