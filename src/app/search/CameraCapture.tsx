@@ -169,8 +169,8 @@ function CameraCapture() {
     setPhase('captured')
   }
 
-  // D-09: 30s AbortController-Timeout
-  async function handleSearch() {
+  // D-09: 30s AbortController-Timeout; D-08: limit-Parameter steuert Ergebnismenge
+  async function executeSearch(limit: number) {
     if (!capturedBlob) return
     setPhase('searching')
     setErrorMessage(null)
@@ -180,7 +180,7 @@ function CameraCapture() {
     const timeoutId = setTimeout(() => controller.abort(), 30_000)
     try {
       const res = await fetch(
-        `/api/search?threshold=0&limit=${Math.max(50, displayLimit)}`,
+        `/api/search?threshold=0&limit=${Math.max(50, limit)}`,
         {
           method: 'POST',
           body: formData,
@@ -208,39 +208,8 @@ function CameraCapture() {
     }
   }
 
-  // D-08: Limit-Wechsel triggert neue API-Anfrage
-  async function handleSearchWithLimit(newLimit: number) {
-    if (!capturedBlob) return
-    setPhase('searching')
-    setErrorMessage(null)
-    const formData = new FormData()
-    formData.append('image', capturedBlob, 'capture.jpg')
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 30_000)
-    try {
-      const res = await fetch(
-        `/api/search?threshold=0&limit=${Math.max(50, newLimit)}`,
-        { method: 'POST', body: formData, signal: controller.signal }
-      )
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data: SearchResponse = await res.json()
-      setSearchResult(data)
-      setPhase('result')
-    } catch (err) {
-      let msg: string
-      if (err instanceof DOMException && err.name === 'AbortError') {
-        msg = 'Suche hat zu lange gedauert. Bitte erneut versuchen.'
-      } else if (err instanceof Error && err.message.startsWith('HTTP ')) {
-        msg = 'Suche fehlgeschlagen (Server-Fehler). Bitte erneut versuchen.'
-      } else {
-        msg = 'Suche fehlgeschlagen. Bitte überprüfe deine Verbindung und versuche es erneut.'
-      }
-      setErrorMessage(msg)
-      setPhase('error')
-    } finally {
-      clearTimeout(timeoutId)
-    }
-  }
+  function handleSearch() { executeSearch(displayLimit) }
+  function handleSearchWithLimit(newLimit: number) { executeSearch(newLimit) }
 
   // ---------------------------------------------------------------------------
   // Wiederverwendbarer File-Input-Trigger (D-06: in allen States außer searching)
