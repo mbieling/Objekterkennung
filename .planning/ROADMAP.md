@@ -183,7 +183,26 @@
   2. Results below the configurable similarity threshold are excluded from the response
   3. The number of returned results respects the configurable limit parameter
   4. A search against a corpus of 100+ indexed parts completes in under 5 seconds end-to-end
-**Plans**: TBD
+**Plans**: 4 plans
+
+**Wave 0** *(Vitest-Stubs — vor Wave 1 abschließen)*
+- [ ] 06-01-PLAN.md — Vitest-Stubs für route.test.ts (9 it.todo, alle SEARCH-03/04/05)
+
+**Wave 1** *(parallel ausführbar, blocked on Wave 0)*
+- [ ] 06-02-PLAN.md — /embed-Endpunkt in worker/main.py (sync FastAPI, S3-Download, get_embedding())
+
+**Wave 2** *(blocked on Wave 1)*
+- [ ] 06-03-PLAN.md — POST /api/search Route (multipart, S3 temp upload, Worker-Call, pgvector, Cleanup)
+
+**Wave 3** *(blocked on Wave 2)*
+- [ ] 06-04-PLAN.md — route.test.ts Tests implementieren + vollständige Suite grün
+
+**Cross-cutting constraints:**
+- embeddingLiteral als String mit ::vector-Cast (Neon Pitfall — kein number[]-Parameter)
+- Threshold-Filter mit vollem Ausdruck im WHERE (kein similarity-Alias)
+- S3 Cleanup (DeleteObjectCommand) auf ALLEN Fehler-Pfaden
+- WHERE status = 'ready' — kein is_archived (Phase-5-Downstream-Constraint)
+- WORKER_URL ist server-only (kein NEXT_PUBLIC_)
 
 ---
 
@@ -251,7 +270,7 @@
 | 3. Ingestion API + Queue | 6/6 | Complete | 2026-05-08 |
 | 4. Ingestion UI | 6/6 | Complete | 2026-05-08 |
 | 5. Admin Catalog | 5/5 | Complete | 2026-05-09 |
-| 6. Search Pipeline | 0/? | Not started | - |
+| 6. Search Pipeline | 0/4 | In progress | - |
 | 7. Camera UI | 0/? | Not started | - |
 | 8. Results UI | 0/? | Not started | - |
 | 9. Part Detail | 0/? | Not started | - |
