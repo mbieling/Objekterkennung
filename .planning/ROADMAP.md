@@ -16,7 +16,7 @@
 - [x] **Phase 5: Admin Catalog** — Parts list with status and thumbnails, metadata edit, archive/delete, retry failed *(completed 2026-05-09)*
 - [x] **Phase 6: Search Pipeline** — Photo-to-embedding, pgvector cosine query, ranked results returned by API *(completed 2026-05-09)*
 - [x] **Phase 7: Camera UI** — Mobile camera capture and file upload fallback wired to search pipeline *(completed 2026-05-09)*
-- [ ] **Phase 8: Results UI** — Ranked results grid with match percentage, configurable threshold and result count
+- [x] **Phase 8: Results UI** — Ranked results grid with match percentage, configurable threshold and result count *(completed 2026-05-09)*
 - [ ] **Phase 9: Part Detail** — Full metadata view and STEP file download
 - [ ] **Phase 10: Hardening** — Error handling, edge cases, mobile polish, performance validation
 
@@ -245,16 +245,16 @@
 **UI hint**: yes
 
 **Wave 0** *(Slider-Installation + Test-Stubs + Phase-7-E2E-Fix — vor Wave 1 abschließen)*
-- [ ] 08-01-PLAN.md — shadcn Slider installieren + SearchResultCard.test.tsx + SearchResults.test.tsx Stubs + phase-08-results-ui.spec.ts Stubs + phase-07-camera-ui.spec.ts locator('pre') fixen
+- [x] 08-01-PLAN.md — shadcn Slider installieren + SearchResultCard.test.tsx + SearchResults.test.tsx Stubs + phase-08-results-ui.spec.ts Stubs + phase-07-camera-ui.spec.ts locator('pre') fixen *(completed 2026-05-09)*
 
 **Wave 1** *(blocked on Wave 0)*
-- [ ] 08-02-PLAN.md — SearchResultCard.tsx (Thumbnail + Badge + Link) + SearchResults.tsx (Controller + Filterlogik + Controls-Zeile)
+- [x] 08-02-PLAN.md — SearchResultCard.tsx (Thumbnail + Badge + Link) + SearchResults.tsx (Controller + Filterlogik + Controls-Zeile) *(completed 2026-05-09)*
 
 **Wave 2** *(blocked on Wave 1)*
-- [ ] 08-03-PLAN.md — CameraCapture.tsx erweitern (displayThreshold/displayLimit State, handleSearch auf threshold=0, result-Block + searching-Block mit D-11-Overlay)
+- [x] 08-03-PLAN.md — CameraCapture.tsx erweitern (displayThreshold/displayLimit State, handleSearch auf threshold=0, result-Block + searching-Block mit D-11-Overlay) *(completed 2026-05-09)*
 
 **Wave 3** *(blocked on Wave 2)*
-- [ ] 08-04-PLAN.md — Playwright E2E-Tests aktivieren + Human-Verify-Checkpoint
+- [x] 08-04-PLAN.md — Playwright E2E-Tests aktivieren + Human-Verify-Checkpoint *(completed 2026-05-09)*
 
 **Cross-cutting constraints:**
 - shadcn Slider via CLI installieren — kein eigener range-input (shadcn/ui first)

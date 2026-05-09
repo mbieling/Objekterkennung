@@ -13,10 +13,11 @@ import { cn } from '@/lib/utils'
 interface SearchResultCardProps {
   id: string
   name: string
+  part_number: string | null
   similarity: number  // Float 0–1 aus API
 }
 
-function SearchResultCard({ id, name, similarity }: SearchResultCardProps) {
+function SearchResultCard({ id, name, part_number, similarity }: SearchResultCardProps) {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null)
 
   // Thumbnail lazy laden — nur [id] im Deps-Array, kein thumbnailUrl (verhindert Endlosloop)
@@ -64,6 +65,9 @@ function SearchResultCard({ id, name, similarity }: SearchResultCardProps) {
           {/* D-02: Name + Badge */}
           <div className="flex flex-col justify-between flex-1 min-w-0 py-0.5">
             <p className="text-sm font-medium leading-tight truncate">{name}</p>
+            {part_number && (
+              <p className="text-xs text-muted-foreground truncate">{part_number}</p>
+            )}
             {/* D-05: Badge rechts unten, nach Name */}
             <div className="flex justify-end">
               <Badge className={badgeClass}>{matchPercent}%</Badge>

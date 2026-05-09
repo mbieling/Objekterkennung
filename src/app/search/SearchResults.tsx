@@ -105,6 +105,7 @@ function SearchResults({
               key={r.id}
               id={r.id}
               name={r.name}
+              part_number={r.part_number}
               similarity={r.similarity}
             />
           ))}

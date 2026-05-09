@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-09 (Phase 8 geplant — 4 Pläne in 4 Waves, Ready to execute)
+**Last updated:** 2026-05-09 (Phase 8 abgeschlossen — 4 Pläne in 4 Waves, Human-Verify approved)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 8 planned — Ready to execute
+**Planning status:** Phase 8 complete — Phase 9 (Part Detail) als nächstes
 
 ---
 
@@ -10,7 +10,7 @@
 
 **Core Value:** Ein Ingenieur fotografiert ein Bauteil mit dem Handy und sieht in Sekunden, ob ein geometrisch ähnliches Teil bereits in der Datenbank existiert.
 
-**Current Focus:** Phase 6 (Search Pipeline) — nächste Phase
+**Current Focus:** Phase 9 (Part Detail) — nächste Phase
 
 ---
 
@@ -18,12 +18,12 @@
 
 | Field | Value |
 |-------|-------|
-| Current Phase | 8 — Results UI |
-| Current Plan | 01 (ready to execute) |
-| Phase Status | Planned — 4 plans in 4 waves |
-| Overall Progress | 7/10 phases complete |
+| Current Phase | 9 — Part Detail |
+| Current Plan | — (planning next) |
+| Phase Status | Phase 8 complete — Phase 9 not started |
+| Overall Progress | 8/10 phases complete |
 
-**Progress:** ███████░░░ 70%
+**Progress:** ████████░░ 80%
 
 ---
 
@@ -38,7 +38,7 @@
 | 5 | Admin Catalog | ✓ Complete (2026-05-09) |
 | 6 | Search Pipeline | ✓ Complete (2026-05-09) |
 | 7 | Camera UI | ✓ Complete (2026-05-09) |
-| 8 | Results UI | Not started |
+| 8 | Results UI | ✓ Complete (2026-05-09) |
 | 9 | Part Detail | Not started |
 | 10 | Hardening | Not started |
 
@@ -49,7 +49,7 @@
 | Metric | Value |
 |--------|-------|
 | Phases complete | 7/10 |
-| Plans complete | 30/30 (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6, Phase 5: 5, Phase 6: 4, Phase 7: 4) |
+| Plans complete | 34/34 (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6, Phase 5: 5, Phase 6: 4, Phase 7: 4, Phase 8: 4) |
 | Requirements covered | 15/15 |
 | v1 requirements done | 0/15 |
 
@@ -104,7 +104,7 @@
 
 ### Next Action
 
-Phase 7 vollständig abgeschlossen (2026-05-09) — alle 4 Pläne done, Human-Verify approved. Nächster Schritt: Phase 8 (Results UI) starten — /gsd-plan-phase 8.
+Phase 8 vollständig abgeschlossen (2026-05-09) — alle 4 Pläne done, Human-Verify approved. Nächster Schritt: Phase 9 (Part Detail) starten — /gsd-discuss-phase 9.
 
 **Phase 7 — Abgeschlossen (4 Pläne in 4 Waves):**
 - [x] Wave 0 (07-01): Vitest-Stubs (CameraCapture.test.tsx) + Playwright-Stubs *(completed 2026-05-09)*
