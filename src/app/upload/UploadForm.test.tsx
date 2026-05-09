@@ -54,7 +54,7 @@ describe('UploadForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /Hochladen/i }))
     await waitFor(() =>
       expect(
-        screen.getByText(/überschreitet die maximale Größe von 100 MB/)
+        screen.getByText(/Diese Datei ist zu groß/)
       ).toBeTruthy()
     )
     expect(global.fetch).not.toHaveBeenCalled()
@@ -93,9 +93,9 @@ describe('UploadForm', () => {
     fireEvent.change(screen.getByLabelText(/Bezeichnung/i), { target: { value: 'A' } })
     fireEvent.click(screen.getByRole('button', { name: /Hochladen/i }))
     await waitFor(() =>
-      expect(screen.getByText(/Diese Datei existiert bereits/)).toBeTruthy()
+      expect(screen.getByText(/Diese Datei wurde bereits hochgeladen/)).toBeTruthy()
     )
-    expect(screen.getByText(/abc-123/)).toBeTruthy()
+    expect(screen.getByText(/Zum vorhandenen Eintrag/)).toBeTruthy()
     // Form bleibt editierbar (D-11)
     expect((screen.getByLabelText(/Bezeichnung/i) as HTMLInputElement).disabled).toBe(false)
   })
