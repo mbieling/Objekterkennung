@@ -1,7 +1,8 @@
 ---
 phase: 10
 slug: hardening
-status: draft
+status: approved
+reviewed_at: 2026-05-09
 shadcn_initialized: true
 preset: default / slate / cssVariables
 created: 2026-05-09
@@ -66,9 +67,9 @@ Deklarierte Werte (Vielfache von 4 — gilt für alle Seiten):
 | Role | Size | Weight | Line Height | Tailwind |
 |------|------|--------|-------------|---------|
 | Body | 14px (text-sm) | 400 (normal) | 1.5 | `text-sm` |
-| Label | 14px (text-sm) | 500 (medium) | 1.4 | `text-sm font-medium` |
+| Label | 14px (text-sm) | 400 (normal) | 1.4 | `text-sm font-normal` |
 | Heading (Card) | 18px (text-lg) | 600 (semibold) | 1.2 | `text-lg font-semibold` |
-| Display (Page-Titel) | 24px (text-2xl) | 700 (bold) | 1.2 | `text-2xl font-bold` |
+| Display (Page-Titel) | 24px (text-2xl) | 600 (semibold) | 1.2 | `text-2xl font-semibold` |
 
 **Quelle:** Aus bestehenden Komponenten extrahiert (CardTitle `text-lg`, Body `text-sm`,
 Muted `text-xs text-muted-foreground`).
