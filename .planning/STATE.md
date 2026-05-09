@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-09 (Phase 10 geplant — 3 Pläne in Wave 1, Verifikation bestanden)
+**Last updated:** 2026-05-09 (Phase 10 abgeschlossen — alle 10 Phasen von v1 vollständig)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 10 geplant — bereit zur Ausführung
+**Planning status:** Milestone v1 COMPLETE — alle 10 Phasen abgeschlossen
 
 ---
 
@@ -10,7 +10,7 @@
 
 **Core Value:** Ein Ingenieur fotografiert ein Bauteil mit dem Handy und sieht in Sekunden, ob ein geometrisch ähnliches Teil bereits in der Datenbank existiert.
 
-**Current Focus:** Phase 9 (Part Detail) — nächste Phase
+**Current Focus:** v1 Milestone vollständig — alle 10 Phasen abgeschlossen
 
 ---
 
@@ -18,12 +18,12 @@
 
 | Field | Value |
 |-------|-------|
-| Current Phase | 10 — Hardening |
-| Current Plan | — (bereit zur Ausführung) |
-| Phase Status | Phase 10 geplant — Ready to execute |
-| Overall Progress | 9/10 phases complete (Phase 10 geplant) |
+| Current Phase | — (Milestone v1 abgeschlossen) |
+| Current Plan | — |
+| Phase Status | Phase 10 Complete |
+| Overall Progress | 10/10 phases complete |
 
-**Progress:** █████████░ 90%
+**Progress:** ██████████ 100%
 
 ---
 
@@ -39,8 +39,8 @@
 | 6 | Search Pipeline | ✓ Complete (2026-05-09) |
 | 7 | Camera UI | ✓ Complete (2026-05-09) |
 | 8 | Results UI | ✓ Complete (2026-05-09) |
-| 9 | Part Detail | Not started |
-| 10 | Hardening | Not started |
+| 9 | Part Detail | ✓ Complete (2026-05-09) |
+| 10 | Hardening | ✓ Complete (2026-05-09) |
 
 ---
 
@@ -48,10 +48,10 @@
 
 | Metric | Value |
 |--------|-------|
-| Phases complete | 7/10 |
-| Plans complete | 34/34 (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6, Phase 5: 5, Phase 6: 4, Phase 7: 4, Phase 8: 4) |
+| Phases complete | 10/10 |
+| Plans complete | 43/43 |
 | Requirements covered | 15/15 |
-| v1 requirements done | 0/15 |
+| v1 requirements done | 15/15 |
 
 ---
 
@@ -104,7 +104,7 @@
 
 ### Next Action
 
-Phase 8 vollständig abgeschlossen (2026-05-09) — alle 4 Pläne done, Human-Verify approved. Nächster Schritt: Phase 9 (Part Detail) starten — /gsd-discuss-phase 9.
+Milestone v1 vollständig abgeschlossen (2026-05-09) — alle 10 Phasen abgeschlossen, Human-Verify approved. Nächster Schritt: /gsd-complete-milestone oder /gsd-new-milestone für v2.
 
 **Phase 7 — Abgeschlossen (4 Pläne in 4 Waves):**
 - [x] Wave 0 (07-01): Vitest-Stubs (CameraCapture.test.tsx) + Playwright-Stubs *(completed 2026-05-09)*

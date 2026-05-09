@@ -18,7 +18,7 @@
 - [x] **Phase 7: Camera UI** — Mobile camera capture and file upload fallback wired to search pipeline *(completed 2026-05-09)*
 - [x] **Phase 8: Results UI** — Ranked results grid with match percentage, configurable threshold and result count *(completed 2026-05-09)*
 - [x] **Phase 9: Part Detail** — Full metadata view and STEP file download *(completed 2026-05-09)*
-- [ ] **Phase 10: Hardening** — Error handling, edge cases, mobile polish, performance validation
+- [x] **Phase 10: Hardening** — Error handling, edge cases, mobile polish, performance validation *(completed 2026-05-09)*
 
 ---
 
@@ -302,9 +302,9 @@
 **Plans**: 3 plans
 
 **Wave 1** (alle drei unabhängig — parallel ausführbar)
-- [ ] 10-01-PLAN.md — SC-1: Worker-Fehler Alert mit Retry-Button, Duplikat-Link, nutzerfreundlicher Netzwerkfehlertext (UploadForm.tsx)
-- [ ] 10-02-PLAN.md — SC-2+SC-3: Mobile Touch-Targets, CameraCapture-Fehlertexte, onChange-Validierung mit MB-Angabe
-- [ ] 10-03-PLAN.md — SC-4: Serverseitige Pagination (/api/parts route.ts + CatalogTable.tsx)
+- [x] 10-01-PLAN.md — SC-1: Worker-Fehler Alert mit Retry-Button, Duplikat-Link, nutzerfreundlicher Netzwerkfehlertext (UploadForm.tsx) *(completed 2026-05-09)*
+- [x] 10-02-PLAN.md — SC-2+SC-3: Mobile Touch-Targets, CameraCapture-Fehlertexte, onChange-Validierung mit MB-Angabe *(completed 2026-05-09)*
+- [x] 10-03-PLAN.md — SC-4: Serverseitige Pagination (/api/parts route.ts + CatalogTable.tsx) *(completed 2026-05-09)*
 
 ---
 
@@ -321,7 +321,7 @@
 | 7. Camera UI | 4/4 | Complete | 2026-05-09 |
 | 8. Results UI | 4/4 | Complete | 2026-05-09 |
 | 9. Part Detail | 4/4 | Complete | 2026-05-09 |
-| 10. Hardening | 0/3 | Not started | - |
+| 10. Hardening | 3/3 | Complete | 2026-05-09 |
 
 ---
 
