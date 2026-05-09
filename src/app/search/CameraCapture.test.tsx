@@ -143,8 +143,9 @@ describe('Phase 7: CameraCapture', () => {
     fireEvent.click(screen.getByRole('button', { name: /suchen/i }))
 
     await waitFor(() => {
+      // Phase 8: threshold=0&limit=... (D-07)
       expect(global.fetch).toHaveBeenCalledWith(
-        '/api/search',
+        expect.stringMatching(/\/api\/search\?threshold=0&limit=\d+/),
         expect.objectContaining({
           method: 'POST',
           body: expect.any(FormData),
@@ -159,12 +160,12 @@ describe('Phase 7: CameraCapture', () => {
     expect(fetchCall.headers).toBeUndefined()
   })
 
-  // SEARCH-01+02: Erfolgreiche Suche (D-10)
-  it('SEARCH-01+02: POST /api/search 200 → JSON in pre-Block sichtbar (D-10)', async () => {
+  // SEARCH-01+02: Erfolgreiche Suche — Ergebnis-Grid sichtbar (Phase 8: SearchResults)
+  it('SEARCH-01+02: POST /api/search 200 → Ergebnis-Grid mit Bauteilname sichtbar (Phase 8)', async () => {
     mockGetUserMedia(true)
     const mockResponse = {
       results: [{ id: '1', name: 'Flanschplatte', part_number: null, project: null, status: 'ready', similarity: 0.92, created_at: '2026-01-01' }],
-      query: { threshold: 0.7, limit: 10, results_count: 1 },
+      query: { threshold: 0, limit: 50, results_count: 1 },
     }
     vi.mocked(global.fetch).mockResolvedValue({
       ok: true,
@@ -180,8 +181,8 @@ describe('Phase 7: CameraCapture', () => {
     fireEvent.click(screen.getByRole('button', { name: /suchen/i }))
 
     await waitFor(() => {
-      const pre = screen.getByText(/flanschplatte/i)
-      expect(pre).toBeInTheDocument()
+      // Phase 8: Bauteilname wird in SearchResultCard angezeigt (nicht mehr in <pre>)
+      expect(screen.getByText(/flanschplatte/i)).toBeInTheDocument()
     })
   })
 
