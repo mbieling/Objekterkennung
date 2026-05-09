@@ -1,14 +1,14 @@
 ---
-status: partial
+status: approved
 phase: 04-ingestion-ui
 source: [04-VERIFICATION.md]
 started: 2026-05-08T20:40:00Z
-updated: 2026-05-08T20:40:00Z
+updated: 2026-05-09T06:45:00Z
 ---
 
 ## Current Test
 
-[awaiting human testing]
+approved 2026-05-09 — SC1/SC4 manuell bestätigt, SC2/SC3 pending Docker-Worker
 
 ## Tests
 

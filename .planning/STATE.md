@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-08 (Phase 4 vollständig abgeschlossen — alle 6 Pläne complete)
+**Last updated:** 2026-05-09 (Phase 4 abgeschlossen — Human-Verify approved)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 4 in Ausführung
+**Planning status:** Phase 4 abgeschlossen — Phase 5 bereit
 
 ---
 
@@ -18,9 +18,9 @@
 
 | Field | Value |
 |-------|-------|
-| Current Phase | 4 — Ingestion UI |
-| Current Plan | Phase 4 complete |
-| Phase Status | Phase 4 executing — Wave 4 complete |
+| Current Phase | 5 — Admin Catalog |
+| Current Plan | — |
+| Phase Status | Phase 4 complete ✓ — Phase 5 not started |
 | Overall Progress | 4/10 phases complete |
 
 **Progress:** ████░░░░░░ 40%
@@ -48,7 +48,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Phases complete | 3/10 |
+| Phases complete | 4/10 |
 | Plans complete | 17/? (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6) |
 | Requirements covered | 15/15 |
 | v1 requirements done | 0/15 |
