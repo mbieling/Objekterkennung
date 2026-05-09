@@ -241,8 +241,27 @@
   2. User can adjust the similarity threshold via a slider or input; the results list updates to reflect the new threshold
   3. User can change the maximum number of results shown; the list updates accordingly
   4. Results are ordered highest-to-lowest similarity score with the best match shown first
-**Plans**: TBD
+**Plans**: 4 plans
 **UI hint**: yes
+
+**Wave 0** *(Slider-Installation + Test-Stubs + Phase-7-E2E-Fix — vor Wave 1 abschließen)*
+- [ ] 08-01-PLAN.md — shadcn Slider installieren + SearchResultCard.test.tsx + SearchResults.test.tsx Stubs + phase-08-results-ui.spec.ts Stubs + phase-07-camera-ui.spec.ts locator('pre') fixen
+
+**Wave 1** *(blocked on Wave 0)*
+- [ ] 08-02-PLAN.md — SearchResultCard.tsx (Thumbnail + Badge + Link) + SearchResults.tsx (Controller + Filterlogik + Controls-Zeile)
+
+**Wave 2** *(blocked on Wave 1)*
+- [ ] 08-03-PLAN.md — CameraCapture.tsx erweitern (displayThreshold/displayLimit State, handleSearch auf threshold=0, result-Block + searching-Block mit D-11-Overlay)
+
+**Wave 3** *(blocked on Wave 2)*
+- [ ] 08-04-PLAN.md — Playwright E2E-Tests aktivieren + Human-Verify-Checkpoint
+
+**Cross-cutting constraints:**
+- shadcn Slider via CLI installieren — kein eigener range-input (shadcn/ui first)
+- Thumbnail-useEffect deps=[id] — kein thumbnailUrl im Array (verhindert Endlosloop)
+- handleSearch: KEIN Content-Type-Header bei POST /api/search (Browser setzt Boundary automatisch)
+- Similarity Float 0–1 aus API → Math.round(similarity * 100) für Anzeige
+- Phase-7-E2E-Tests müssen nach Phase-8-Änderung weiterhin grün bleiben
 
 ---
 
@@ -284,7 +303,7 @@
 | 5. Admin Catalog | 5/5 | Complete | 2026-05-09 |
 | 6. Search Pipeline | 4/4 | Complete | 2026-05-09 |
 | 7. Camera UI | 4/4 | Complete | 2026-05-09 |
-| 8. Results UI | 0/? | Not started | - |
+| 8. Results UI | 0/4 | Not started | - |
 | 9. Part Detail | 0/? | Not started | - |
 | 10. Hardening | 0/? | Not started | - |
 
@@ -319,3 +338,4 @@
 *Roadmap created: 2026-05-07*
 *Phase 2 plans created: 2026-05-08*
 *Phase 3 plans created: 2026-05-08*
+*Phase 8 plans created: 2026-05-09*
