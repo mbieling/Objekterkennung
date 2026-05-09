@@ -17,7 +17,8 @@ test.describe('Phase 7: Camera UI', () => {
     await expect(page.getByText('Foto aus Galerie wählen')).toBeVisible()
   })
 
-  test('SEARCH-02: Datei-Upload via File-Input löst Suche aus (D-06)', async ({ page }) => {
+  // Phase 8 Wave 0: test.skip bis SearchResults-Komponente (Wave 1) existiert
+  test.skip('SEARCH-02: Datei-Upload via File-Input löst Suche aus (D-06)', async ({ page }) => {
     // Route-Mock damit kein echter Worker nötig ist
     await page.route('/api/search', async route => {
       await route.fulfill({
@@ -41,9 +42,8 @@ test.describe('Phase 7: Camera UI', () => {
     await expect(page.getByText('Suchen')).toBeVisible()
     // Suchen-Button klicken
     await page.getByText('Suchen').click()
-    // JSON-Ergebnis erscheint
-    await expect(page.locator('pre')).toBeVisible({ timeout: 10_000 })
-    await expect(page.locator('pre')).toContainText('results_count')
+    // Phase 8: pre-Block entfernt — Leer-Zustand prüfen (mock gibt leere results zurück)
+    await expect(page.getByText('Keine ähnlichen Teile gefunden.')).toBeVisible({ timeout: 10_000 })
   })
 
   test('D-02: Homepage zeigt beide Buttons (Teil hochladen + Teil suchen)', async ({ page }) => {
@@ -81,7 +81,8 @@ test.describe('Phase 7: Camera UI', () => {
     await expect(page.getByText('Suche läuft...')).toBeVisible({ timeout: 3_000 })
   })
 
-  test('D-10: JSON-Ergebnis in pre-Block nach erfolgreicher Suche', async ({ page }) => {
+  // Phase 8 Wave 0: test.skip bis SearchResults-Komponente (Wave 1) existiert
+  test.skip('D-10: Ergebnis-Grid nach erfolgreicher Suche', async ({ page }) => {
     await page.route('/api/search', async route => {
       await route.fulfill({
         status: 200,
@@ -102,6 +103,9 @@ test.describe('Phase 7: Camera UI', () => {
         }),
       })
     })
+    await page.route('/api/parts/*/thumbnail', async route => {
+      await route.fulfill({ status: 404 })
+    })
     await page.goto('/search')
     const fileInput = page.locator('input[type="file"]')
     await fileInput.setInputFiles({
@@ -110,9 +114,9 @@ test.describe('Phase 7: Camera UI', () => {
       buffer: Buffer.from('fake-jpeg-data'),
     })
     await page.getByText('Suchen').click()
-    await expect(page.locator('pre')).toBeVisible({ timeout: 10_000 })
-    await expect(page.locator('pre')).toContainText('Testbauteil')
-    await expect(page.locator('pre')).toContainText('"similarity": 0.87')
+    // Phase 8: Ergebnis-Grid statt pre-Block
+    await expect(page.getByText('Testbauteil')).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByText('87%')).toBeVisible()
   })
 
 })
