@@ -22,13 +22,8 @@ RUN conda env update -n base -f environment.yml && conda clean -afy
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# DINOv2-Modell beim Build cachen — kein Download zur Laufzeit (RESEARCH.md Pitfall 2)
-# ~330 MB; Build-Zeit ~3 Minuten beim ersten Mal
-# HF_HOME ersetzt das veraltete TRANSFORMERS_CACHE (transformers >= 4.36)
+# HF_HOME: Modell-Cache-Pfad — wird per Docker Volume persistiert (docker-compose.yml)
+# Download erfolgt beim ersten Start (~330 MB), danach aus dem Volume geladen.
 ENV HF_HOME=/app/model_cache
-RUN mkdir -p /app/model_cache && \
-    python -c "from transformers import AutoImageProcessor, AutoModel; \
-    AutoModel.from_pretrained('facebook/dinov2-base'); \
-    AutoImageProcessor.from_pretrained('facebook/dinov2-base')"
 
 COPY . .
