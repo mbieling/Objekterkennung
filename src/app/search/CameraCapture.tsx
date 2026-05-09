@@ -325,7 +325,11 @@ function CameraCapture() {
                 displayThreshold={displayThreshold}
                 displayLimit={displayLimit}
                 onThresholdChange={setDisplayThreshold}
-                onLimitChange={() => {}}
+                onLimitChange={(newLimit) => {
+                  // Speichert den neuen Wert; kein Re-Search während laufender Suche.
+                  // Der gespeicherte Wert wird beim nächsten handleSearch verwendet.
+                  setDisplayLimit(newLimit)
+                }}
               />
             </div>
           </div>
