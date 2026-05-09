@@ -215,8 +215,20 @@
   2. User can alternatively select an existing image file from their device as a search input
   3. Both capture methods deliver the photo to the search API and trigger a search without requiring a native app install
   4. The UI provides visible guidance (framing overlay or instructions) to help the user photograph the part correctly
-**Plans**: TBD
+**Plans**: 4 plans
 **UI hint**: yes
+
+**Wave 0** *(Test-Stubs — vor Wave 1 abschliessen)*
+- [ ] 07-01-PLAN.md — Vitest-Stubs (CameraCapture.test.tsx) + Playwright-Stubs (phase-07-camera-ui.spec.ts)
+
+**Wave 1** *(parallel nach Wave 0)*
+- [ ] 07-02-PLAN.md — CameraCapture.tsx (vollstaendige State Machine) + src/app/search/page.tsx (Server Component)
+
+**Wave 2** *(nach Wave 1)*
+- [ ] 07-03-PLAN.md — Homepage D-02 (zweiter Button) + CameraCapture.test.tsx Tests aktivieren
+
+**Wave 3** *(nach Wave 2)*
+- [ ] 07-04-PLAN.md — Playwright E2E Tests aktivieren + Human-Verify-Checkpoint
 
 ---
 
@@ -270,8 +282,8 @@
 | 3. Ingestion API + Queue | 6/6 | Complete | 2026-05-08 |
 | 4. Ingestion UI | 6/6 | Complete | 2026-05-08 |
 | 5. Admin Catalog | 5/5 | Complete | 2026-05-09 |
-| 6. Search Pipeline | 0/4 | In progress | - |
-| 7. Camera UI | 0/? | Not started | - |
+| 6. Search Pipeline | 4/4 | Complete | 2026-05-09 |
+| 7. Camera UI | 0/4 | Planned | - |
 | 8. Results UI | 0/? | Not started | - |
 | 9. Part Detail | 0/? | Not started | - |
 | 10. Hardening | 0/? | Not started | - |
