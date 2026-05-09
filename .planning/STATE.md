@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-09 (Phase 5 Plan 03 abgeschlossen — PATCH/DELETE/archive/retry Routes implementiert)
+**Last updated:** 2026-05-09 (Phase 5 Plan 04 abgeschlossen — CatalogTable Admin-UI implementiert)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 5 in progress — Plan 03 complete
+**Planning status:** Phase 5 in progress — Plan 04 complete
 
 ---
 
@@ -19,8 +19,8 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 5 — Admin Catalog |
-| Current Plan | 03 complete — PATCH/DELETE/archive/retry implementiert |
-| Phase Status | Phase 5 in progress — Plan 03 complete |
+| Current Plan | 04 complete — CatalogTable Admin-UI implementiert |
+| Phase Status | Phase 5 in progress — Plan 04 complete |
 | Overall Progress | 4/10 phases complete |
 
 **Progress:** ████░░░░░░ 40% (Phase 5 in progress)
@@ -49,7 +49,7 @@
 | Metric | Value |
 |--------|-------|
 | Phases complete | 4/10 |
-| Plans complete | 18/? (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6, Phase 5: 1) |
+| Plans complete | 20/? (Phase 1: 2, Phase 2: 3, Phase 3: 6, Phase 4: 6, Phase 5: 3) |
 | Requirements covered | 15/15 |
 | v1 requirements done | 0/15 |
 
@@ -118,10 +118,10 @@ Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) ist gepl
 - [x] Wave 0 (05-01): Toaster-Mount + 5 Test-Stubs *(completed 2026-05-09)*
 - [x] Wave 1 (05-02): GET /api/parts (ADMIN-01) *(completed 2026-05-09)*
 - [x] Wave 1 (05-03): PATCH/DELETE/archive/retry Routes (ADMIN-02/03/04) *(completed 2026-05-09)*
-- [ ] Wave 2 (05-04): CatalogTable-Komponente (ADMIN-01/02/03/04)
+- [x] Wave 2 (05-04): CatalogTable-Komponente (ADMIN-01/02/03/04) *(completed 2026-05-09)*
 - [ ] Wave 3 (05-05): /admin/catalog Page + E2E-Checkpoint
 
-**Nächster Schritt:** Plan 04 (CatalogTable-Komponente) ausführen.
+**Nächster Schritt:** Plan 05 (E2E-Checkpoint) ausführen.
 
 ### Entscheidung (05-01):
 - Playwright `test.skip()` statt `test.todo()` verwenden — Playwright 1.58.2 hat keine `test.todo()` API; `test.skip()` mit leerer async-Funktion ist das etablierte Muster im Projekt (vgl. `tests/phase-04-upload.spec.ts`)
@@ -131,6 +131,11 @@ Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) ist gepl
 
 ### Entscheidung (05-03):
 - Constructor-kompatibles Mock für AWS SDK Konstruktoren: `vi.fn().mockImplementation(function(this, args) { return Object.assign(this, { ...args }) })` statt arrow function — arrow functions können nicht mit `new` aufgerufen werden (TypeError: is not a constructor).
+
+### Entscheidung (05-04):
+- Header (h1 + Upload-Link) gehört in CatalogTable, nicht in page.tsx — CatalogTable ist die einzige Client-Komponente und kennt den Sheet-State.
+- `archived` nicht im Edit-Schema-Enum (nur pending/processing/ready/failed) — Archivierung bleibt dedizierter /archive-Route vorbehalten (D-10).
+- Thumbnail-useEffect mit eslint-disable für thumbnailUrls in Deps-Array — verhindert Endlosschleifen bei URL-Updates im Cache.
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*

@@ -163,7 +163,7 @@
 - [x] 05-03-PLAN.md — PATCH + DELETE /api/parts/[id] + POST /archive + POST /retry *(completed 2026-05-09)*
 
 **Wave 2** *(blocked on Wave 1: API-Design muss stabil sein)*
-- [ ] 05-04-PLAN.md — /admin page.tsx + CatalogTable.tsx (Tabs, Suche, Pagination, Sheet, AlertDialog)
+- [x] 05-04-PLAN.md — /admin page.tsx + CatalogTable.tsx (Tabs, Suche, Pagination, Sheet, AlertDialog) *(completed 2026-05-09)*
 
 **Wave 3** *(blocked on Wave 2: UI muss vorhanden sein)*
 - [ ] 05-05-PLAN.md — Playwright E2E Smoke-Tests + Human-Verify-Checkpoint
@@ -250,7 +250,7 @@
 | 2. Python Worker Spike | 3/3 | Complete (alle Pläne done) | 2026-05-08 |
 | 3. Ingestion API + Queue | 6/6 | Complete | 2026-05-08 |
 | 4. Ingestion UI | 6/6 | Complete | 2026-05-08 |
-| 5. Admin Catalog | 0/? | Not started | - |
+| 5. Admin Catalog | 4/5 | In Progress | - |
 | 6. Search Pipeline | 0/? | Not started | - |
 | 7. Camera UI | 0/? | Not started | - |
 | 8. Results UI | 0/? | Not started | - |
