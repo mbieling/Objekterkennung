@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Label } from '@/components/ui/label'
 import { AlertCircle, Loader2, Upload, CheckCircle2, XCircle, RefreshCw } from 'lucide-react'
@@ -392,10 +392,30 @@ export function UploadForm() {
                 Verarbeitung abgeschlossen. Vorschau wird geladen…
               </p>
             )}
-            {polledStatus === 'failed' && (
-              <p className="text-sm text-destructive">
-                Die Verarbeitung ist fehlgeschlagen. Bitte prüfe die STEP-Datei und versuche es erneut.
-              </p>
+            {polledStatus === 'failed' && partId && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Verarbeitung fehlgeschlagen</AlertTitle>
+                <AlertDescription>
+                  <p>Die STEP-Datei konnte nicht verarbeitet werden. Mögliche Ursachen: leere Geometrie, nicht unterstütztes STEP-Format, oder korrupte Datei.</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch(`/api/parts/${partId}/retry`, { method: 'POST' })
+                        if (!res.ok) throw new Error('Retry failed')
+                        setPhase('polling')
+                      } catch {
+                        // Fehler still ignorieren — Nutzer kann es erneut versuchen
+                      }
+                    }}
+                  >
+                    Erneut versuchen
+                  </Button>
+                </AlertDescription>
+              </Alert>
             )}
 
             {/* Verarbeitungsphasen ohne polledStatus (hashing, initializing, confirming) */}
