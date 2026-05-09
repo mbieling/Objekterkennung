@@ -121,19 +121,14 @@ export function UploadForm() {
   // Pitfall 7: Doppel-Submit verhindert durch sofortiges phase='hashing' (Button disabled)
   const onSubmit = async (values: FormValues) => {
     // 1. File-Validierung (RESEARCH.md Pattern 5)
+    // Größen- und Format-Prüfung erfolgt bereits im onChange-Handler (SC-3)
     const file = fileInputRef.current?.files?.[0]
     if (!file) {
       setFileError('Bitte eine STEP-Datei auswählen.')
       return
     }
-    if (file.size > MAX_FILE_BYTES) {
-      setFileError('Datei überschreitet die maximale Größe von 100 MB.')
-      return
-    }
-    if (!STEP_EXT_RE.test(file.name)) {
-      setFileError('Nur STEP-Dateien (.step, .stp) werden akzeptiert.')
-      return
-    }
+    // fileError wird durch onChange gesetzt — expliziter Guard verhindert Submit bei Validierungsfehler
+    if (fileError) return
     setFileError(null)
     setDuplicateId(null)
     setErrorMsg(null)
@@ -204,6 +199,24 @@ export function UploadForm() {
     setFileError(null)
   }
 
+  // onChange-Validierung (SC-3): sofortige Prüfung bei Dateiauswahl
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) {
+      setFileError(null)
+      return
+    }
+    if (file.size > MAX_FILE_BYTES) {
+      setFileError(`Diese Datei ist zu groß (${Math.round(file.size / 1024 / 1024)} MB). Maximal erlaubt: 100 MB.`)
+      return
+    }
+    if (!STEP_EXT_RE.test(file.name)) {
+      setFileError('Nur STEP-Dateien (.step, .stp) werden akzeptiert.')
+      return
+    }
+    setFileError(null)
+  }
+
   // Hilfswerte für UI-Rendering
   const isFormDisabled = phase !== 'idle' && phase !== 'duplicate'
   const showStatusTracker = phase !== 'idle' && phase !== 'duplicate' && phase !== 'error'
@@ -225,6 +238,7 @@ export function UploadForm() {
               ref={fileInputRef}
               accept=".step,.stp"
               disabled={isFormDisabled}
+              onChange={handleFileChange}
               className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-secondary file:text-secondary-foreground hover:file:bg-secondary/80 disabled:cursor-not-allowed disabled:opacity-50 min-h-[44px]"
             />
             <p className="text-xs text-muted-foreground">Maximale Dateigröße: 100 MB</p>
@@ -323,7 +337,7 @@ export function UploadForm() {
               <Button
                 type="submit"
                 disabled={isFormDisabled}
-                className="w-full"
+                className="w-full min-h-[44px]"
               >
                 {isFormDisabled ? (
                   <>
