@@ -283,7 +283,7 @@
 | 4. Ingestion UI | 6/6 | Complete | 2026-05-08 |
 | 5. Admin Catalog | 5/5 | Complete | 2026-05-09 |
 | 6. Search Pipeline | 4/4 | Complete | 2026-05-09 |
-| 7. Camera UI | 0/4 | Planned | - |
+| 7. Camera UI | 1/4 | In Progress | - |
 | 8. Results UI | 0/? | Not started | - |
 | 9. Part Detail | 0/? | Not started | - |
 | 10. Hardening | 0/? | Not started | - |

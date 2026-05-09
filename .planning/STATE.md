@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-09 (Phase 6 abgeschlossen — 4/4 Pläne, Verification human-approved)
+**Last updated:** 2026-05-09 (Phase 7 Plan 01 abgeschlossen — Wave 0 Testgerüst: CameraCapture.test.tsx + phase-07-camera-ui.spec.ts)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 6 complete — Phase 7 (Camera UI) ist nächste Phase
+**Planning status:** Phase 7 in progress — Plan 01 (Wave 0) complete, Plan 02 (Wave 1: CameraCapture.tsx) ist nächste Phase
 
 ---
 
@@ -19,8 +19,8 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 7 — Camera UI |
-| Current Plan | — |
-| Phase Status | Not started |
+| Current Plan | 01 complete — 02 next |
+| Phase Status | In progress |
 | Overall Progress | 6/10 phases complete |
 
 **Progress:** ██████░░░░ 60%
@@ -37,7 +37,7 @@
 | 4 | Ingestion UI | ✓ Complete (2026-05-08) |
 | 5 | Admin Catalog | ✓ Complete (2026-05-09) |
 | 6 | Search Pipeline | ✓ Complete (2026-05-09) |
-| 7 | Camera UI | Not started |
+| 7 | Camera UI | In progress — Plan 01 done (Wave 0) |
 | 8 | Results UI | Not started |
 | 9 | Part Detail | Not started |
 | 10 | Hardening | Not started |
@@ -141,6 +141,11 @@ Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) ist gepl
 - test.skip-Guard mit hasRows-Check (Timeout 3000ms) statt harter DB-Voraussetzung — ADMIN-02/03-Tests überspringen sich selbst wenn keine Teile in DB vorhanden; CI-kompatibel ohne Testdaten-Setup.
 - Suchfeld-Test akzeptiert beide Empty-States (kein Teil vs. kein Treffer) — robuste CI-Kompatibilität unabhängig vom DB-Füllungsgrad.
 - Downstream-Constraint für Phase 6: WHERE status = 'ready' als Filter verwenden — NICHT WHERE is_archived = false (is_archived-Boolean wird in Phase 5 nicht geschrieben).
+
+### Entscheidung (07-01):
+- `it.todo()` statt `test.skip` für Vitest-Stubs — korrekte todo-Semantik, Tests werden als "todo" markiert ohne zu fehlschlagen oder übersprungen zu werden.
+- `Object.defineProperty(global.navigator, 'mediaDevices', { value: { getUserMedia: vi.fn() }, writable: true, configurable: true })` — jsdom hat kein `navigator.mediaDevices`; direkte Eigenschaftszuweisung würde TypeError werfen.
+- `HTMLCanvasElement.prototype.toBlob = vi.fn(callback => callback(blob))` — jsdom implementiert `toBlob` nicht; synchroner Mock triggert den Callback sofort.
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*
