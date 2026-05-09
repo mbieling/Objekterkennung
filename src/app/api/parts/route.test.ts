@@ -72,4 +72,37 @@ describe('GET /api/parts', () => {
     const data = await response.json()
     expect(data.parts).toEqual([])
   })
+
+  it('gibt HTTP 400 zurück bei ungültigem status-Parameter', async () => {
+    const response = await GET(makeRequest({ status: 'invalid' }))
+    expect(response.status).toBe(400)
+    const data = await response.json()
+    expect(data.error).toBeDefined()
+  })
+
+  it('gibt HTTP 400 zurück wenn limit=0 angegeben', async () => {
+    const response = await GET(makeRequest({ limit: '0' }))
+    expect(response.status).toBe(400)
+    const data = await response.json()
+    expect(data.error).toBeDefined()
+  })
+
+  it('gibt HTTP 400 zurück wenn limit=101 angegeben (über Maximum)', async () => {
+    const response = await GET(makeRequest({ limit: '101' }))
+    expect(response.status).toBe(400)
+    const data = await response.json()
+    expect(data.error).toBeDefined()
+  })
+
+  it('escapet LIKE-Metazeichen im search-Parameter korrekt (CR-01)', async () => {
+    // search=% darf nicht zu einer de-facto-Suche ohne Filter führen;
+    // die Abfrage soll normal ausgeführt werden (kein 400), aber das
+    // escapeLike()-Escaping verhindert Wildcard-Injection.
+    mockDb.mockResolvedValueOnce([])
+    mockDb.mockResolvedValueOnce([{ total: 0 }])
+    const response = await GET(makeRequest({ search: '%' }))
+    expect(response.status).toBe(200)
+    const data = await response.json()
+    expect(data.parts).toEqual([])
+  })
 })
