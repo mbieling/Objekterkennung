@@ -1,8 +1,8 @@
 # Project State: Bauteil-Finder (CAD Part Recognition)
 
-**Last updated:** 2026-05-09 (Phase 5 geplant — 5 Pläne erstellt, bereit zur Ausführung)
+**Last updated:** 2026-05-09 (Phase 5 Plan 02 abgeschlossen — GET /api/parts implementiert)
 **Milestone:** v1 — Core Search Experience
-**Planning status:** Phase 5 geplant — bereit zur Ausführung
+**Planning status:** Phase 5 in progress — Plan 02 complete
 
 ---
 
@@ -10,7 +10,7 @@
 
 **Core Value:** Ein Ingenieur fotografiert ein Bauteil mit dem Handy und sieht in Sekunden, ob ein geometrisch ähnliches Teil bereits in der Datenbank existiert.
 
-**Current Focus:** Phase 5 (Admin Catalog) — geplant, bereit zur Ausführung
+**Current Focus:** Phase 5 (Admin Catalog) — Plan 02 complete (GET /api/parts)
 
 ---
 
@@ -19,8 +19,8 @@
 | Field | Value |
 |-------|-------|
 | Current Phase | 5 — Admin Catalog |
-| Current Plan | 01 complete — Wave 0 done |
-| Phase Status | Phase 5 in progress — Plan 01 complete |
+| Current Plan | 02 complete — GET /api/parts implementiert |
+| Phase Status | Phase 5 in progress — Plan 02 complete |
 | Overall Progress | 4/10 phases complete |
 
 **Progress:** ████░░░░░░ 40% (Phase 5 in progress)
@@ -114,10 +114,20 @@ Phase 3 vollständig abgeschlossen (2026-05-08). Phase 4 (Ingestion UI) ist gepl
 - [x] Wave 3 (04-05): UploadForm.tsx (State-Machine, SHA-256 + XHR-PUT, Duplikat-Alert) *(completed 2026-05-08)*
 - [x] Wave 4 (04-06): /upload page + Homepage-Link + Human-Verify-Checkpoint *(completed 2026-05-08)*
 
-**Nächster Schritt:** Phase 5 Plan 01 (Wave 0) abgeschlossen. Plan 02 (GET /api/parts) und Plan 03 (PATCH/DELETE/archive/retry) können parallel ausgeführt werden.
+**Phase 5 — Fortschritt:**
+- [x] Wave 0 (05-01): Toaster-Mount + 5 Test-Stubs *(completed 2026-05-09)*
+- [x] Wave 1 (05-02): GET /api/parts (ADMIN-01) *(completed 2026-05-09)*
+- [ ] Wave 1 (05-03): PATCH/DELETE/archive/retry Routes (ADMIN-02/03/04)
+- [ ] Wave 2 (05-04): CatalogTable-Komponente (ADMIN-01/02/03/04)
+- [ ] Wave 3 (05-05): /admin/catalog Page + E2E-Checkpoint
+
+**Nächster Schritt:** Plan 03 (PATCH/DELETE/archive/retry Routes) ausführen.
 
 ### Entscheidung (05-01):
 - Playwright `test.skip()` statt `test.todo()` verwenden — Playwright 1.58.2 hat keine `test.todo()` API; `test.skip()` mit leerer async-Funktion ist das etablierte Muster im Projekt (vgl. `tests/phase-04-upload.spec.ts`)
+
+### Entscheidung (05-02):
+- `vi.mocked(db)` statt top-level `mockDb = vi.fn()` — Vitest hostet `vi.mock()` ans Dateianfang; Variable noch nicht initialisiert → ReferenceError. Fix: Factory in `vi.mock()`, Import danach, `vi.mocked()` für typisierten Zugriff.
 
 ---
 *State initialized: 2026-05-07 after roadmap creation*

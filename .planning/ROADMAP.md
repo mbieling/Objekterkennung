@@ -159,7 +159,7 @@
 - [x] 05-01-PLAN.md — Toaster in layout.tsx mounten + 5 Vitest/Playwright-Test-Stubs *(completed 2026-05-09)*
 
 **Wave 1** *(parallel ausführbar, blocked on Wave 0)*
-- [ ] 05-02-PLAN.md — GET /api/parts (alle Teile, kein embedding)
+- [x] 05-02-PLAN.md — GET /api/parts (alle Teile, kein embedding) *(completed 2026-05-09)*
 - [ ] 05-03-PLAN.md — PATCH + DELETE /api/parts/[id] + POST /archive + POST /retry
 
 **Wave 2** *(blocked on Wave 1: API-Design muss stabil sein)*
