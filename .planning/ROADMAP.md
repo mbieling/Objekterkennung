@@ -299,8 +299,12 @@
   2. The camera search flow is fully usable on a mid-range Android phone in a workshop lighting environment
   3. Uploading a STEP file larger than 100 MB is rejected at the form level with an informative message before any network request
   4. The parts catalog remains responsive (under 2s load) with 1,000+ parts indexed
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 3 plans
+
+**Wave 1** (alle drei unabhängig — parallel ausführbar)
+- [ ] 10-01-PLAN.md — SC-1: Worker-Fehler Alert mit Retry-Button, Duplikat-Link, nutzerfreundlicher Netzwerkfehlertext (UploadForm.tsx)
+- [ ] 10-02-PLAN.md — SC-2+SC-3: Mobile Touch-Targets, CameraCapture-Fehlertexte, onChange-Validierung mit MB-Angabe
+- [ ] 10-03-PLAN.md — SC-4: Serverseitige Pagination (/api/parts route.ts + CatalogTable.tsx)
 
 ---
 
@@ -317,7 +321,7 @@
 | 7. Camera UI | 4/4 | Complete | 2026-05-09 |
 | 8. Results UI | 4/4 | Complete | 2026-05-09 |
 | 9. Part Detail | 4/4 | Complete | 2026-05-09 |
-| 10. Hardening | 0/? | Not started | - |
+| 10. Hardening | 0/3 | Not started | - |
 
 ---
 
