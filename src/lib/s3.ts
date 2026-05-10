@@ -12,6 +12,9 @@ export const s3 = new S3Client({
   ...(process.env.DECOMPOSEDS3_ENDPOINT
     ? { endpoint: process.env.DECOMPOSEDS3_ENDPOINT, forcePathStyle: true }
     : {}),
+  // Verhindert x-amz-checksum-mode=ENABLED in Presigned URLs (inkompatibel mit non-AWS S3)
+  requestChecksumCalculation: 'WHEN_REQUIRED',
+  responseChecksumValidation: 'WHEN_REQUIRED',
 })
 
 // Bucket-Namen als Konstanten — Pfadkonvention: {part_id}/original.step, {part_id}/view_0.png … view_7.png
