@@ -115,15 +115,11 @@ export function UploadForm() {
   useEffect(() => {
     if (polledStatus === 'ready' && phase === 'polling') {
       setPhase('ready')
-      // Thumbnail fetchen nach status='ready' (D-07, D-08)
-      const controller = new AbortController()
-      fetch(`/api/parts/${partId}/thumbnail`, { signal: controller.signal })
+      // Kein AbortController — cleanup würde den Fetch abbrechen bevor setThumbnailUrl aufgerufen wird
+      fetch(`/api/parts/${partId}/thumbnail`)
         .then(r => r.ok ? r.json() : Promise.reject(new Error(`thumb HTTP ${r.status}`)))
         .then(({ url }: { url: string }) => setThumbnailUrl(url))
-        .catch(() => {
-          // UI-SPEC: Skeleton bleibt sichtbar, kein Fallback in Phase 4 (deferred to Phase 10)
-        })
-      return () => controller.abort()
+        .catch(() => {})
     }
     if (polledStatus === 'failed' && phase === 'polling') setPhase('failed')
     if (timedOut && phase === 'polling') setPhase('failed')
