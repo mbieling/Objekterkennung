@@ -81,7 +81,7 @@ def render_views(shape, output_dir: str) -> list[str]:
     Returns:
         Liste mit 8 PNG-Pfaden: [output_dir/view_0.png, ..., output_dir/view_7.png]
     """
-    viewer = Viewer3d()
+    viewer = Viewer3d(offscreen=True)
     viewer.Create()
     viewer.View.Window().SetSize(512, 512)  # IN-03 Fix: explizite Auflösung statt VTK-Default
     viewer.SetModeShaded()
