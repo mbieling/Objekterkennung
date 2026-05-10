@@ -83,7 +83,6 @@ def render_views(shape, output_dir: str) -> list[str]:
     """
     viewer = Viewer3d()
     viewer.Create()
-    viewer.View.Window().SetSize(512, 512)  # IN-03 Fix: explizite Auflösung statt VTK-Default
     viewer.SetModeShaded()
     # Weißer Hintergrund (D-05): maximaler Kontrast für dunkle Metallbauteile
     viewer.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
