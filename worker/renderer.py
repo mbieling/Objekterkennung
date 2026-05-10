@@ -89,12 +89,11 @@ def render_views(shape, output_dir: str) -> list[str]:
     viewer.DisplayShape(shape, update=True)
 
     paths = []
-    try:
-        for i, (name, orientation) in enumerate(VIEWS):
-            viewer.View.SetProj(orientation)
-            viewer.FitAll()  # Automatischer Kamera-Abstand aus Bounding-Box
-            path = os.path.join(output_dir, f"view_{i}.png")  # view_0..view_7 (S3-Pfadkonvention)
-            viewer.ExportToImage(path)
-            paths.append(path)
-            logger.info(f"View {i} ({name}): {path}")
+    for i, (name, orientation) in enumerate(VIEWS):
+        viewer.View.SetProj(orientation)
+        viewer.FitAll()
+        path = os.path.join(output_dir, f"view_{i}.png")
+        viewer.ExportToImage(path)
+        paths.append(path)
+        logger.info(f"View {i} ({name}): {path}")
     return paths
