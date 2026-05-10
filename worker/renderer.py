@@ -97,11 +97,4 @@ def render_views(shape, output_dir: str) -> list[str]:
             viewer.ExportToImage(path)
             paths.append(path)
             logger.info(f"View {i} ({name}): {path}")
-    finally:
-        # CR-02 Fix: Nativen Render-Kontext explizit freigeben (verhindert Speicherleck bei Batch-Betrieb)
-        try:
-            viewer.Viewer.Remove()
-        except Exception:
-            pass
-
-    return paths  # 8 PNG-Pfade (512x512px explizit gesetzt)
+    return paths
