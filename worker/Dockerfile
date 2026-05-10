@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     libgomp1 \
     curl \
+    xvfb \
     --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
