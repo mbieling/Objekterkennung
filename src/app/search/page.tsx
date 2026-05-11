@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 
 export default function SearchPage() {
   return (
-    <main className="min-h-screen bg-background py-8 px-4">
+    <div className="py-8 px-4">
       <div className="max-w-md mx-auto">
         <h1 className="text-2xl font-semibold mb-8">Bauteil fotografieren</h1>
         <CameraCapture />
       </div>
-    </main>
+    </div>
   )
 }

@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 
 export default function AdminPage() {
   return (
-    <main className="min-h-screen bg-background py-8 px-4">
+    <div className="py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <CatalogTable />
       </div>
-    </main>
+    </div>
   )
 }

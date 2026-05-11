@@ -12,10 +12,10 @@ export default async function PartDetailPage({
 }) {
   const { id } = await params  // Next.js 16: params ist Promise
   return (
-    <main className="min-h-screen bg-background py-8 px-4">
+    <div className="py-8 px-4">
       <div className="max-w-md mx-auto">
         <PartDetail id={id} />
       </div>
-    </main>
+    </div>
   )
 }
