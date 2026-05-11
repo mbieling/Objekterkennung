@@ -147,14 +147,26 @@ def process(part_id: str) -> None:
                 thumbnail_urls.append(s3_url)
                 logger.info(f"[{part_id}] Hochgeladen: {s3_url}")
 
-            # Schritt 6: DINOv2-Embeddings berechnen + Mean-Pool (D-07)
+            # Schritt 6: DINOv2-Embeddings berechnen — mode='render' für die Pipeline-Konsistenz
+            # (rembg läuft auch auf Renderings, damit beide Domänen identische Bildraum-Statistik haben)
             logger.info(f"[{part_id}] DINOv2-Inferenz für 8 Views...")
-            embeddings = [get_embedding(path) for path in png_paths]
+            embeddings = [get_embedding(path, mode="render") for path in png_paths]
             mean_embedding = mean_pool(embeddings)
             assert mean_embedding.shape == (768,), f"Embedding-Shape: {mean_embedding.shape}"
             logger.info(f"[{part_id}] Mean-Embedding: shape={mean_embedding.shape}, norm={np.linalg.norm(mean_embedding):.4f}")
 
-            # Schritt 7: DB schreiben (embedding, thumbnail_urls, thumbnail_count, status='ready')
+            # Schritt 7a: Alte part_views löschen (Re-Processing-tauglich)
+            cur.execute("DELETE FROM part_views WHERE part_id = %s", (part_id,))
+
+            # Schritt 7b: Alle 8 View-Embeddings einzeln in part_views schreiben (Hebel 2)
+            for view_idx, view_embedding in enumerate(embeddings):
+                cur.execute(
+                    "INSERT INTO part_views (part_id, view_idx, embedding) VALUES (%s, %s, %s)",
+                    (part_id, view_idx, view_embedding)
+                )
+            logger.info(f"[{part_id}] {len(embeddings)} View-Embeddings in part_views geschrieben")
+
+            # Schritt 7c: parts-Tabelle aktualisieren (Mean-Embedding bleibt als Fallback)
             cur.execute("""
                 UPDATE parts SET
                     embedding = %s,

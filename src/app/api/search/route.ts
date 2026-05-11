@@ -121,27 +121,33 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // Temp-Objekt wird nicht mehr benötigt sobald das Embedding vorliegt
   await cleanupTempS3(tempKey)
 
-  // 6. pgvector Cosine Similarity Query (Pitfall 1 + 3)
+  // 6. pgvector Cosine Similarity Query — Multi-View Max-per-Part (Hebel 2)
   // KRITISCH: embeddingLiteral als String — Neon serialisiert number[] als PG-Array {0.1,...},
   //           pgvector erwartet Literal-Format [0.1,...]::vector
   // KRITISCH: Threshold-Filter NICHT als Alias (Pitfall 3) — Ausdruck vollständig wiederholen
-  // Filter: WHERE status = 'ready' — KEIN is_archived (D-12, Phase-5-Downstream-Constraint)
+  //
+  // Strategie:
+  //   - part_views enthält 8 Embeddings pro Bauteil (je eine Render-Perspektive)
+  //   - Für jedes Bauteil: Cosine-Similarity der BESTEN passenden View nehmen (MAX)
+  //   - Mean-Pool über alle Views (alter Ansatz) hat Form-Diskriminanz zerstört
+  // Filter: parts.status = 'ready' — kein is_archived (D-12)
   const embeddingLiteral = `[${embedding.join(',')}]`
 
   const rows = await db`
     SELECT
-      id,
-      name,
-      part_number,
-      project,
-      status,
-      created_at,
-      1 - (embedding <=> ${embeddingLiteral}::vector) AS similarity
-    FROM parts
-    WHERE status = 'ready'
-      AND embedding IS NOT NULL
-      AND 1 - (embedding <=> ${embeddingLiteral}::vector) >= ${threshold}
-    ORDER BY embedding <=> ${embeddingLiteral}::vector
+      p.id,
+      p.name,
+      p.part_number,
+      p.project,
+      p.status,
+      p.created_at,
+      MAX(1 - (pv.embedding <=> ${embeddingLiteral}::vector)) AS similarity
+    FROM parts p
+    JOIN part_views pv ON pv.part_id = p.id
+    WHERE p.status = 'ready'
+    GROUP BY p.id, p.name, p.part_number, p.project, p.status, p.created_at
+    HAVING MAX(1 - (pv.embedding <=> ${embeddingLiteral}::vector)) >= ${threshold}
+    ORDER BY similarity DESC
     LIMIT ${limit}
   `
 
