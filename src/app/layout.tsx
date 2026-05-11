@@ -22,13 +22,13 @@ export default function RootLayout({
             <Link href="/" className="flex items-center gap-3 group">
               <Image
                 src="/bbs-logo.svg"
-                alt="BBS Automation"
-                width={120}
-                height={40}
+                alt="BBS Automation Stuttgart"
+                width={156}
+                height={80}
                 priority
-                className="h-9 w-auto"
+                className="h-10 w-auto"
               />
-              <span className="hidden sm:inline text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+              <span className="hidden sm:flex items-center text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors pl-3 border-l border-border h-6">
                 Objekterkennung
               </span>
             </Link>
