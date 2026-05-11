@@ -13,3 +13,6 @@ fastapi>=0.136.0,<1.0.0
 uvicorn>=0.30.0,<1.0.0
 celery>=5.6.0,<6.0.0
 redis>=7.0.0,<8.0.0
+# Hebel 1: Background-Removal für Foto-Vorverarbeitung (rembg = U²Net via onnxruntime)
+rembg>=2.0.50,<3.0.0
+onnxruntime>=1.16.0,<2.0.0

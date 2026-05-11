@@ -28,5 +28,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Download erfolgt beim ersten Start (~330 MB), danach aus dem Volume geladen.
 ENV HF_HOME=/app/model_cache
 
+# rembg U²Net-Modell vorab herunterladen, damit erster Suchaufruf nicht blockiert.
+# Standardpfad: ~/.u2net/u2net.onnx (~170 MB) — wir setzen explizit U2NET_HOME.
+ENV U2NET_HOME=/app/u2net_cache
+RUN python -c "from rembg import new_session; new_session('u2net')" || \
+    echo "rembg pre-download fehlgeschlagen — Modell wird beim ersten Aufruf geladen"
+
 # Dateien als worker/-Paket kopieren, damit uvicorn/celery worker.main finden
 COPY . ./worker/

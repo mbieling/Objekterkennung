@@ -4,10 +4,13 @@
 # HF_HOME=/app/model_cache (Dockerfile) — kein HuggingFace-Download zur Laufzeit.
 
 import logging
+from typing import Literal
+
 import numpy as np
-from PIL import Image
 import torch
 from transformers import AutoImageProcessor, AutoModel
+
+from worker.preprocess import prepare_image
 
 logger = logging.getLogger(__name__)
 
@@ -21,50 +24,58 @@ _model.eval()
 logger.info("DINOv2-Modell geladen")
 
 
-def get_embedding(image_path: str) -> np.ndarray:
+def get_embedding(
+    image_path: str,
+    mode: Literal["photo", "render"] = "photo",
+) -> np.ndarray:
     """Berechnet Patch-Token Mean-Pool Embedding (768-dim) für ein Bild.
 
     Args:
-        image_path: Pfad zu einer PNG-Datei (512x512px aus renderer.py)
+        image_path: Pfad zu einer Bilddatei (PNG/JPG).
+        mode: "photo" für Suchfotos, "render" für STEP-Renderings.
+              Beide Modi durchlaufen die gleiche Preprocessing-Pipeline
+              (Background-Removal, Crop, Padding) für einen konsistenten Bildraum.
 
     Returns:
-        numpy-Array der Shape (768,) — DINOv2 ViT-B/14 Patch-Token Mean-Pool
+        numpy-Array der Shape (768,) — DINOv2 ViT-B/14 Patch-Token Mean-Pool.
 
-    Preprocessing (D-06):
-        - Resize auf 224x224 VOR AutoImageProcessor (verhindert unerwartete Skalierung)
-        - Mean-Pool der Patch-Tokens (Index 1..256) — NICHT CLS-Token (Index 0)
-        - CR-03 Fix: Patch-Mean-Pool liefert bessere geometrische Ähnlichkeit als CLS-Token
-          Quelle: 02-REVIEW.md CR-03 + CLAUDE.md Architektur-Entscheidung
+    Pipeline:
+        1. prepare_image() — rembg + Crop + Padding auf 224x224 (worker/preprocess.py)
+        2. AutoImageProcessor (Normalisierung)
+        3. DINOv2 Forward-Pass
+        4. Mean-Pool über Patch-Tokens (Index 1..256), KEIN CLS-Token
     """
-    # Resize auf 224x224px (D-06: DINOv2 nativer Input) vor Processor
-    img = Image.open(image_path).convert("RGB").resize((224, 224))
+    img = prepare_image(image_path, mode=mode)
 
     inputs = _processor(images=img, return_tensors="pt")
 
     with torch.no_grad():
         outputs = _model(**inputs)
 
-    # CR-03 Fix: Patch-Token Mean-Pool statt CLS-Token
-    # last_hidden_state: Shape [batch=1, seq_len=257, hidden=768]
-    # Index 0 = CLS-Token, Index 1..256 = 256 Patch-Tokens (16x16 Patches bei 224px)
-    patch_tokens = outputs.last_hidden_state[:, 1:, :]  # Shape: [1, 256, 768]
-    mean_embedding = patch_tokens.mean(dim=1).squeeze().numpy()  # Shape: (768,)
+    # Patch-Token Mean-Pool — last_hidden_state Shape: [1, 257, 768]
+    # Index 0 = CLS-Token, Index 1..256 = 256 Patch-Tokens (16x16 bei 224px)
+    patch_tokens = outputs.last_hidden_state[:, 1:, :]
+    mean_embedding = patch_tokens.mean(dim=1).squeeze().numpy()
 
     assert mean_embedding.shape == (768,), f"Unerwartete Embedding-Shape: {mean_embedding.shape}"
     return mean_embedding
 
 
 def mean_pool(embeddings: list) -> np.ndarray:
-    """Mean-Pool über alle 8 View-Embeddings zu einem einzigen 768-dim Vektor (D-07).
+    """Mean-Pool über N View-Embeddings zu einem einzigen 768-dim Vektor.
+
+    Wird weiterhin als Fallback in parts.embedding geschrieben, damit alte Routen
+    (z.B. Admin-Listen) ohne Multi-View-Query auskommen. Die eigentliche Suche
+    läuft seit Hebel-2 über part_views (Max-per-Group statt Mean).
 
     Args:
-        embeddings: Liste von 8 numpy-Arrays, je Shape (768,)
+        embeddings: Liste von numpy-Arrays, je Shape (768,).
 
     Returns:
-        numpy-Array der Shape (768,) — arithmetisches Mittel aller Views
+        numpy-Array der Shape (768,) — arithmetisches Mittel aller Views.
     """
     assert len(embeddings) > 0, "Leere Embedding-Liste"
-    stacked = np.stack(embeddings)  # Shape: (N, 768)
-    pooled = np.mean(stacked, axis=0)  # Shape: (768,)
+    stacked = np.stack(embeddings)
+    pooled = np.mean(stacked, axis=0)
     assert pooled.shape == (768,), f"Unerwartete Pool-Shape: {pooled.shape}"
     return pooled

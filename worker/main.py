@@ -10,9 +10,10 @@ import logging
 import boto3
 import tempfile
 import os
+from typing import Literal
 
 from fastapi import FastAPI
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel, UUID4, Field
 
 from worker.tasks import process_step_task
 from worker.embedder import get_embedding
@@ -39,8 +40,10 @@ class EmbedRequest(BaseModel):
     """Request-Body für POST /embed.
 
     s3_key ist der S3-Objektschlüssel des Thumbnails (z.B. "thumbnails/part-uuid/view-0.jpg").
+    mode steuert die Preprocessing-Pipeline (Default: "photo" — Suchfotos).
     """
     s3_key: str
+    mode: Literal["photo", "render"] = Field(default="photo")
 
 
 class EmbedResponse(BaseModel):
@@ -101,8 +104,8 @@ def embed(req: EmbedRequest) -> EmbedResponse:
             req.s3_key,
             tmp_path,
         )
-        embedding = get_embedding(tmp_path)
-        logger.info(f"[{req.s3_key}] Embedding berechnet, shape={embedding.shape}")
+        embedding = get_embedding(tmp_path, mode=req.mode)
+        logger.info(f"[{req.s3_key}] Embedding berechnet (mode={req.mode}), shape={embedding.shape}")
         return EmbedResponse(embedding=embedding.tolist())
     finally:
         if os.path.exists(tmp_path):
