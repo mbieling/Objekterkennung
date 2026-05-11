@@ -2,7 +2,6 @@
 paths:
   - "src/app/api/**"
   - ".env*"
-  - "supabase/**"
   - "next.config.*"
 ---
 
@@ -19,10 +18,10 @@ paths:
 - Never trust client-side validation alone
 - Sanitize data before database insertion
 
-## Authentication
-- Always verify authentication before processing API requests
-- Use Supabase RLS as a second line of defense
-- Implement rate limiting on authentication endpoints
+## API Security
+- Kein direkter Client-Zugriff auf DB — alle DB-Operationen nur über Next.js API-Routen (server-only)
+- Worker-Endpunkte (Port 8000) sind intern — nicht öffentlich exponieren
+- Rate Limiting auf Upload- und Search-Endpunkten beachten
 
 ## Security Headers
 - X-Frame-Options: DENY
@@ -31,6 +30,4 @@ paths:
 - Strict-Transport-Security with includeSubDomains
 
 ## Code Review Triggers
-- Any changes to RLS policies require explicit user approval
-- Any changes to authentication flow require explicit user approval
 - Any new environment variables must be documented in .env.local.example

@@ -25,12 +25,37 @@ Dieses Projekt verwendet Get-Shit-Done (GSD). Planungsdokumente liegen in `.plan
 - Datenbankzugriff ausschließlich über **Neon PostgreSQL** (`src/lib/db.ts`) — `db` ist ein tagged-template-literal-Client
 - S3-Zugriff über `src/lib/s3.ts` — zwei Buckets: `BUCKET_STEPS` (STEP-Dateien) und `BUCKET_THUMBNAILS` (Thumbnails + Search-Temp)
 - `src/components/ui/` sind shadcn/ui-Komponenten — **niemals neu erstellen, nur importieren**
+- `src/components/common/` — projektspezifische Wiederverwendungskomponenten (`EmptyState`, `LoadingSkeleton`, `PageHeader`) — immer prüfen, bevor neue erstellt werden
+
+**Pages:**
+- `/upload` — STEP-Datei hochladen (`UploadForm.tsx`)
+- `/search` — Bauteil per Kamera suchen (`CameraCapture.tsx` + `SearchResults.tsx`)
+- `/parts/[id]` — Bauteil-Detailseite (`PartDetail.tsx`)
+- `/admin` — Katalogverwaltung (`CatalogTable.tsx`)
+
+**API-Routen (Next.js):**
+- `POST /api/upload/init` — Duplikatprüfung, `parts`-Eintrag anlegen, Presigned PUT-URL
+- `POST /api/upload/confirm` — Status → `processing`, Worker `/enqueue` aufrufen
+- `POST /api/search` — FormData (Foto) → S3-Temp-Upload → Worker `/embed` → pgvector → S3-Cleanup
+- `GET /api/parts` — Bauteil-Liste
+- `GET/DELETE /api/parts/[id]` — Einzelnes Bauteil
+- `GET /api/parts/[id]/status` — Polling (verwendet von `use-part-status` Hook)
+- `POST /api/parts/[id]/archive` — Archivieren
+- `POST /api/parts/[id]/retry` — Fehlgeschlagene Verarbeitung wiederholen
+- `GET /api/parts/[id]/download` — Presigned Download-URL für STEP-Datei
 
 ### 2. Python Worker (`worker/`)
 - FastAPI + Celery + Redis
 - DINOv2 ViT-B/14 für Embeddings (`worker/embedder.py`)
 - STEP → Thumbnails via OCC/PythonOCC (`worker/process_step.py`, `worker/renderer.py`)
 - Läuft als Docker-Container: `docker compose up`
+
+**Worker-API-Endpunkte (intern, Port 8000):**
+- `GET /health` — Health-Check
+- `POST /enqueue` — `{part_id}` → Celery-Task einreihen (HTTP 202)
+- `POST /embed` — `{s3_key}` → synchrones Embedding (HTTP 200, 768 Floats)
+
+**S3-Pfadkonvention:** `{part_id}/original.step` (STEP-Bucket), `{part_id}/view_0.png … view_7.png` (Thumbnails-Bucket)
 
 ## Build & Test
 
@@ -117,6 +142,20 @@ Migration-Dateien in `supabase/migrations/` — manuell im Neon Dashboard oder v
 - STEP-Verarbeitung: Python-Microservice (Docker), NICHT in Next.js/Vercel
 - Async-Queue: FastAPI + Celery + Redis
 - DB-Client: Neon (`@neondatabase/serverless`), **nicht** Supabase-Client — `src/lib/db.ts` ist server-only
+
+## Design System
+
+Das Projekt verwendet das BBS Design System (`DESIGN-SYSTEM.md`). Keine generischen Tailwind-Graustufen für Markenfarben verwenden:
+- **BBS Orange** `#f29000` → `bg-primary` / `text-primary` (Buttons, Links, Fokus)
+- **BBS Blau** `#007cba` → `bg-secondary` / `text-secondary` (Sekundäre Aktionen)
+
+Tailwind-Konfiguration aus `DESIGN-SYSTEM-files/tailwind.config.ts` kopieren, nicht manuell erstellen.
+
+## Umgebungsvariablen
+
+Vorlage: `.env.local.example` — alle benötigten Variablen mit Platzhaltern. Lokal: `.env.local`.
+
+Worker nutzt eigene `.env` (`worker/.env.example`). Wichtig: `DECOMPOSEDS3_ENDPOINT` nur bei Non-AWS-S3 setzen (aktiviert `forcePathStyle: true`).
 
 ## Tests
 

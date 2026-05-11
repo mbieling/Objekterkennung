@@ -28,7 +28,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 - Keep components small and focused
 - Use TypeScript interfaces for all props
 
-## Auth Best Practices (Supabase)
-- Use `window.location.href` for post-login redirect (not `router.push`)
-- Always verify `data.session` exists before redirecting
-- Always reset loading state in all code paths (success, error, finally)
+## Common Components
+- Vor neuen Komponenten immer `src/components/common/` prüfen — `EmptyState`, `LoadingSkeleton`, `PageHeader` vorhanden
+- Farben ausschließlich über Design-System-Tokens: `bg-primary` (BBS Orange), `bg-secondary` (BBS Blau) — keine Hex-Werte hardcoden

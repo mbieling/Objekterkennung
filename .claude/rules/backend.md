@@ -1,32 +1,28 @@
 ---
 paths:
   - "src/app/api/**"
-  - "src/lib/supabase*"
-  - "supabase/**"
+  - "src/lib/**"
+  - "worker/**"
 ---
 
 # Backend Development Rules
 
-## Database (Supabase)
-- ALWAYS enable Row Level Security on every table
-- Create RLS policies for SELECT, INSERT, UPDATE, DELETE
-- Add indexes on columns used in WHERE, ORDER BY, and JOIN clauses
-- Use foreign keys with ON DELETE CASCADE where appropriate
-- Never skip RLS - security first
+## Datenbank (Neon PostgreSQL)
+- DB-Client ausschließlich `db` aus `src/lib/db.ts` verwenden — tagged-template-literal-Client (`@neondatabase/serverless`)
+- **NIEMALS** Supabase-Client oder andere Datenbank-Libraries einbinden
+- RLS ist **bewusst deaktiviert** — kein direkter Browser-Zugriff auf DB
+- Migrationen in `supabase/migrations/` — manuell im Neon Dashboard oder via `supabase db push` einspielen
 
-## API Routes
-- Validate all inputs using Zod schemas before processing
-- Always check authentication: verify user session exists
-- Return meaningful error messages with appropriate HTTP status codes
-- Use `.limit()` on all list queries
+## API-Routen
+- Alle Inputs mit Zod-Schemas validieren
+- Sinnvolle HTTP-Status-Codes zurückgeben
+- `.limit()` auf alle Listen-Queries
 
-## Query Patterns
-- Use Supabase joins instead of N+1 query loops
-- Use `unstable_cache` from Next.js for rarely-changing data
-- Always handle errors from Supabase responses
+## Query-Patterns
+- pgvector-Embeddings immer als String übergeben: `` `[${embedding.join(',')}]` `` — kein Array (Neon serialisiert anders)
+- Cosine-Similarity-Ausdruck im WHERE vollständig wiederholen — kein Alias
 
-## Security
-- Never hardcode secrets in source code
-- Use environment variables for all credentials
-- Validate and sanitize all user input
-- Use parameterized queries (Supabase handles this)
+## S3
+- `s3` und Bucket-Konstanten aus `src/lib/s3.ts` — server-only, nie in Client-Komponenten
+- `ContentType` **nicht** in `signableHeaders` bei Presigned URLs
+- `DECOMPOSEDS3_ENDPOINT` → `forcePathStyle: true` ist bereits in `s3.ts` gehandhabt
