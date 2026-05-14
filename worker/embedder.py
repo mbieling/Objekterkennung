@@ -16,7 +16,9 @@ logger = logging.getLogger(__name__)
 
 # Einmaliges Laden beim Modulimport (RESEARCH.md Anti-Pattern: nicht in Schleife laden)
 # TRANSFORMERS_CACHE=/app/model_cache via Dockerfile ENV — Modell ist bereits gecacht
-_MODEL_NAME = "facebook/dinov2-base"
+_MODEL_NAME = "facebook/dinov2-large"
+EMBEDDING_DIM = 1024  # DINOv2 ViT-L/14 hidden state dim (base war 768, large ist 1024)
+
 logger.info(f"Lade DINOv2-Modell: {_MODEL_NAME}")
 _processor = AutoImageProcessor.from_pretrained(_MODEL_NAME)
 _model = AutoModel.from_pretrained(_MODEL_NAME)
@@ -28,7 +30,7 @@ def get_embedding(
     image_path: str,
     mode: Literal["photo", "render"] = "photo",
 ) -> np.ndarray:
-    """Berechnet Patch-Token Mean-Pool Embedding (768-dim) für ein Bild.
+    """Berechnet Patch-Token Mean-Pool Embedding (EMBEDDING_DIM-dim) für ein Bild.
 
     Args:
         image_path: Pfad zu einer Bilddatei (PNG/JPG).
@@ -37,7 +39,7 @@ def get_embedding(
               (Background-Removal, Crop, Padding) für einen konsistenten Bildraum.
 
     Returns:
-        numpy-Array der Shape (768,) — DINOv2 ViT-B/14 Patch-Token Mean-Pool.
+        numpy-Array der Shape (EMBEDDING_DIM,) — DINOv2 ViT-L/14 Patch-Token Mean-Pool.
 
     Pipeline:
         1. prepare_image() — rembg + Crop + Padding auf 224x224 (worker/preprocess.py)
@@ -52,30 +54,30 @@ def get_embedding(
     with torch.no_grad():
         outputs = _model(**inputs)
 
-    # Patch-Token Mean-Pool — last_hidden_state Shape: [1, 257, 768]
+    # Patch-Token Mean-Pool — last_hidden_state Shape: [1, 257, EMBEDDING_DIM]
     # Index 0 = CLS-Token, Index 1..256 = 256 Patch-Tokens (16x16 bei 224px)
     patch_tokens = outputs.last_hidden_state[:, 1:, :]
     mean_embedding = patch_tokens.mean(dim=1).squeeze().numpy()
 
-    assert mean_embedding.shape == (768,), f"Unerwartete Embedding-Shape: {mean_embedding.shape}"
+    assert mean_embedding.shape == (EMBEDDING_DIM,), f"Unerwartete Embedding-Shape: {mean_embedding.shape}"
     return mean_embedding
 
 
 def mean_pool(embeddings: list) -> np.ndarray:
-    """Mean-Pool über N View-Embeddings zu einem einzigen 768-dim Vektor.
+    """Mean-Pool über N View-Embeddings zu einem einzigen EMBEDDING_DIM-Vektor.
 
     Wird weiterhin als Fallback in parts.embedding geschrieben, damit alte Routen
     (z.B. Admin-Listen) ohne Multi-View-Query auskommen. Die eigentliche Suche
     läuft seit Hebel-2 über part_views (Max-per-Group statt Mean).
 
     Args:
-        embeddings: Liste von numpy-Arrays, je Shape (768,).
+        embeddings: Liste von numpy-Arrays, je Shape (EMBEDDING_DIM,).
 
     Returns:
-        numpy-Array der Shape (768,) — arithmetisches Mittel aller Views.
+        numpy-Array der Shape (EMBEDDING_DIM,) — arithmetisches Mittel aller Views.
     """
     assert len(embeddings) > 0, "Leere Embedding-Liste"
     stacked = np.stack(embeddings)
     pooled = np.mean(stacked, axis=0)
-    assert pooled.shape == (768,), f"Unerwartete Pool-Shape: {pooled.shape}"
+    assert pooled.shape == (EMBEDDING_DIM,), f"Unerwartete Pool-Shape: {pooled.shape}"
     return pooled

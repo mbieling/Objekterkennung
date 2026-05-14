@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 
 # Worker-Module (aus worker/-Verzeichnis)
 from worker.renderer import load_step, validate_geometry, render_views, VIEW_COUNT
-from worker.embedder import get_embedding, mean_pool
+from worker.embedder import get_embedding, mean_pool, EMBEDDING_DIM
 
 # .env-Datei laden wenn vorhanden (lokale Entwicklung)
 load_dotenv()
@@ -84,7 +84,7 @@ def process(part_id: str) -> None:
         3. STEP laden + Geometrie validieren (face_count >= 4, BBox-Volumen > 1e-6)
         4. 8 Views rendern (renderer.py) → 8 PNG-Dateien (512x512px)
         5. S3: 8 PNGs hochladen ({part_id}/view_0..7.png in BUCKET_THUMBNAILS)
-        6. DINOv2: Embedding für alle 8 Views → Mean-Pool → 768-dim Vektor
+        6. DINOv2: Embedding für alle N Views → Mean-Pool → EMBEDDING_DIM-Vektor
         7. DB: embedding, embedding_model, embedding_version, thumbnail_urls, status='ready'
 
     Fehlerbehandlung:
@@ -103,7 +103,7 @@ def process(part_id: str) -> None:
     try:
         # DB-Verbindung öffnen
         conn = psycopg2.connect(os.environ["DATABASE_URL"])
-        register_vector(conn)  # PFLICHT vor erstem vector(768)-Query (RESEARCH.md Anti-Pattern)
+        register_vector(conn)  # PFLICHT vor erstem vector(N)-Query (RESEARCH.md Anti-Pattern)
         cur = conn.cursor()
 
         # Schritt 1: Status → 'processing'
@@ -152,7 +152,7 @@ def process(part_id: str) -> None:
             logger.info(f"[{part_id}] DINOv2-Inferenz für 8 Views...")
             embeddings = [get_embedding(path, mode="render") for path in png_paths]
             mean_embedding = mean_pool(embeddings)
-            assert mean_embedding.shape == (768,), f"Embedding-Shape: {mean_embedding.shape}"
+            assert mean_embedding.shape == (EMBEDDING_DIM,), f"Embedding-Shape: {mean_embedding.shape}"
             logger.info(f"[{part_id}] Mean-Embedding: shape={mean_embedding.shape}, norm={np.linalg.norm(mean_embedding):.4f}")
 
             # Schritt 7a: Alte part_views löschen (Re-Processing-tauglich)
@@ -177,9 +177,9 @@ def process(part_id: str) -> None:
                     status = 'ready'
                 WHERE id = %s
             """, (
-                mean_embedding,          # numpy(768,) → vector(768) via pgvector
-                "dinov2-base",           # embedding_model
-                "facebook/dinov2-base",  # embedding_version
+                mean_embedding,           # numpy(EMBEDDING_DIM,) → vector(EMBEDDING_DIM) via pgvector
+                "dinov2-large",           # embedding_model
+                "facebook/dinov2-large",  # embedding_version
                 thumbnail_urls,          # list[str] → text[]
                 len(png_paths),          # thumbnail_count — benötigt von /api/parts/[id]/thumbnails
                 part_id

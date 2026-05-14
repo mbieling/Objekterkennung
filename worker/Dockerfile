@@ -25,8 +25,13 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # HF_HOME: Modell-Cache-Pfad — wird per Docker Volume persistiert (docker-compose.yml)
-# Download erfolgt beim ersten Start (~330 MB), danach aus dem Volume geladen.
 ENV HF_HOME=/app/model_cache
+
+# DINOv2-large vorab herunterladen (~1.3 GB), damit erster Embedding-Aufruf nicht
+# 30+ Sekunden blockiert. Bei Modellwechsel hier den Namen anpassen — muss mit
+# worker/embedder.py:_MODEL_NAME übereinstimmen.
+RUN python -c "from transformers import AutoImageProcessor, AutoModel; AutoImageProcessor.from_pretrained('facebook/dinov2-large'); AutoModel.from_pretrained('facebook/dinov2-large')" || \
+    echo "DINOv2-large pre-download fehlgeschlagen — Modell wird beim ersten Aufruf geladen"
 
 # rembg U²Net-Modell vorab herunterladen, damit erster Suchaufruf nicht blockiert.
 # Standardpfad: ~/.u2net/u2net.onnx (~170 MB) — wir setzen explizit U2NET_HOME.

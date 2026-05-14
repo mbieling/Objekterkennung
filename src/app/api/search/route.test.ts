@@ -73,7 +73,7 @@ describe('POST /api/search', () => {
     // Worker antwortet standardmäßig mit gültigem Embedding
     mockFetch.mockResolvedValue({
       ok: true,
-      json: async () => ({ embedding: new Array(768).fill(0.1) }),
+      json: async () => ({ embedding: new Array(1024).fill(0.1) }),
     })
   })
 
