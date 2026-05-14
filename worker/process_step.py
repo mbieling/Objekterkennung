@@ -177,9 +177,9 @@ def process(part_id: str) -> None:
                     status = 'ready'
                 WHERE id = %s
             """, (
-                mean_embedding,           # numpy(EMBEDDING_DIM,) → vector(EMBEDDING_DIM) via pgvector
-                "dinov2-large",           # embedding_model
-                "facebook/dinov2-large",  # embedding_version
+                mean_embedding,                                  # numpy(EMBEDDING_DIM,) → vector(EMBEDDING_DIM) via pgvector
+                "dinov3-large",                                  # embedding_model
+                "facebook/dinov3-vitl16-pretrain-lvd1689m",      # embedding_version
                 thumbnail_urls,          # list[str] → text[]
                 len(png_paths),          # thumbnail_count — benötigt von /api/parts/[id]/thumbnails
                 part_id

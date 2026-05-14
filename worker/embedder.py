@@ -16,14 +16,22 @@ logger = logging.getLogger(__name__)
 
 # Einmaliges Laden beim Modulimport (RESEARCH.md Anti-Pattern: nicht in Schleife laden)
 # TRANSFORMERS_CACHE=/app/model_cache via Dockerfile ENV — Modell ist bereits gecacht
-_MODEL_NAME = "facebook/dinov2-large"
-EMBEDDING_DIM = 1024  # DINOv2 ViT-L/14 hidden state dim (base war 768, large ist 1024)
+_MODEL_NAME = "facebook/dinov3-vitl16-pretrain-lvd1689m"
+EMBEDDING_DIM = 1024  # DINOv3 ViT-L/16 hidden state dim — identisch zu DINOv2-large, daher keine DB-Migration
 
-logger.info(f"Lade DINOv2-Modell: {_MODEL_NAME}")
+# Token-Layout DINOv3 ViT-L/16 bei 224×224-Eingang:
+#   [CLS, register_1..register_4, patch_1..patch_196] = 201 Tokens total.
+# Patch-Mean-Pool muss CLS UND die 4 Register-Tokens überspringen (DINOv2 hatte keine Register-Tokens
+# und der alte Slice [:, 1:, :] reichte). Wenn HF das Layout je ändert, schlägt die Shape-Assertion
+# in get_embedding zu — keine stillen Embedding-Drifts.
+_PATCH_TOKEN_START = 5
+_EXPECTED_PATCH_COUNT = 196  # 224 / 16 = 14 × 14
+
+logger.info(f"Lade DINOv3-Modell: {_MODEL_NAME}")
 _processor = AutoImageProcessor.from_pretrained(_MODEL_NAME)
 _model = AutoModel.from_pretrained(_MODEL_NAME)
 _model.eval()
-logger.info("DINOv2-Modell geladen")
+logger.info("DINOv3-Modell geladen")
 
 
 def get_embedding(
@@ -39,13 +47,14 @@ def get_embedding(
               (Background-Removal, Crop, Padding) für einen konsistenten Bildraum.
 
     Returns:
-        numpy-Array der Shape (EMBEDDING_DIM,) — DINOv2 ViT-L/14 Patch-Token Mean-Pool.
+        numpy-Array der Shape (EMBEDDING_DIM,) — DINOv3 ViT-L/16 Patch-Token Mean-Pool.
 
     Pipeline:
         1. prepare_image() — rembg + Crop + Padding auf 224x224 (worker/preprocess.py)
         2. AutoImageProcessor (Normalisierung)
-        3. DINOv2 Forward-Pass
-        4. Mean-Pool über Patch-Tokens (Index 1..256), KEIN CLS-Token
+        3. DINOv3 Forward-Pass
+        4. Mean-Pool über die 196 Patch-Tokens (Index 5..200) — CLS + 4 Register-Tokens
+           werden bewusst übersprungen.
     """
     img = prepare_image(image_path, mode=mode)
 
@@ -54,9 +63,14 @@ def get_embedding(
     with torch.no_grad():
         outputs = _model(**inputs)
 
-    # Patch-Token Mean-Pool — last_hidden_state Shape: [1, 257, EMBEDDING_DIM]
-    # Index 0 = CLS-Token, Index 1..256 = 256 Patch-Tokens (16x16 bei 224px)
-    patch_tokens = outputs.last_hidden_state[:, 1:, :]
+    total_tokens = outputs.last_hidden_state.shape[1]
+    expected_total = _PATCH_TOKEN_START + _EXPECTED_PATCH_COUNT
+    assert total_tokens == expected_total, (
+        f"Unerwartete Token-Anzahl: got {total_tokens}, erwartet {expected_total}. "
+        f"DINOv3-Layout hat sich geändert — _PATCH_TOKEN_START / _EXPECTED_PATCH_COUNT anpassen."
+    )
+
+    patch_tokens = outputs.last_hidden_state[:, _PATCH_TOKEN_START:, :]
     mean_embedding = patch_tokens.mean(dim=1).squeeze().numpy()
 
     assert mean_embedding.shape == (EMBEDDING_DIM,), f"Unerwartete Embedding-Shape: {mean_embedding.shape}"
