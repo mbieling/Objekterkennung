@@ -48,6 +48,7 @@ Dieses Projekt verwendet Get-Shit-Done (GSD). Planungsdokumente liegen in `.plan
 - FastAPI + Celery + Redis
 - **DINOv3 ViT-L/16** (`facebook/dinov3-vitl16-pretrain-lvd1689m`) für Embeddings (`worker/embedder.py`)
 - STEP → Thumbnails via OCC/PythonOCC (`worker/process_step.py`, `worker/renderer.py`)
+- Celery-Task-Definition in `worker/tasks.py`, FastAPI-App in `worker/main.py`, Celery-Konfiguration in `worker/celery_app.py`
 - Läuft als Docker-Container: `docker compose up`
 - **HF_TOKEN** nötig (`worker/.env`) — DINOv3 ist hinter einer HF-Privacy-Policy-Gate
 
@@ -75,8 +76,9 @@ docker compose up               # Redis + Worker starten
 docker compose logs -f worker   # Worker-Logs
 docker compose down
 
-# Python Worker-Tests direkt (conda env aktivieren)
+# Python Worker-Tests direkt (conda env "base" aktivieren)
 cd worker && python -m pytest tests/
+cd worker && python -m pytest tests/test_embed.py   # einzelner Test
 ```
 
 **Einzelnen Vitest-Test ausführen:**
@@ -198,6 +200,14 @@ SEARCH_BASE_URL=http://localhost:3000 node scripts/eval_baseline.mjs # gegen lok
 ```
 
 Output: `eval/results/baseline_<ts>.json` + Konsolen-Report. Snapshot in Git einchecken, damit der Trend dokumentiert ist (`eval/README.md` listet die bisherigen Messpunkte). Referenzfotos selbst sind **nicht** im Repo (Kunden-IP, Pfad via `REF_DIR`-Env überschreibbar).
+
+## Detaillierte Entwicklungsregeln
+
+Kontextspezifische Regeln (werden automatisch per Pfad-Matching geladen):
+- `.claude/rules/backend.md` — DB/S3/API-Regeln (für `src/app/api/**`, `src/lib/**`, `worker/**`)
+- `.claude/rules/frontend.md` — shadcn/ui-Pflicht, Tailwind-Tokens, Responsive-Anforderungen (für `src/components/**`, `src/app/**/page.tsx`)
+- `.claude/rules/security.md` — Sicherheitsregeln
+- `.claude/rules/general.md` — Feature-Tracking, Git-Konventionen, Human-in-the-Loop
 
 ## Feature Overview
 
