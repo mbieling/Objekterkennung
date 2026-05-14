@@ -158,8 +158,9 @@ npm run test:watch
 npm run test:e2e         # Playwright
 npm run test:all
 
-# Worker (lokal, conda env aktivieren)
+# Worker (lokal, conda env "base" aktivieren)
 cd worker && python -m pytest tests/
+cd worker && python -m pytest tests/test_embed.py   # einzelner Test
 
 # Einzelnen Vitest-Test
 npm test -- src/app/api/parts/route.test.ts
