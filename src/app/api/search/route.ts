@@ -1,6 +1,7 @@
 // src/app/api/search/route.ts
-// POST /api/search — Suche per Foto-Embedding gegen pgvector-Datenbank
-// Ablauf: Query-Params validieren → FormData parsen → S3 Upload → Worker /embed → S3 Cleanup → pgvector Query → Response
+// POST /api/search — Suche per Foto-Embedding gegen pgvector-Datenbank.
+// Unterstützt 1..MAX_PHOTOS_PER_QUERY Fotos pro Anfrage (mehrere 'image'-Felder im FormData);
+// pro Bauteil wird die maximale (View × Query-Foto)-Similarity zurückgegeben.
 // Server-only — KEIN "use client", keine Browser-Imports.
 
 import { NextResponse } from 'next/server'
@@ -14,14 +15,16 @@ import { s3, BUCKET_THUMBNAILS } from '@/lib/s3'
 export const maxDuration = 30
 
 // Zod-Schema für Query-Parameter (D-05, D-06, D-07)
-// z.coerce.number() konvertiert URL-Strings zu Zahlen
 const SearchQuerySchema = z.object({
   threshold: z.coerce.number().min(0).max(1).optional().default(0.7),
   limit: z.coerce.number().int().min(1).max(50).optional().default(10),
 })
 
+// Hartes Limit gegen versehentlich zu große FormData-Uploads. Praktisch nutzt
+// kein Anwender > 3–4 Fotos pro Suche, 5 ist ein bequemer Sicherheitspuffer.
+const MAX_PHOTOS_PER_QUERY = 5
+
 // Hilfsfunktion: S3 Temp-Cleanup — fire-and-forget mit .catch(warn)
-// Wird auf ALLEN Fehler-Pfaden aufgerufen (Worker-Fehler, Network-Fehler, etc.)
 async function cleanupTempS3(key: string): Promise<void> {
   await s3.send(new DeleteObjectCommand({
     Bucket: BUCKET_THUMBNAILS,
@@ -29,8 +32,56 @@ async function cleanupTempS3(key: string): Promise<void> {
   })).catch(err => console.warn(`[search] S3 Cleanup fehlgeschlagen für ${key}: ${err}`))
 }
 
+type EmbedSuccess = { ok: true; embedding: number[] }
+type EmbedFailure = { ok: false; status: number; body: object }
+type EmbedResult = EmbedSuccess | EmbedFailure
+
+// Lädt EIN Foto nach S3, ruft Worker /embed auf, gibt Embedding oder strukturierten
+// Fehler zurück. tempKey wird über die geteilte `keys`-Liste mitgeschrieben, damit
+// der Caller alle hochgeladenen Objekte cleanup kann — auch wenn der Embed schlägt.
+async function embedSingle(
+  file: File,
+  workerUrl: string,
+  keys: string[],
+): Promise<EmbedResult> {
+  const buffer = Buffer.from(await file.arrayBuffer())
+  const tempKey = `search-temp/${crypto.randomUUID()}.jpg`
+  keys.push(tempKey)
+
+  try {
+    await s3.send(new PutObjectCommand({
+      Bucket: BUCKET_THUMBNAILS,
+      Key: tempKey,
+      Body: buffer,
+      ContentType: file.type,
+    }))
+  } catch (err) {
+    return { ok: false, status: 500, body: { error: 'S3 Upload fehlgeschlagen', detail: String(err) } }
+  }
+
+  let res: Response
+  try {
+    // AbortSignal.timeout(28_000) — 2 s Puffer vor maxDuration=30 (T-6-07)
+    res = await fetch(`${workerUrl}/embed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ s3_key: tempKey }),
+      signal: AbortSignal.timeout(28_000),
+    })
+  } catch {
+    return { ok: false, status: 502, body: { error: 'Worker nicht erreichbar' } }
+  }
+
+  if (!res.ok) {
+    return { ok: false, status: 502, body: { error: 'Worker Embed-Fehler' } }
+  }
+
+  const { embedding } = await res.json() as { embedding: number[] }
+  return { ok: true, embedding }
+}
+
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  // 1. Query-Parameter validieren (threshold, limit) — vor FormData-Parsing
+  // 1. Query-Parameter validieren
   const rawThreshold = request.nextUrl.searchParams.get('threshold')
   const rawLimit = request.nextUrl.searchParams.get('limit')
 
@@ -46,7 +97,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
   const { threshold, limit } = parsedQuery.data
 
-  // 2. FormData parsen und Bild extrahieren
+  // 2. FormData parsen — ein oder mehrere image-Felder
   let formData: FormData
   try {
     formData = await request.formData()
@@ -54,120 +105,126 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'FormData konnte nicht gelesen werden' }, { status: 400 })
   }
 
-  const file = formData.get('image')
+  const rawFiles = formData.getAll('image')
+  const files = rawFiles.filter((f): f is File => f instanceof File)
 
-  if (!(file instanceof File)) {
+  if (files.length === 0) {
     return NextResponse.json({ error: 'image-Feld fehlt oder ist kein File' }, { status: 400 })
   }
-
-  // MIME-Type-Validierung — verhindert PIL.UnidentifiedImageError im Worker (T-6-03)
-  if (!file.type.startsWith('image/')) {
-    return NextResponse.json({ error: 'Nur Bilddateien erlaubt (image/*)' }, { status: 400 })
-  }
-
-  const bytes = await file.arrayBuffer()
-  const buffer = Buffer.from(bytes)
-
-  // 3. Suchbild temporär in S3 hochladen (D-03)
-  // Bucket: BUCKET_THUMBNAILS mit Prefix search-temp/ (Wiederverwendung — kein neuer Bucket)
-  // Key: crypto.randomUUID() — kein User-Input im S3-Key (Schutz gegen Path-Traversal, T-6-06)
-  const tempKey = `search-temp/${crypto.randomUUID()}.jpg`
-
-  try {
-    await s3.send(new PutObjectCommand({
-      Bucket: BUCKET_THUMBNAILS,
-      Key: tempKey,
-      Body: buffer,
-      ContentType: file.type,
-    }))
-  } catch (err) {
+  if (files.length > MAX_PHOTOS_PER_QUERY) {
     return NextResponse.json(
-      { error: 'S3 Upload fehlgeschlagen', detail: String(err) },
-      { status: 500 }
+      { error: `Maximal ${MAX_PHOTOS_PER_QUERY} Fotos pro Suche erlaubt (übergeben: ${files.length})` },
+      { status: 400 }
     )
   }
+  for (const file of files) {
+    // T-6-03: MIME-Validierung verhindert PIL.UnidentifiedImageError im Worker
+    if (!file.type.startsWith('image/')) {
+      return NextResponse.json({ error: 'Nur Bilddateien erlaubt (image/*)' }, { status: 400 })
+    }
+  }
 
-  // 4. Worker /embed synchron aufrufen (D-04)
-  // Worker-URL ist server-only (kein NEXT_PUBLIC_) — Pflicht für Suche (kein Dev-Bypass)
+  // 3. Worker-Erreichbarkeit
   const workerUrl = process.env.WORKER_URL
   if (!workerUrl) {
-    await cleanupTempS3(tempKey)
     return NextResponse.json({ error: 'Worker nicht konfiguriert (WORKER_URL fehlt)' }, { status: 503 })
   }
 
-  let embedResponse: Response
-  try {
-    // AbortSignal.timeout(28_000) — 2s Puffer vor maxDuration=30 (T-6-07)
-    embedResponse = await fetch(`${workerUrl}/embed`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ s3_key: tempKey }),
-      signal: AbortSignal.timeout(28_000),
-    })
-  } catch {
-    // AbortError (Timeout) oder TypeError (Network unreachable)
-    await cleanupTempS3(tempKey)
-    return NextResponse.json({ error: 'Worker nicht erreichbar' }, { status: 502 })
+  // 4. Alle Fotos parallel hochladen + embedden
+  const tempKeys: string[] = []
+  const embedResults = await Promise.all(
+    files.map(file => embedSingle(file, workerUrl, tempKeys))
+  )
+
+  // 5. S3-Cleanup für ALLE hochgeladenen Keys — egal ob Embed gelungen oder nicht.
+  //    Fire-and-forget: wir warten nicht, da das Embedding bereits in-memory liegt.
+  Promise.all(tempKeys.map(cleanupTempS3)).catch(() => {})
+
+  // 6. Erster Fehler entscheidet den HTTP-Status — deterministisch über Reihenfolge
+  const firstFailure = embedResults.find((r): r is EmbedFailure => !r.ok)
+  if (firstFailure) {
+    return NextResponse.json(firstFailure.body, { status: firstFailure.status })
   }
+  const embeddings = (embedResults as EmbedSuccess[]).map(r => r.embedding)
 
-  if (!embedResponse.ok) {
-    await cleanupTempS3(tempKey)
-    return NextResponse.json({ error: 'Worker Embed-Fehler' }, { status: 502 })
-  }
-
-  const { embedding } = await embedResponse.json() as { embedding: number[] }
-
-  // 5. S3 Cleanup — direkt nach Embedding-Erhalt, vor pgvector-Query
-  // Temp-Objekt wird nicht mehr benötigt sobald das Embedding vorliegt
-  await cleanupTempS3(tempKey)
-
-  // 6. pgvector Cosine Similarity Query — Multi-View Max-per-Part (Hebel 2)
-  // KRITISCH: embeddingLiteral als String — Neon serialisiert number[] als PG-Array {0.1,...},
-  //           pgvector erwartet Literal-Format [0.1,...]::vector
-  // KRITISCH: Threshold-Filter NICHT als Alias (Pitfall 3) — Ausdruck vollständig wiederholen
+  // 7. pgvector-Query — eine HNSW-beschleunigte Query pro Foto, dann in JS mergen.
+  //    Begründung: ein einzelner CROSS-JOIN-Query mit n Vektoren würde den HNSW-Index
+  //    umgehen und bei wachsendem Korpus zur Linear-Search degenerieren. n parallele
+  //    indizierte Queries skalieren sauber. n ≤ MAX_PHOTOS_PER_QUERY = 5.
   //
-  // Strategie:
-  //   - part_views enthält 8 Embeddings pro Bauteil (je eine Render-Perspektive)
-  //   - Für jedes Bauteil: Cosine-Similarity der BESTEN passenden View nehmen (MAX)
-  //   - Mean-Pool über alle Views (alter Ansatz) hat Form-Diskriminanz zerstört
-  // Filter: parts.status = 'ready' — kein is_archived (D-12)
-  const embeddingLiteral = `[${embedding.join(',')}]`
+  //    Threshold-Filter und finales LIMIT werden NACH dem Merge in JS angewendet —
+  //    pro Foto holen wir bewusst mehr als `limit`, damit ein Bauteil, das nur in
+  //    EINEM Foto hoch rankt, nicht im SQL-LIMIT verloren geht.
+  //
+  //    KRITISCH (CLAUDE.md): Embedding als String-Literal-Vektor übergeben — Neon
+  //    serialisiert number[] als PG-Array {…}, pgvector braucht [...]::vector.
+  const perPhotoLimit = Math.max(limit * 3, 50)
 
-  const rows = await db`
-    SELECT
-      p.id,
-      p.name,
-      p.part_number,
-      p.project,
-      p.status,
-      p.created_at,
-      MAX(1 - (pv.embedding <=> ${embeddingLiteral}::vector)) AS similarity
-    FROM parts p
-    JOIN part_views pv ON pv.part_id = p.id
-    WHERE p.status = 'ready'
-    GROUP BY p.id, p.name, p.part_number, p.project, p.status, p.created_at
-    HAVING MAX(1 - (pv.embedding <=> ${embeddingLiteral}::vector)) >= ${threshold}
-    ORDER BY similarity DESC
-    LIMIT ${limit}
-  `
+  const perPhotoRows = await Promise.all(
+    embeddings.map((emb) => {
+      const embeddingLiteral = `[${emb.join(',')}]`
+      return db`
+        SELECT
+          p.id,
+          p.name,
+          p.part_number,
+          p.project,
+          p.status,
+          p.created_at,
+          MAX(1 - (pv.embedding <=> ${embeddingLiteral}::vector)) AS similarity
+        FROM parts p
+        JOIN part_views pv ON pv.part_id = p.id
+        WHERE p.status = 'ready'
+        GROUP BY p.id, p.name, p.part_number, p.project, p.status, p.created_at
+        ORDER BY similarity DESC
+        LIMIT ${perPhotoLimit}
+      `
+    })
+  )
 
-  // 7. Response serialisieren (D-11 Shape)
-  // parseFloat(row.similarity): Neon gibt berechnete Float-Ausdrücke manchmal als Decimal-String zurück
-  // row ist Record<string, any> (Neon-Typ) — expliziter Cast für Type-Safety
+  // 8. Merge — maximale Similarity pro part_id über alle Fotos
+  type Row = {
+    id: string
+    name: string
+    part_number: string | null
+    project: string | null
+    status: string
+    created_at: string
+    similarity: number
+  }
+  const merged = new Map<string, Row>()
+  for (const rows of perPhotoRows) {
+    for (const row of rows) {
+      const sim = parseFloat(String(row.similarity as string | number))
+      const id = row.id as string
+      const existing = merged.get(id)
+      if (!existing || existing.similarity < sim) {
+        merged.set(id, {
+          id,
+          name: row.name as string,
+          part_number: (row.part_number ?? null) as string | null,
+          project: (row.project ?? null) as string | null,
+          status: row.status as string,
+          created_at: row.created_at as string,
+          similarity: sim,
+        })
+      }
+    }
+  }
+
+  // 9. Threshold-Filter + Sort + Limit (finalisiert das gemergte Ranking)
+  const final = [...merged.values()]
+    .filter(r => r.similarity >= threshold)
+    .sort((a, b) => b.similarity - a.similarity)
+    .slice(0, limit)
+
   return NextResponse.json({
-    results: rows.map((row) => ({
-      id: row.id as string,
-      name: row.name as string,
-      part_number: (row.part_number ?? null) as string | null,
-      project: (row.project ?? null) as string | null,
-      status: row.status as string,
-      similarity: parseFloat(String(row.similarity as string | number)),
-      created_at: row.created_at as string,
-    })),
+    results: final,
     query: {
       threshold,
       limit,
-      results_count: rows.length,
+      photo_count: files.length,
+      results_count: final.length,
     },
   })
 }

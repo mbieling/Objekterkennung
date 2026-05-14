@@ -1,28 +1,29 @@
 'use client'
 
 // src/app/search/CameraCapture.tsx
-// Phase 7 — Kamera-Erfassung als Client Component (SEARCH-01, SEARCH-02, D-03 bis D-11)
-// Vollständige State Machine: idle → requesting → previewing → captured → searching → result | error
+// Multi-Foto-Suche: 1..N Fotos werden gesammelt und gemeinsam an /api/search geschickt.
+// Backend mergt per Bauteil mit MAX-Similarity über alle Foto×View-Paare.
+// State Machine: idle → requesting → previewing → captured(N≥1) → searching → result | error
 
 import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Camera, Upload, RotateCcw, Search, Loader2 } from 'lucide-react'
+import { Camera, Upload, RotateCcw, Search, Loader2, Plus, X } from 'lucide-react'
 import { SearchResults } from './SearchResults'
 
 // ---------------------------------------------------------------------------
 // Typen
 // ---------------------------------------------------------------------------
 type SearchPhase =
-  | 'idle'        // Startbildschirm
-  | 'requesting'  // getUserMedia läuft
-  | 'previewing'  // Video-Stream aktiv
-  | 'captured'    // Standbild, Bestätigung
-  | 'searching'   // POST /api/search läuft
-  | 'result'      // Antwort vorhanden
-  | 'error'       // Fehler
+  | 'idle'
+  | 'requesting'
+  | 'previewing'
+  | 'captured'
+  | 'searching'
+  | 'result'
+  | 'error'
 
 interface SearchResponse {
   results: Array<{
@@ -37,15 +38,21 @@ interface SearchResponse {
   query: {
     threshold: number
     limit: number
+    photo_count?: number  // ergänzt durch Multi-Foto-API
     results_count: number
   }
 }
 
 // ---------------------------------------------------------------------------
-// Hilfsfunktionen (außerhalb der Komponente)
+// Konstanten
 // ---------------------------------------------------------------------------
+// Muss mit MAX_PHOTOS_PER_QUERY in src/app/api/search/route.ts übereinstimmen.
+const MAX_PHOTOS = 5
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 
-// D-04: facingMode ideal (nicht exact) — fällt auf Frontkamera zurück statt Hard-Error
+// ---------------------------------------------------------------------------
+// Hilfsfunktionen
+// ---------------------------------------------------------------------------
 async function startCamera(): Promise<MediaStream> {
   return navigator.mediaDevices.getUserMedia({
     video: { facingMode: { ideal: 'environment' } },
@@ -53,10 +60,6 @@ async function startCamera(): Promise<MediaStream> {
   })
 }
 
-// Maximale Upload-Größe für Kamera-Aufnahmen und Galerie-Uploads (5 MB)
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024
-
-// Claude's Discretion: max 1024px Breite, JPEG 0.85
 function captureFrame(video: HTMLVideoElement): Promise<Blob> {
   const MAX_WIDTH = 1024
   const scale = Math.min(1, MAX_WIDTH / video.videoWidth)
@@ -81,10 +84,9 @@ function captureFrame(video: HTMLVideoElement): Promise<Blob> {
 function CameraCapture() {
   const [phase, setPhase] = useState<SearchPhase>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [capturedBlobs, setCapturedBlobs] = useState<Blob[]>([])
+  const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [searchResult, setSearchResult] = useState<SearchResponse | null>(null)
-  const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null)
-  // Phase 8: Threshold + Limit für SearchResults (D-06, D-08)
   const [displayThreshold, setDisplayThreshold] = useState<number>(0.5)
   const [displayLimit, setDisplayLimit] = useState<number>(10)
 
@@ -92,8 +94,7 @@ function CameraCapture() {
   const streamRef = useRef<MediaStream | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Stream → video-Element verbinden, sobald 'previewing' aktiv ist und das DOM-Element existiert.
-  // Ohne diesen Effect wäre videoRef.current null (video nicht gerendert während 'requesting').
+  // Stream → Video-Element verbinden, sobald 'previewing' aktiv ist
   useEffect(() => {
     if (phase === 'previewing' && streamRef.current && videoRef.current) {
       try {
@@ -102,33 +103,63 @@ function CameraCapture() {
         // jsdom unterstützt srcObject nicht — in Tests ignorieren
       }
       videoRef.current.play().catch(() => {
-        // play() kann fehlschlagen wenn der Nutzer navigiert oder in Tests — ignorieren
+        // play() kann fehlschlagen wenn der Nutzer navigiert oder in Tests
       })
     }
   }, [phase])
 
-  // Stream-Cleanup beim Unmount (Pattern 4 aus RESEARCH.md)
+  // Stream-Cleanup beim Unmount + alle ObjectURLs freigeben
   useEffect(() => {
     return () => {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop())
         streamRef.current = null
       }
-      if (previewUrl) URL.revokeObjectURL(previewUrl)
+      previewUrls.forEach(URL.revokeObjectURL)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // ---------------------------------------------------------------------------
+  // Foto-Verwaltung (gemeinsame Logik für Kamera + Galerie)
+  // ---------------------------------------------------------------------------
+  function addPhoto(blob: Blob) {
+    if (capturedBlobs.length >= MAX_PHOTOS) {
+      setErrorMessage(`Maximal ${MAX_PHOTOS} Fotos pro Suche.`)
+      return
+    }
+    setCapturedBlobs(prev => [...prev, blob])
+    setPreviewUrls(prev => [...prev, URL.createObjectURL(blob)])
+    setPhase('captured')
+  }
+
+  function removePhoto(index: number) {
+    const url = previewUrls[index]
+    if (url) URL.revokeObjectURL(url)
+    setCapturedBlobs(prev => prev.filter((_, i) => i !== index))
+    setPreviewUrls(prev => prev.filter((_, i) => i !== index))
+    // Wenn alle weg sind → zurück zu idle
+    if (capturedBlobs.length === 1) {
+      setPhase('idle')
+    }
+  }
+
+  function clearAllPhotos() {
+    previewUrls.forEach(URL.revokeObjectURL)
+    setCapturedBlobs([])
+    setPreviewUrls([])
+  }
+
+  // ---------------------------------------------------------------------------
   // Handler
   // ---------------------------------------------------------------------------
-
   async function handleStartCamera() {
     setPhase('requesting')
+    setErrorMessage(null)
     try {
       const stream = await startCamera()
       streamRef.current = stream
-      setPhase('previewing')  // löst den useEffect aus, der srcObject setzt
+      setPhase('previewing')
     } catch (err) {
       const isDomException = err instanceof DOMException
       const isNotAllowed = isDomException && err.name === 'NotAllowedError'
@@ -136,7 +167,8 @@ function CameraCapture() {
         ? 'Kamerazugriff verweigert. Bitte erlaube den Kamerazugriff in den Browser-Einstellungen oder wähle ein Foto aus der Galerie.'
         : 'Kamera konnte nicht gestartet werden. Wähle ein Foto aus der Galerie.'
       setErrorMessage(msg)
-      setPhase('idle')
+      // Wenn vorher schon Fotos da waren, bleiben wir in 'captured'; sonst zurück zu idle
+      setPhase(capturedBlobs.length > 0 ? 'captured' : 'idle')
     }
   }
 
@@ -147,26 +179,23 @@ function CameraCapture() {
       setErrorMessage('Aufnahme ist zu groß. Bitte Umgebungsbeleuchtung verbessern und erneut versuchen.')
       return
     }
-    // Stream stoppen nach Aufnahme
+    // Stream stoppen nach Aufnahme (Foto-Modus, kein kontinuierlicher Stream)
     streamRef.current?.getTracks().forEach(t => t.stop())
     streamRef.current = null
-    setCapturedBlob(blob)
-    setPreviewUrl(URL.createObjectURL(blob))
-    setPhase('captured')
+    addPhoto(blob)
   }
 
   function handleRetry() {
-    if (previewUrl) URL.revokeObjectURL(previewUrl)
+    clearAllPhotos()
     setPhase('idle')
-    setCapturedBlob(null)
-    setPreviewUrl(null)
     setErrorMessage(null)
   }
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
+    // Input resetten, damit dieselbe Datei zweimal gewählt werden kann
+    e.target.value = ''
     if (!file) return
-    // T-7-01: MIME-Typ-Check (Threat Modell: Tampering)
     if (!file.type.startsWith('image/')) {
       setErrorMessage('Nur Bilddateien (JPEG, PNG) erlaubt.')
       return
@@ -175,18 +204,17 @@ function CameraCapture() {
       setErrorMessage(`Datei ist zu groß (${Math.round(file.size / 1024 / 1024)} MB). Maximal: 5 MB.`)
       return
     }
-    setCapturedBlob(file)
-    setPreviewUrl(URL.createObjectURL(file))
-    setPhase('captured')
+    addPhoto(file)
   }
 
-  // D-09: 30s AbortController-Timeout; D-08: limit-Parameter steuert Ergebnismenge
   async function executeSearch(limit: number) {
-    if (!capturedBlob) return
+    if (capturedBlobs.length === 0) return
     setPhase('searching')
     setErrorMessage(null)
     const formData = new FormData()
-    formData.append('image', capturedBlob, 'capture.jpg')
+    capturedBlobs.forEach((blob, idx) => {
+      formData.append('image', blob, `capture-${idx}.jpg`)
+    })
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30_000)
     try {
@@ -195,7 +223,6 @@ function CameraCapture() {
         {
           method: 'POST',
           body: formData,
-          // KEIN Content-Type-Header — Browser setzt multipart Boundary automatisch
           signal: controller.signal,
         }
       )
@@ -223,13 +250,35 @@ function CameraCapture() {
   function handleSearchWithLimit(newLimit: number) { executeSearch(newLimit) }
 
   // ---------------------------------------------------------------------------
-  // Wiederverwendbarer File-Input-Trigger (D-06: in allen States außer searching)
+  // UI-Bausteine
   // ---------------------------------------------------------------------------
   const FileInputTrigger = (
     <Button variant="ghost" className="w-full min-h-[44px]" onClick={() => fileInputRef.current?.click()}>
       <Upload className="mr-2 h-4 w-4" />
-      Foto aus Galerie wählen
+      {capturedBlobs.length === 0 ? 'Foto aus Galerie wählen' : 'Foto aus Galerie hinzufügen'}
     </Button>
+  )
+
+  const ThumbnailStrip = (
+    <div className="flex gap-2 overflow-x-auto pb-2" aria-label="Aufgenommene Fotos">
+      {previewUrls.map((url, idx) => (
+        <div key={url} className="relative flex-shrink-0">
+          <img
+            src={url}
+            alt={`Foto ${idx + 1}`}
+            className="w-20 h-20 object-cover rounded-md border border-border"
+          />
+          <button
+            type="button"
+            onClick={() => removePhoto(idx)}
+            className="absolute -top-1 -right-1 bg-background border border-border rounded-full p-0.5 shadow-sm hover:bg-muted"
+            aria-label={`Foto ${idx + 1} entfernen`}
+          >
+            <X className="h-3 w-3" />
+          </button>
+        </div>
+      ))}
+    </div>
   )
 
   // ---------------------------------------------------------------------------
@@ -237,7 +286,6 @@ function CameraCapture() {
   // ---------------------------------------------------------------------------
   return (
     <div>
-      {/* File-Input (immer im DOM, visuell versteckt) */}
       <input
         ref={fileInputRef}
         type="file"
@@ -246,7 +294,6 @@ function CameraCapture() {
         onChange={handleFileSelect}
       />
 
-      {/* idle-State */}
       {phase === 'idle' && (
         <Card>
           <CardContent className="pt-6 flex flex-col gap-4 items-center">
@@ -264,7 +311,6 @@ function CameraCapture() {
         </Card>
       )}
 
-      {/* requesting-State */}
       {phase === 'requesting' && (
         <div className="flex flex-col gap-4">
           <Skeleton className="w-full aspect-[4/3] max-w-sm mx-auto rounded-lg" />
@@ -272,9 +318,9 @@ function CameraCapture() {
         </div>
       )}
 
-      {/* previewing-State */}
       {phase === 'previewing' && (
         <div className="flex flex-col gap-4">
+          {capturedBlobs.length > 0 && ThumbnailStrip}
           <div className="relative w-full aspect-[4/3] max-w-sm mx-auto">
             <video
               ref={videoRef}
@@ -284,7 +330,6 @@ function CameraCapture() {
               autoPlay
               aria-label="Kamera-Vorschau"
             />
-            {/* Framing-Overlay (D-07) */}
             <div
               className="absolute inset-[10%] border-2 border-white/70 rounded-xl pointer-events-none"
               aria-hidden="true"
@@ -293,39 +338,69 @@ function CameraCapture() {
           <Button className="w-full h-12" onClick={handleCapture}>
             <Camera className="mr-2 h-4 w-4" />
             Aufnehmen
+            {capturedBlobs.length > 0 && (
+              <span className="ml-2 text-xs opacity-70">
+                ({capturedBlobs.length}/{MAX_PHOTOS} bereits aufgenommen)
+              </span>
+            )}
           </Button>
           {FileInputTrigger}
         </div>
       )}
 
-      {/* captured-State */}
       {phase === 'captured' && (
         <div className="flex flex-col gap-4">
-          {previewUrl && (
+          {errorMessage && (
+            <Alert variant="destructive">
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
+          {/* Großes Hauptbild: zuletzt aufgenommenes Foto */}
+          {previewUrls.length > 0 && (
             <img
-              src={previewUrl}
+              src={previewUrls[previewUrls.length - 1]}
               alt="Aufgenommenes Bauteil"
               className="w-full max-w-sm mx-auto rounded-lg object-cover aspect-[4/3]"
             />
           )}
-          <div className="flex gap-4">
+          {/* Thumbnail-Strip aller bisherigen Fotos */}
+          {previewUrls.length > 1 && ThumbnailStrip}
+          {/* Aktionen */}
+          <div className="flex gap-2">
             <Button className="flex-1 min-h-[44px]" onClick={handleSearch}>
               <Search className="mr-2 h-4 w-4" />
-              Suchen
+              {capturedBlobs.length === 1
+                ? 'Suchen'
+                : `Mit ${capturedBlobs.length} Fotos suchen`}
             </Button>
             <Button variant="outline" className="flex-1 min-h-[44px]" onClick={handleRetry}>
               <RotateCcw className="mr-2 h-4 w-4" />
               Wiederholen
             </Button>
           </div>
-          {FileInputTrigger}
+          {capturedBlobs.length < MAX_PHOTOS && (
+            <>
+              <Button
+                variant="secondary"
+                className="w-full min-h-[44px]"
+                onClick={handleStartCamera}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Weiteres Foto aufnehmen
+              </Button>
+              {FileInputTrigger}
+            </>
+          )}
+          {capturedBlobs.length >= MAX_PHOTOS && (
+            <p className="text-xs text-muted-foreground text-center">
+              Maximale Anzahl ({MAX_PHOTOS}) erreicht.
+            </p>
+          )}
         </div>
       )}
 
-      {/* searching-State (D-11: Overlay über altem Grid wenn Re-Suche; reiner Spinner bei Erst-Suche) */}
       {phase === 'searching' && (
         searchResult ? (
-          // Re-Suche: Grid bleibt sichtbar, Spinner-Overlay darüber
           <div className="flex flex-col gap-4">
             <div className="relative">
               <div className="absolute inset-0 bg-background/70 flex items-center justify-center rounded-lg z-10">
@@ -336,26 +411,30 @@ function CameraCapture() {
                 displayThreshold={displayThreshold}
                 displayLimit={displayLimit}
                 onThresholdChange={setDisplayThreshold}
-                onLimitChange={(newLimit) => {
-                  // Speichert den neuen Wert; kein Re-Search während laufender Suche.
-                  // Der gespeicherte Wert wird beim nächsten handleSearch verwendet.
-                  setDisplayLimit(newLimit)
-                }}
+                onLimitChange={(newLimit) => setDisplayLimit(newLimit)}
               />
             </div>
           </div>
         ) : (
-          // Erst-Suche: reiner Spinner
           <div className="flex flex-col items-center gap-4 py-8" aria-live="polite">
             <Loader2 className="animate-spin h-8 w-8" aria-label="Suche läuft" />
-            <p className="text-sm text-muted-foreground">Suche läuft...</p>
+            <p className="text-sm text-muted-foreground">
+              {capturedBlobs.length > 1
+                ? `Suche mit ${capturedBlobs.length} Fotos läuft...`
+                : 'Suche läuft...'}
+            </p>
           </div>
         )
       )}
 
-      {/* result-State — SearchResults ersetzt den pre-JSON-Placeholder (Phase 8) */}
       {phase === 'result' && searchResult && (
         <div className="flex flex-col gap-4">
+          {searchResult.query.photo_count && searchResult.query.photo_count > 1 && (
+            <p className="text-xs text-muted-foreground">
+              Ergebnisse aus {searchResult.query.photo_count} Fotos kombiniert
+              (beste Übereinstimmung pro Bauteil).
+            </p>
+          )}
           <SearchResults
             searchResult={searchResult}
             displayThreshold={displayThreshold}
@@ -363,7 +442,6 @@ function CameraCapture() {
             onThresholdChange={setDisplayThreshold}
             onLimitChange={(newLimit) => {
               setDisplayLimit(newLimit)
-              // D-08: Limit-Wechsel triggert neue API-Anfrage
               handleSearchWithLimit(newLimit)
             }}
           />
@@ -374,7 +452,6 @@ function CameraCapture() {
         </div>
       )}
 
-      {/* error-State (D-11) */}
       {phase === 'error' && (
         <div className="flex flex-col gap-4">
           <Alert variant="destructive">

@@ -38,6 +38,21 @@ function makeImageRequest(url = 'http://localhost/api/search'): NextRequest {
   return request
 }
 
+// Hilfsfunktion: NextRequest mit N image-Files (FormData kann denselben Key mehrfach haben)
+function makeMultiImageRequest(count: number, url = 'http://localhost/api/search'): NextRequest {
+  const request = new NextRequest(url, {
+    method: 'POST',
+    body: 'placeholder',
+    headers: { 'Content-Type': 'text/plain' },
+  })
+  const formData = new FormData()
+  for (let i = 0; i < count; i++) {
+    formData.append('image', new File([`fake-${i}`], `test-${i}.jpg`, { type: 'image/jpeg' }))
+  }
+  vi.spyOn(request, 'formData').mockResolvedValue(formData)
+  return request
+}
+
 // Hilfsfunktion: NextRequest ohne image-Feld erstellen
 function makeRequestWithoutImage(url = 'http://localhost/api/search'): NextRequest {
   const request = new NextRequest(url, {
@@ -51,10 +66,13 @@ function makeRequestWithoutImage(url = 'http://localhost/api/search'): NextReque
   return request
 }
 
-// Hilfsfunktion: DB-Trefferzeile erstellen
-function makeDbRow(similarity: string | number = '0.85') {
+// Hilfsfunktion: DB-Trefferzeile erstellen.
+// Default-ID ist fest, damit Multi-Row-Mocks in Single-Photo-Tests bewusst denselben
+// Part repräsentieren (deduplizierung greift). Tests, die N unterschiedliche Parts
+// brauchen, übergeben eine explizite ID.
+function makeDbRow(similarity: string | number = '0.85', id = '123e4567-e89b-12d3-a456-426614174000') {
   return {
-    id: '123e4567-e89b-12d3-a456-426614174000',
+    id,
     name: 'Testbauteil',
     part_number: 'PN-001',
     project: 'Testprojekt',
@@ -161,7 +179,12 @@ describe('POST /api/search', () => {
 
   // SEARCH-05: Limit-Parameter
   it('begrenzt die Anzahl der Treffer per limit-Parameter (SEARCH-05)', async () => {
-    const rows = [makeDbRow('0.95'), makeDbRow('0.90'), makeDbRow('0.85')]
+    // Drei unterschiedliche Parts — sonst dedupliziert der Multi-Foto-Merge zu einem Eintrag
+    const rows = [
+      makeDbRow('0.95', '11111111-1111-1111-1111-111111111111'),
+      makeDbRow('0.90', '22222222-2222-2222-2222-222222222222'),
+      makeDbRow('0.85', '33333333-3333-3333-3333-333333333333'),
+    ]
     mockDb.mockResolvedValueOnce(rows)
 
     const { POST } = await import('./route')
@@ -194,5 +217,56 @@ describe('POST /api/search', () => {
 
     expect(response.status).toBe(400)
     expect(mockS3Send).not.toHaveBeenCalled()
+  })
+
+  // Multi-Foto-Query
+  it('akzeptiert mehrere image-Felder und mergt per part_id mit MAX-Similarity', async () => {
+    // 2 Fotos → 2 DB-Aufrufe; beide returnieren denselben Part mit verschiedenen Similarities.
+    // Erwartung: gemergter Eintrag mit Max-Similarity (0.92) erscheint in den Ergebnissen.
+    mockDb
+      .mockResolvedValueOnce([makeDbRow('0.80')])
+      .mockResolvedValueOnce([{ ...makeDbRow('0.92'), part_number: 'PN-001' }])
+
+    const { POST } = await import('./route')
+    const request = makeMultiImageRequest(2)
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.results).toHaveLength(1)
+    expect(data.results[0].similarity).toBeCloseTo(0.92, 5)
+    expect(data.query.photo_count).toBe(2)
+    // 2 PUTs (Upload) + 2 DELETEs (Cleanup) = 4 S3-Aufrufe
+    expect(mockS3Send).toHaveBeenCalledTimes(4)
+    expect(mockFetch).toHaveBeenCalledTimes(2)
+  })
+
+  it('gibt HTTP 400 zurück wenn mehr als 5 Fotos übergeben werden', async () => {
+    const { POST } = await import('./route')
+    const request = makeMultiImageRequest(6)
+
+    const response = await POST(request)
+
+    expect(response.status).toBe(400)
+    expect(mockS3Send).not.toHaveBeenCalled()
+    expect(mockFetch).not.toHaveBeenCalled()
+  })
+
+  it('Multi-Foto: Embed-Fehler in einem Foto bricht die Suche ab, alle Uploads werden cleanup-t', async () => {
+    // Erstes Foto: Embed OK. Zweites Foto: Worker antwortet mit 500 → 502 zurück.
+    // Beide Uploads müssen trotzdem cleanup-t werden.
+    mockFetch
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ embedding: new Array(1024).fill(0.1) }) })
+      .mockResolvedValueOnce({ ok: false, status: 500 })
+
+    const { POST } = await import('./route')
+    const request = makeMultiImageRequest(2)
+
+    const response = await POST(request)
+
+    expect(response.status).toBe(502)
+    // 2 PUTs + 2 DELETEs = 4
+    expect(mockS3Send).toHaveBeenCalledTimes(4)
   })
 })
