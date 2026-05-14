@@ -83,22 +83,6 @@ def _crop_to_alpha_bbox(rgba: Image.Image, padding_pct: float = 0.05) -> Image.I
     return rgba.crop((x0, y0, x1 + 1, y1 + 1))
 
 
-def _to_grayscale_rgb(img: Image.Image) -> Image.Image:
-    """Konvertiert ein RGB-Bild zu Luminanz und legt die L-Werte auf alle drei Kanäle.
-
-    Begründung: Renderings sind durch das uniforme OCC-Default-Material praktisch
-    farblos (Helligkeitsvariation = Form). Fotos enthalten dagegen Material- und
-    Beleuchtungsfarbe, die DINOv2-Patch-Tokens stark kodieren — was bei zwei
-    geometrisch identischen Teilen mit unterschiedlicher Farbe (blau vs. rosa)
-    zu fehlerhaften Ranglisten führt. Beide Domänen auf reine Luminanz reduzieren
-    zwingt den Vergleich auf Form und Helligkeitsverlauf.
-
-    DINOv2 erwartet 3-Kanal-Eingang — wir behalten daher RGB, schreiben aber den
-    L-Wert in alle drei Kanäle (idempotent für bereits graue Renderings).
-    """
-    return img.convert("L").convert("RGB")
-
-
 def _compose_on_white_square(rgba: Image.Image, size: int = DINO_INPUT_SIZE) -> Image.Image:
     """Kombiniert das segmentierte Objekt auf weißem Hintergrund, quadratisch, mit Padding.
 
@@ -138,7 +122,6 @@ def prepare_image(
         2. Hintergrund entfernen (rembg / U²Net) → RGBA
         3. Auf Alpha-BBox croppen (Teil füllt den Frame)
         4. Auf weißen Hintergrund komponieren, quadratisch mit Padding, 224x224
-        5. Luminanz-Reduktion (L→RGB) — siehe _to_grayscale_rgb
 
     `mode` ist derzeit informativ und wird geloggt — die Pipeline ist identisch.
     Falls sich später Mode-Unterschiede zeigen (z.B. anderes rembg-Modell für Renderings),
@@ -157,4 +140,4 @@ def prepare_image(
     rgba = _remove_background(img)
     cropped = _crop_to_alpha_bbox(rgba)
     canvas = _compose_on_white_square(cropped, size=DINO_INPUT_SIZE)
-    return _to_grayscale_rgb(canvas)
+    return canvas

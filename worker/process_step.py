@@ -18,7 +18,7 @@ from pgvector.psycopg2 import register_vector
 from dotenv import load_dotenv
 
 # Worker-Module (aus worker/-Verzeichnis)
-from worker.renderer import load_step, validate_geometry, render_views
+from worker.renderer import load_step, validate_geometry, render_views, VIEW_COUNT
 from worker.embedder import get_embedding, mean_pool
 
 # .env-Datei laden wenn vorhanden (lokale Entwicklung)
@@ -124,12 +124,12 @@ def process(part_id: str) -> None:
             validate_geometry(shape)
             logger.info(f"[{part_id}] Geometrie-Validierung: OK")
 
-            # Schritt 4: 8 Views rendern
+            # Schritt 4: VIEW_COUNT Views rendern
             views_dir = os.path.join(tmpdir, "views")
             os.makedirs(views_dir, exist_ok=True)
             png_paths = render_views(shape, views_dir)
-            assert len(png_paths) == 8, f"Erwartet 8 PNGs, erhalten: {len(png_paths)}"
-            logger.info(f"[{part_id}] Rendering abgeschlossen: 8 PNGs in {views_dir}")
+            assert len(png_paths) == VIEW_COUNT, f"Erwartet {VIEW_COUNT} PNGs, erhalten: {len(png_paths)}"
+            logger.info(f"[{part_id}] Rendering abgeschlossen: {VIEW_COUNT} PNGs in {views_dir}")
 
             # Schritt 5: PNGs nach S3 hochladen
             thumbnail_urls = []
