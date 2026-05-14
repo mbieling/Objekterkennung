@@ -79,7 +79,8 @@ Ordner-zu-Projekt-Mapping wird im Skript in `PROJECT_MAP` gepflegt. Bei neuen Pr
 | `baseline_2026-05-14T04-33-54-595.json` | Ausgangslage, Farb-Embedding | DINOv2-base (768-dim) | 6 Ortho + 2 Iso | 82,8% | 96,6% | 100% |
 | `baseline_2026-05-14T04-53-54-038.json` | Graustufen-Experiment (verworfen) | DINOv2-base | 6 Ortho + 2 Iso | 72,4% | 100% | 100% |
 | `baseline_2026-05-14T05-28-59-657.json` | 16 Fibonacci-Sphere-Views | DINOv2-base | 16 Fibonacci | 89,7% | 89,7% | 100% |
-| `baseline_2026-05-14T05-57-29-317.json` | **Aktueller Stand:** DINOv2-large + 16 Fibonacci | **DINOv2-large (1024-dim)** | 16 Fibonacci | **93,1%** | **100%** | **100%** |
+| `baseline_2026-05-14T05-57-29-317.json` | DINOv2-large + 16 Fibonacci | DINOv2-large (1024-dim) | 16 Fibonacci | 93,1% | 100% | 100% |
+| `baseline_2026-05-14T06-51-11-170.json` | **Aktueller Stand:** DINOv3 ViT-L/16 + 16 Fibonacci | **DINOv3 ViT-L/16 (1024-dim)** | 16 Fibonacci | **100%** | **100%** | **100%** |
 
 ## Wichtige Einschränkungen
 
