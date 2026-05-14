@@ -1,327 +1,269 @@
-# AI Coding Starter Kit
+# Bauteil-Finder
 
-> Build production-ready web apps faster with AI-powered Skills handling Requirements, Architecture, Development, QA, and Deployment.
+> Web-App für Ingenieure: STEP-Dateien hochladen, Bauteile per Handy-Kamera fotografieren, geometrisch ähnliche Teile in der Datenbank wiederfinden.
 
-This template uses [Claude Code](https://docs.anthropic.com/en/docs/claude-code) with modern Skills, Rules, and Sub-Agents to provide a complete AI-powered development workflow.
-
-## Quick Start
-
-### 1. Clone & Install
-
-```bash
-git clone https://github.com/YOUR_USERNAME/ai-coding-starter-kit.git my-project
-cd my-project
-npm install
-npx playwright install chromium   # one-time: installs browser for E2E tests (~300MB)
-```
-
-### 2. (Optional) Supabase Setup
-
-If you need a backend:
-
-1. Create Supabase Project: [supabase.com](https://supabase.com)
-2. Copy `.env.local.example` to `.env.local`
-3. Add your Supabase credentials
-4. Uncomment the Supabase client in `src/lib/supabase.ts`
-
-Skip this step if you're building frontend-only (landing pages, portfolios, etc.)
-
-### 3. Start Development
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 4. Initialize Your Project
-
-Open Claude Code and describe your project. The `/requirements` skill automatically detects that this is a fresh project and enters **Init Mode**:
-
-```
-/requirements I want to build a project management tool for small teams
-where users can create projects, assign tasks, and track progress.
-```
-
-The skill will:
-1. Ask interactive questions to clarify your vision, target users, and MVP scope
-2. Create your **Product Requirements Document** (`docs/PRD.md`)
-3. Break the project into individual features (Single Responsibility)
-4. Create all **feature specs** (`features/PROJ-1.md`, `PROJ-2.md`, etc.)
-5. Update **feature tracking** (`features/INDEX.md`)
-6. Recommend which feature to build first
-
-You don't need to put everything in the first prompt - a brief description is enough. The skill asks follow-up questions interactively.
-
-### 5. Build Features
-
-After project initialization, build features one at a time using skills:
-
-```
-/architecture    Design the tech approach for features/PROJ-1-user-auth.md
-/frontend        Build the UI for features/PROJ-1-user-auth.md
-/backend         Build the API for features/PROJ-1-user-auth.md
-/qa              Test features/PROJ-1-user-auth.md
-/deploy          Deploy to Vercel
-```
-
-Each skill suggests the next step when it finishes. Handoffs are always user-initiated.
-
-To add more features later, run `/requirements` again - it detects the existing PRD and adds a single feature.
+Visuelle Ähnlichkeitssuche für CAD-Teile auf Basis von **DINOv3-Embeddings** und **pgvector**. Eine STEP-Datei wird automatisch aus 16 Perspektiven gerendert, jede Ansicht durchläuft den Vision-Transformer, und beim späteren Suchen via Kamera-Foto wird per HNSW-Index die nächstgelegene Ansicht über den gesamten Katalog gefunden.
 
 ---
 
-## Available Skills
+## Was die App leistet
 
-| Skill | Command | What It Does |
-|-------|---------|-------------|
-| Requirements Engineer | `/requirements` | Creates feature specs with user stories, acceptance criteria, edge cases |
-| Solution Architect | `/architecture` | Designs PM-friendly tech architecture (no code, only high-level design) |
-| Frontend Developer | `/frontend` | Builds UI with React, Tailwind CSS, and shadcn/ui |
-| Backend Developer | `/backend` | Builds APIs, database schemas, RLS policies with Supabase |
-| QA Engineer | `/qa` | Tests features against acceptance criteria + security audit |
-| DevOps | `/deploy` | Deploys to Vercel with production-ready checks |
-| Help | `/help` | Context-aware guide: shows where you are and what to do next |
+- **Katalog-Upload:** STEP-Datei rein, Worker rendert 16 Thumbnails (Fibonacci-Sphere-Sampling) und berechnet Embeddings.
+- **Foto-Suche:** Bis zu 5 Handy-Fotos pro Anfrage. Hintergrund wird automatisch entfernt, das Embedding wird gegen die Katalog-Views gematcht (MAX-per-Part).
+- **Admin-Bereich:** Bauteile listen, archivieren, fehlgeschlagene Verarbeitung erneut anstoßen.
+- **Eval-Harness:** Reproduzierbare Top-1/3/5-Trefferquote gegen einen festen Referenzfoto-Korpus.
 
-### How Skills Work
+### Aktueller Stand der Suchqualität
 
-- **Skills** are defined in `.claude/skills/` and auto-discovered by Claude Code
-- **Rules** in `.claude/rules/` are auto-applied based on file context (no manual loading)
-- **Sub-Agents** run heavy tasks (frontend, backend, QA) in isolated contexts for cost efficiency
-- **CLAUDE.md** provides project context automatically at every session start
+| Modell | Views | Top-1 | Top-3 | Top-5 |
+|---|---|---|---|---|
+| DINOv2-base, 6 Ortho + 2 Iso | 8 | 82,8 % | 96,6 % | 100 % |
+| DINOv2-base, 16 Fibonacci | 16 | 89,7 % | 89,7 % | 100 % |
+| DINOv2-large, 16 Fibonacci | 16 | 93,1 % | 100 % | 100 % |
+| **DINOv3 ViT-L/16, 16 Fibonacci** | **16** | **100 %** | **100 %** | **100 %** |
+
+Snapshots in `eval/results/`. Beachte: Der Katalog umfasst aktuell nur 5 Referenz-Bauteile — die 100 % sind eine Untergrenze, die Eval gewinnt erst mit wachsendem Katalog echte Aussagekraft.
 
 ---
 
-## Development Workflow
+## Architektur
+
+Zwei Services, klar getrennt:
 
 ```
-1. Define    /requirements  -->  Feature spec in features/PROJ-X.md
-2. Design    /architecture  -->  Tech design added to feature spec
-3. Build     /frontend      -->  UI components implemented
-             /backend       -->  APIs + database (if needed)
-4. Test      /qa            -->  Test results added to feature spec
-5. Ship      /deploy        -->  Deployed to Vercel
+┌────────────────────────────┐         ┌──────────────────────────────┐
+│  Next.js 16 (App Router)   │  HTTP   │  Python Worker (FastAPI)     │
+│  TypeScript · Tailwind     │ ───────▶│  Celery · Redis · DINOv3     │
+│  shadcn/ui                 │         │  PythonOCC · rembg · VTK     │
+│                            │◀─── ─── │                              │
+│  src/                      │         │  worker/                     │
+└──────────────┬─────────────┘         └──────────────┬───────────────┘
+               │                                      │
+               ▼                                      ▼
+        ┌─────────────────────┐              ┌──────────────────┐
+        │ Neon PostgreSQL     │              │ AWS S3           │
+        │ + pgvector (HNSW)   │              │ STEPs + Renders  │
+        └─────────────────────┘              └──────────────────┘
 ```
 
-### Feature Tracking
+### Next.js Frontend + API (`src/`)
 
-Features are tracked in `features/INDEX.md`:
+| Pfad | Zweck |
+|---|---|
+| `/upload` | STEP-Datei hochladen — 2-Schritt-Flow mit Presigned PUT |
+| `/search` | Bauteil per Kamera suchen (1–5 Fotos) |
+| `/parts/[id]` | Bauteil-Detailseite mit 16 Render-Thumbnails |
+| `/admin` | Katalogverwaltung (HTTP Basic Auth) |
+| `POST /api/upload/init` | Duplikatprüfung via SHA-256, Presigned URL |
+| `POST /api/upload/confirm` | Worker-Task einreihen |
+| `POST /api/search` | Multi-Foto-Suche, MAX-per-Part-Merge |
+| `GET /api/parts/[id]/status` | Polling für Verarbeitungs-Status |
 
-| ID | Feature | Status | Spec |
-|----|---------|--------|------|
-| PROJ-1 | User Login | Deployed | [Spec](features/PROJ-1-user-login.md) |
-| PROJ-2 | Dashboard | In Progress | [Spec](features/PROJ-2-dashboard.md) |
+### Python Worker (`worker/`)
 
-Every skill reads this file at start and updates it when done, preventing duplicate work.
+| Komponente | Aufgabe |
+|---|---|
+| `process_step.py` | STEP herunterladen → 16 Thumbnails rendern → embedden → DB schreiben |
+| `renderer.py` | Fibonacci-Sphere-Sampling, OCC → VTK → PNG (512 × 512 px) |
+| `preprocess.py` | rembg + Crop + Padding → 224 × 224 px, einheitlich für Foto und Render |
+| `embedder.py` | DINOv3 ViT-L/16, Patch-Token Mean-Pool (Indizes 5–200), 1024-dim |
+| `tasks.py` | Celery-Task `process_step_task` |
+| `main.py` | FastAPI: `/health`, `/enqueue`, `/embed` |
 
 ---
 
 ## Tech Stack
 
-| Category | Tool | Why? |
-|----------|------|------|
-| **Framework** | Next.js 16 | React + Server Components + App Router |
-| **Language** | TypeScript | Type safety |
-| **Styling** | Tailwind CSS | Utility-first CSS |
-| **UI Library** | shadcn/ui | Copy-paste, customizable components |
-| **Backend** | Supabase (optional) | PostgreSQL + Auth + Storage + Realtime |
-| **Deployment** | Vercel | Zero-config Next.js hosting |
-| **Validation** | Zod | Runtime type validation |
+| Layer | Technologie |
+|---|---|
+| Frontend | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS · shadcn/ui |
+| API | Next.js Route Handlers · Zod · `@neondatabase/serverless` |
+| Datenbank | Neon PostgreSQL + pgvector (HNSW, `vector_cosine_ops`) |
+| Object Storage | AWS S3 (zwei Buckets: STEPs + Thumbnails) |
+| Worker | FastAPI · Celery · Redis · PythonOCC · VTK · rembg |
+| ML-Modell | `facebook/dinov3-vitl16-pretrain-lvd1689m` (HuggingFace, Privacy-Policy-Gate) |
+| Test | Vitest (jsdom) · Playwright (Chromium + Mobile Safari) · pytest |
+| Deployment | Docker Compose + Traefik |
 
 ---
 
-## Project Structure
+## Setup
 
-```
-ai-coding-starter-kit/
-+-- CLAUDE.md                        <-- Auto-loaded project context
-+-- .claude/
-|   +-- settings.json                <-- Team permissions (committed)
-|   +-- settings.local.json          <-- Personal overrides (gitignored)
-|   +-- rules/                       <-- Auto-applied coding rules
-|   |   +-- general.md                   Git workflow, feature tracking
-|   |   +-- frontend.md                  shadcn/ui, component standards
-|   |   +-- backend.md                   RLS, validation, queries
-|   |   +-- security.md                  Secrets, headers, auth
-|   +-- skills/                      <-- Invocable workflows (/command)
-|   |   +-- requirements/SKILL.md        /requirements
-|   |   +-- architecture/SKILL.md        /architecture
-|   |   +-- frontend/SKILL.md            /frontend (runs as sub-agent)
-|   |   +-- backend/SKILL.md             /backend (runs as sub-agent)
-|   |   +-- qa/SKILL.md                  /qa (runs as sub-agent)
-|   |   +-- deploy/SKILL.md              /deploy
-|   |   +-- help/SKILL.md                /help
-|   +-- agents/                      <-- Sub-agent configs
-|       +-- frontend-dev.md              Model, tools, limits
-|       +-- backend-dev.md
-|       +-- qa-engineer.md
-+-- features/                        <-- Feature specifications
-|   +-- INDEX.md                         Status tracking
-|   +-- README.md                        Spec format documentation
-+-- docs/
-|   +-- PRD.md                       <-- Product Requirements Document
-|   +-- production/                  <-- Production setup guides
-|       +-- error-tracking.md            Sentry setup (5 min)
-|       +-- security-headers.md          XSS/Clickjacking protection
-|       +-- performance.md               Lighthouse, optimization
-|       +-- database-optimization.md     Indexing, N+1, caching
-|       +-- rate-limiting.md             Upstash Redis
-+-- src/
-|   +-- app/                         <-- Pages (Next.js App Router)
-|   +-- components/
-|   |   +-- ui/                      <-- shadcn/ui components (35+ installed)
-|   +-- hooks/                       <-- Custom React hooks
-|   +-- lib/                         <-- Utilities
-+-- public/                          <-- Static files
-```
+### Voraussetzungen
 
----
+- Node.js 20+
+- Docker + Docker Compose
+- Neon-Account (PostgreSQL) — `pgvector`-Extension aktiviert
+- AWS-S3-Buckets (oder S3-kompatibler Storage)
+- HuggingFace-Token mit Lese-Zugriff auf [DINOv3](https://huggingface.co/facebook/dinov3-vitl16-pretrain-lvd1689m) (Privacy-Policy einmalig bestätigen)
 
-## Getting Started
-
-### 1. Fill Out Your PRD
-
-Define your product vision in `docs/PRD.md`:
-- What are you building and why?
-- Who are the target users?
-- What features are on the roadmap?
-
-### 2. Build Your First Feature
-
-Run `/requirements` with your feature idea. The skill will:
-- Ask interactive questions to clarify requirements
-- Create a feature spec in `features/PROJ-1-name.md`
-- Update `features/INDEX.md` with the new feature
-- Suggest running `/architecture` as the next step
-
-### 3. Add shadcn/ui Components (as needed)
-
-35+ components are pre-installed. Add more as needed:
-```bash
-npx shadcn@latest add [component-name]
-```
-
-### 4. Production Setup (first deployment)
-
-When you're ready to deploy, the `/deploy` skill guides you through:
-- Vercel setup and deployment
-- Error tracking with Sentry
-- Security headers configuration
-- Performance monitoring with Lighthouse
-
-See `docs/production/` for detailed setup guides.
-
----
-
-## How It Works Under the Hood
-
-### Skills (`.claude/skills/`)
-Each skill is a structured workflow that Claude Code discovers automatically. Skills can run inline (in the main conversation) or as forked sub-agents (isolated context window).
-
-| Skill | Execution | Why? |
-|-------|-----------|------|
-| `/requirements` | Inline | Needs live interaction with user |
-| `/architecture` | Inline | Short output, user reviews in real-time |
-| `/frontend` | Sub-agent (forked) | Heavy file editing, lots of output |
-| `/backend` | Sub-agent (forked) | Heavy file editing, SQL, API code |
-| `/qa` | Sub-agent (forked) | Systematic testing, lots of output |
-| `/deploy` | Inline | Deployment needs user oversight |
-| `/help` | Inline | Quick status check and guidance |
-
-### Rules (`.claude/rules/`)
-Coding standards that are auto-applied based on which files Claude is working with. No manual loading needed.
-
-### Sub-Agent Configs (`.claude/agents/`)
-Lightweight configurations that define model, tool access, and turn limits for forked skills.
-
-### CLAUDE.md
-Auto-loaded at every session start. Contains tech stack, conventions, and references to PRD and feature index.
-
----
-
-## Context Engineering
-
-AI agents work best with clean, structured context - not longer prompts. This template is designed around these principles:
-
-### State lives in files, not in memory
-
-Every skill reads `features/INDEX.md` and the relevant feature spec at start. After context compaction or a new session, nothing is lost - the agent simply re-reads the files. Progress tracking, acceptance criteria, and tech designs all live in markdown files, not in the conversation.
-
-### Context is layered
-
-Not everything is loaded at once. Information is layered by relevance:
-
-| Layer | What | When loaded |
-|-------|------|-------------|
-| `CLAUDE.md` | Tech stack, conventions, commands | Every session (auto) |
-| `.claude/rules/` | Coding standards | When editing matching files (auto) |
-| Skill `SKILL.md` | Workflow instructions | When skill is invoked |
-| Feature spec | Requirements, AC, tech design | On demand (skill reads it) |
-| `docs/production/` | Deployment guides | Only when referenced |
-
-### Context is isolated
-
-Heavy implementation skills (`/frontend`, `/backend`, `/qa`) run as **forked sub-agents** with their own context window. Research noise from one skill doesn't pollute another. Each fork starts clean and loads only what it needs.
-
-### Context recovery is built in
-
-All forked skills include a **Context Recovery** section: if the context is compacted mid-task, the agent re-reads the feature spec, checks `git diff` for progress, and continues without restarting or duplicating work.
-
-### Always read, never guess
-
-A global rule (`rules/general.md`) enforces: always read a file before modifying it, never assume contents from memory, verify import paths and API routes by reading. This prevents hallucinated code references - the most common source of AI coding errors.
-
----
-
-## Customization for Your Team
-
-This template is designed as a starting point. Customize it for your team:
-
-1. **Edit CLAUDE.md** - Add your project-specific conventions and build commands
-2. **Edit docs/PRD.md** - Define your product vision and roadmap
-3. **Edit .claude/rules/** - Adjust coding standards for your team
-4. **Edit .claude/skills/** - Modify workflows to match your process
-5. **Edit .claude/settings.json** - Configure team permissions
-
----
-
-## Production Guides
-
-Standalone guides in `docs/production/`:
-
-| Guide | Setup Time | What It Does |
-|-------|-----------|-------------|
-| [Error Tracking](docs/production/error-tracking.md) | 5 min | Sentry integration for automatic error capture |
-| [Security Headers](docs/production/security-headers.md) | 2 min | XSS, Clickjacking, MIME sniffing protection |
-| [Performance](docs/production/performance.md) | 10 min | Lighthouse checks, image optimization, caching |
-| [Database Optimization](docs/production/database-optimization.md) | 15 min | Indexing, N+1 prevention, query optimization |
-| [Rate Limiting](docs/production/rate-limiting.md) | 10 min | Upstash Redis for API abuse prevention |
-
----
-
-## Scripts
+### 1. Repository klonen und Dependencies installieren
 
 ```bash
-npm run dev          # Development server (localhost:3000)
-npm run build        # Production build
-npm run start        # Production server
-npm run lint         # ESLint
-npm test             # Vitest: integration tests for API routes
-npm run test:e2e     # Playwright: E2E tests for user flows
-npm run test:all     # Run both test suites
+git clone <repo-url> bauteil-finder
+cd bauteil-finder
+npm install
+npx playwright install chromium   # einmalig, für E2E-Tests
+```
+
+### 2. Env-Dateien anlegen
+
+```bash
+cp .env.local.example .env.local
+cp worker/.env.example worker/.env
+```
+
+In `.env.local` setzen: `DATABASE_URL`, `AWS_*`, `WORKER_URL`, `ADMIN_PASSWORD`.
+In `worker/.env` setzen: `DATABASE_URL`, `AWS_*`, `HF_TOKEN`.
+
+### 3. Datenbank-Migrationen einspielen
+
+Im Neon-Dashboard (SQL Editor) oder via `supabase db push` der Reihe nach:
+
+```
+supabase/migrations/001_parts_schema.sql
+supabase/migrations/002_add_thumbnail_count.sql
+supabase/migrations/003_part_views.sql
+supabase/migrations/004_embedding_dim_1024.sql
+```
+
+### 4. Worker starten
+
+```bash
+docker compose up -d            # Redis + Worker + (in Prod) Next.js
+docker compose logs -f worker
+```
+
+Erster Start lädt DINOv3 (~1,5 GB) ins `model_cache`-Volume. Danach Cache-Hit.
+
+### 5. Next.js Dev-Server
+
+```bash
+npm run dev   # http://localhost:3000
 ```
 
 ---
 
-## Author
+## Entwicklung
 
-Created by **Alex Sprogis** – AI Product Engineer & Content Creator.
+### Test- und Build-Skripte
 
-- [YouTube](https://www.youtube.com/@alex.sprogis)
-- [Website](https://alexsprogis.de)
+```bash
+# Next.js
+npm run dev              # localhost:3000
+npm run build
+npm run lint
+npm test                 # Vitest (unit + integration)
+npm run test:watch
+npm run test:e2e         # Playwright
+npm run test:all
+
+# Worker (lokal, conda env aktivieren)
+cd worker && python -m pytest tests/
+
+# Einzelnen Vitest-Test
+npm test -- src/app/api/parts/route.test.ts
+```
+
+### Reindex nach Modell-/Render-Änderungen
+
+Bei Änderungen an `embedder.py`, `renderer.py` oder `preprocess.py` müssen alle bestehenden Bauteile neu eingebettet werden — sonst mischen sich alte und neue Embeddings im Index:
+
+```bash
+docker compose exec worker python -m worker.reindex                  # alle ready-Teile
+docker compose exec worker python -m worker.reindex <part-uuid>      # einzelnes Teil
+```
+
+### Eval ausführen
+
+Nach jeder geometrisch wirksamen Änderung (Render-Konfiguration, Preprocess, Embedder-Modell):
+
+```bash
+node scripts/eval_baseline.mjs                                       # gegen Production
+SEARCH_BASE_URL=http://localhost:3000 node scripts/eval_baseline.mjs # gegen lokalen Dev
+```
+
+Output: `eval/results/baseline_<timestamp>.json` + Konsolen-Report. Snapshots gehören ins Repo (Trend-Doku). Referenzfotos selbst sind **bewusst nicht** im Repo (Kunden-IP) — Pfad via `REF_DIR`-Env überschreibbar.
+
+Details: [`eval/README.md`](eval/README.md).
 
 ---
 
-## License
+## Wichtige Architekturentscheidungen
 
-MIT License - feel free to use for your projects!
+Diese Festlegungen sind absichtlich getroffen worden und sollten nicht ohne Diskussion geändert werden:
+
+- **Embedding-Modell:** DINOv3 ViT-L/16 (1024-dim). CLS-Token und 4 Register-Tokens werden bewusst übersprungen — nur Patch-Token (Indizes 5–200) gehen ins Mean-Pool.
+- **Render-Views:** 16 Fibonacci-Sphere-Views statt fixer Ortho/Iso. Gleichmäßige Kameraverteilung schlägt manuell gesetzte Standardansichten.
+- **Suche:** MAX-per-Part über `part_views`, nicht Mean-Pool über `parts.embedding`. Mean glättet Form-Diskriminanz weg.
+- **Multi-Foto:** Bis zu 5 Fotos pro Suche → n parallele HNSW-Queries + JS-Merge. Kein CROSS-JOIN, der den Index umgehen würde.
+- **Vektorindex:** pgvector **HNSW** (nie IVFFlat — IVFFlat erfordert Rebuild bei wachsendem Corpus).
+- **STEP-Verarbeitung:** Python-Microservice (Docker), niemals in Next.js/Vercel — PythonOCC und VTK gehören nicht in eine Serverless-Runtime.
+- **DB-Client:** Neon (`@neondatabase/serverless`) als Tagged-Template-Literal-Client, **nicht** Supabase-Client. RLS bewusst deaktiviert — alle DB-Zugriffe gehen server-only durch Next.js-API-Routen.
+
+### Häufige Stolperfallen
+
+- **pgvector-Query-Format:** Neon serialisiert `number[]` als PG-Array `{0.1,...}`, pgvector erwartet `[0.1,...]::vector`. Embedding immer als String übergeben.
+- **VTK-Crash:** `os.environ["VTK_DEFAULT_OPENGL_WINDOW"] = "vtkOSOpenGLRenderWindow"` muss in **jeder** Datei mit OCC/VTK-Imports als allererste Zeile vor allen anderen Imports stehen.
+- **S3 Presigned URL:** `ContentType` **nicht** in `signableHeaders` aufnehmen — sonst Content-Type-Mismatch beim Browser-Upload.
+- **pgvector Threshold-Filter:** Alias im WHERE ist verboten — Cosine-Similarity-Ausdruck im WHERE vollständig wiederholen, nicht aliasieren.
+
+---
+
+## Projektstruktur
+
+```
+bauteil-finder/
+├── CLAUDE.md                       # Projekt-Kontext für Claude Code
+├── DESIGN-SYSTEM.md                # BBS Design System (Orange #f29000, Blau #007cba)
+├── docker-compose.yml              # Prod-Stack (App + Worker + Redis)
+├── Dockerfile                      # Next.js Image
+├── .planning/                      # GSD-Workflow (Phasen, Roadmap, Forschung)
+├── eval/
+│   ├── README.md                   # Eval-Harness-Doku
+│   └── results/                    # Top-1/3/5-Snapshots pro Modell-Generation
+├── scripts/
+│   └── eval_baseline.mjs           # Eval-Skript
+├── supabase/migrations/            # 001–004 SQL-Migrationen
+├── src/
+│   ├── app/                        # Next.js App Router (pages + api)
+│   ├── components/
+│   │   ├── ui/                     # shadcn/ui (nicht neu erstellen)
+│   │   └── common/                 # Wiederverwendung (EmptyState, PageHeader, ...)
+│   ├── hooks/                      # use-part-status etc.
+│   ├── lib/                        # db.ts (Neon), s3.ts
+│   └── middleware.ts               # HTTP Basic Auth für /admin
+├── worker/
+│   ├── Dockerfile
+│   ├── main.py                     # FastAPI (/health, /enqueue, /embed)
+│   ├── tasks.py                    # Celery-Task
+│   ├── process_step.py             # STEP → Thumbnails → Embeddings
+│   ├── renderer.py                 # Fibonacci-Sphere Sampling, OCC → VTK
+│   ├── preprocess.py               # rembg + Crop + Padding
+│   ├── embedder.py                 # DINOv3 Patch-Token Mean-Pool
+│   └── reindex.py                  # Bulk-Reindex CLI
+└── tests/                          # Playwright E2E
+```
+
+---
+
+## Deployment
+
+Der Prod-Stack läuft unter `objekt.bielingserver.de` als Docker-Compose-Setup hinter Traefik (`docker-compose.yml`). Drei Container: Next.js, Python-Worker (Xvfb für headless VTK), Redis. Das DINOv3-Modell wird in einem Docker-Volume (`model_cache`) gecacht, sodass Restarts schnell sind.
+
+Voraussetzungen:
+
+- Externes Docker-Netzwerk `proxy` für Traefik: `docker network create proxy`
+- `.env` und `worker/.env` mit Prod-Credentials befüllt
+- HuggingFace-Token mit DINOv3-Zugriff in `worker/.env`
+
+```bash
+docker compose up -d
+docker compose logs -f worker
+```
+
+---
+
+## Lizenz
+
+Privates Projekt, keine offene Lizenz.
