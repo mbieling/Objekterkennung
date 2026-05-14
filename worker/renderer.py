@@ -96,22 +96,19 @@ def render_views(shape, output_dir: str) -> list[str]:
         Liste der PNG-Pfade: [output_dir/view_0.png, ..., output_dir/view_{N-1}.png]
     """
     viewer = Viewer3d()
-    try:
-        viewer.Create()
-        viewer.SetSize(512, 512)  # IN-03
-        viewer.SetModeShaded()
-        # Weißer Hintergrund (D-05): maximaler Kontrast für dunkle Metallbauteile
-        viewer.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
-        viewer.DisplayShape(shape, update=True)
+    viewer.Create()
+    viewer.SetSize(512, 512)  # IN-03
+    viewer.SetModeShaded()
+    # Weißer Hintergrund (D-05): maximaler Kontrast für dunkle Metallbauteile
+    viewer.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
+    viewer.DisplayShape(shape, update=True)
 
-        paths = []
-        for i, (dx, dy, dz) in enumerate(VIEW_DIRECTIONS):
-            viewer.View.SetProj(dx, dy, dz)
-            viewer.FitAll()
-            path = os.path.join(output_dir, f"view_{i}.png")
-            viewer.ExportToImage(path)
-            paths.append(path)
-            logger.info(f"View {i} (dir=({dx:+.3f},{dy:+.3f},{dz:+.3f})): {path}")
-        return paths
-    finally:
-        viewer.Viewer.Remove()  # CR-02: OCC-Viewer-Ressourcen freigeben
+    paths = []
+    for i, (dx, dy, dz) in enumerate(VIEW_DIRECTIONS):
+        viewer.View.SetProj(dx, dy, dz)
+        viewer.FitAll()
+        path = os.path.join(output_dir, f"view_{i}.png")
+        viewer.ExportToImage(path)
+        paths.append(path)
+        logger.info(f"View {i} (dir=({dx:+.3f},{dy:+.3f},{dz:+.3f})): {path}")
+    return paths
