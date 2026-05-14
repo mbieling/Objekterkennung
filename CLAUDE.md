@@ -36,7 +36,7 @@ Dieses Projekt verwendet Get-Shit-Done (GSD). Planungsdokumente liegen in `.plan
 **API-Routen (Next.js):**
 - `POST /api/upload/init` — Duplikatprüfung, `parts`-Eintrag anlegen, Presigned PUT-URL
 - `POST /api/upload/confirm` — Status → `processing`, Worker `/enqueue` aufrufen
-- `POST /api/search` — FormData (Foto) → S3-Temp-Upload → Worker `/embed` → pgvector → S3-Cleanup
+- `POST /api/search` — FormData mit 1..5 `image`-Feldern → S3-Temp-Upload je Foto → Worker `/embed` je Foto → pgvector (eine HNSW-Query je Foto, MAX-per-Part-Merge in JS) → S3-Cleanup. Multi-Foto-Modus ist additiv (Single-Photo = N=1).
 - `GET /api/parts` — Bauteil-Liste
 - `GET/DELETE /api/parts/[id]` — Einzelnes Bauteil
 - `GET /api/parts/[id]/status` — Polling (verwendet von `use-part-status` Hook)
@@ -46,16 +46,17 @@ Dieses Projekt verwendet Get-Shit-Done (GSD). Planungsdokumente liegen in `.plan
 
 ### 2. Python Worker (`worker/`)
 - FastAPI + Celery + Redis
-- DINOv2 ViT-B/14 für Embeddings (`worker/embedder.py`)
+- **DINOv3 ViT-L/16** (`facebook/dinov3-vitl16-pretrain-lvd1689m`) für Embeddings (`worker/embedder.py`)
 - STEP → Thumbnails via OCC/PythonOCC (`worker/process_step.py`, `worker/renderer.py`)
 - Läuft als Docker-Container: `docker compose up`
+- **HF_TOKEN** nötig (`worker/.env`) — DINOv3 ist hinter einer HF-Privacy-Policy-Gate
 
 **Worker-API-Endpunkte (intern, Port 8000):**
 - `GET /health` — Health-Check
 - `POST /enqueue` — `{part_id}` → Celery-Task einreihen (HTTP 202)
-- `POST /embed` — `{s3_key}` → synchrones Embedding (HTTP 200, 768 Floats)
+- `POST /embed` — `{s3_key}` → synchrones Embedding (HTTP 200, 1024 Floats)
 
-**S3-Pfadkonvention:** `{part_id}/original.step` (STEP-Bucket), `{part_id}/view_0.png … view_7.png` (Thumbnails-Bucket)
+**S3-Pfadkonvention:** `{part_id}/original.step` (STEP-Bucket), `{part_id}/view_0.png … view_15.png` (Thumbnails-Bucket — 16 Fibonacci-Sphere-Views)
 
 ## Build & Test
 
@@ -95,16 +96,18 @@ npm test -- src/app/api/parts/route.test.ts
 
 `process_step_task` (Celery) → `process()` (`process_step.py`):
 1. STEP-Datei aus S3 herunterladen
-2. 8 Thumbnails rendern (OCC → VTK → PNG, 512×512px)
-3. Jedes Thumbnail per `GET /embed`-ähnlichem Aufruf embedden
-4. Mean-Pool über alle 8 View-Embeddings → 768-dim Vektor
-5. `embedding`, `thumbnail_urls`, `thumbnail_count`, status=`ready` in DB schreiben
+2. **16 Thumbnails rendern** (Fibonacci-Sphere-Sampling in `worker/renderer.py` — VIEW_DIRECTIONS, OCC → VTK → PNG, 512×512px)
+3. Jedes Thumbnail einzeln embedden (via `prepare_image` → DINOv3)
+4. **Beide Speicherpfade**:
+   - `part_views(part_id, view_idx, embedding)` — 16 Zeilen pro Bauteil, **das ist die für Suche relevante Tabelle** (MAX-per-Part-Query, HNSW-indiziert)
+   - `parts.embedding` — Mean-Pool als Fallback für Alt-Code (Admin-Listen etc.)
+5. `thumbnail_urls`, `thumbnail_count=16`, `embedding_model`, status=`ready` in `parts` schreiben
 
 **Embedding-Details (`worker/embedder.py`):**
-- Modell: `facebook/dinov2-base` (gecacht in `/app/model_cache` via Dockerfile)
-- **Patch-Token Mean-Pool** (Indizes 1..256 aus `last_hidden_state`) — **KEIN CLS-Token** (Index 0)
-- Input: 224×224px (Resize VOR AutoImageProcessor)
-- Output: `np.ndarray` Shape `(768,)`
+- Modell: `facebook/dinov3-vitl16-pretrain-lvd1689m` (gecacht in `/app/model_cache` via Dockerfile + `model_cache`-Volume)
+- **Patch-Token Mean-Pool** (Indizes 5..200 aus `last_hidden_state`) — CLS-Token (Index 0) **und 4 Register-Tokens** (Indizes 1..4) bewusst überspringen. Wenn HF das Layout je ändert: Shape-Assertion in `get_embedding` schlägt zu.
+- Input: 224×224px (rembg + Crop + Padding via `worker/preprocess.py`, beide Modi `photo` und `render` identisch)
+- Output: `np.ndarray` Shape `(1024,)` — Konstante `EMBEDDING_DIM` in `embedder.py`
 
 ## Kritische Nicht-Offensichtlichkeiten
 
@@ -116,7 +119,7 @@ await db`... WHERE embedding <=> ${embeddingLiteral}::vector ...`
 
 **pgvector Threshold-Filter:** Alias im WHERE ist verboten (Pitfall 3) — Cosine-Similarity-Ausdruck im WHERE vollständig wiederholen, nicht aliasieren.
 
-**VTK-Crash verhindern:** `os.environ["VTK_DEFAULT_OPENGL_WINDOW"] = "vtkOSOpenGLRenderWindow"` muss in `tasks.py` **vor allen anderen Imports** stehen.
+**VTK-Crash verhindern:** `os.environ["VTK_DEFAULT_OPENGL_WINDOW"] = "vtkOSOpenGLRenderWindow"` muss in **jeder Datei mit OCC/VTK-Imports** als allererste Zeile vor allen anderen Imports stehen (`renderer.py`, `process_step.py`, `reindex.py`).
 
 **S3 Presigned URL:** `ContentType` **nicht** in `signableHeaders` angeben — sonst Content-Type-Mismatch beim Browser-Upload.
 
@@ -127,21 +130,43 @@ await db`... WHERE embedding <=> ${embeddingLiteral}::vector ...`
 Tabelle `parts` — wichtigste Felder:
 - `id UUID`, `status text` (`pending`|`processing`|`ready`|`failed`|`archived`)
 - `sha256 text` — Deduplizierung beim Upload
-- `embedding vector(768)` — NULLABLE bis Worker fertig
+- `embedding vector(1024)` — Mean-Pool-Fallback, NULLABLE bis Worker fertig
 - `thumbnail_urls text[]`, `thumbnail_count integer`
+- `embedding_model text`, `embedding_version text` — bei Modellwechsel mitführen
 - `is_archived boolean` — Admin-Aktion, unabhängig von `status`
 
-**Index:** HNSW mit `vector_cosine_ops` — **NIEMALS IVFFlat ersetzen** (IVFFlat erfordert Rebuild bei wachsendem Corpus).
+Tabelle `part_views` (Migration 003) — eine Zeile pro Render-Perspektive:
+- `(part_id, view_idx)` Primary Key, `view_idx` in 0..15
+- `embedding vector(1024) NOT NULL`
+- **Das ist die Suchquellen-Tabelle** — `/api/search` macht MAX-per-Part über die 16 Views statt Mean-Pool über `parts.embedding` (Mean zerstörte die Form-Diskriminanz)
 
-Migration-Dateien in `supabase/migrations/` — manuell im Neon Dashboard oder via `supabase db push` einspielen. RLS ist **bewusst deaktiviert** (kein direkter Client-Zugriff auf DB).
+**Index:** HNSW mit `vector_cosine_ops` auf beiden Vector-Spalten — **NIEMALS IVFFlat ersetzen** (IVFFlat erfordert Rebuild bei wachsendem Corpus).
+
+Migration-Dateien in `supabase/migrations/`:
+- `001_parts_schema.sql` — Grundschema
+- `002_add_thumbnail_count.sql` — `thumbnail_count`-Spalte
+- `003_part_views.sql` — Multi-View-Tabelle
+- `004_embedding_dim_1024.sql` — Wechsel vector(768) → vector(1024) (DINOv2-base → -large/DINOv3)
+
+Einspielen: manuell im Neon Dashboard oder via `supabase db push`. RLS ist **bewusst deaktiviert** (kein direkter Client-Zugriff auf DB).
 
 ## Kritische Architektur-Entscheidungen (nicht ändern ohne Diskussion)
 
-- Embedding: DINOv2 ViT-B/14, 768-dim, Patch-Token Mean-Pool, 8 Views
+- Embedding-Modell: **DINOv3 ViT-L/16**, 1024-dim Patch-Token Mean-Pool (CLS + 4 Register-Tokens überspringen)
+- Render-Views: **16 Fibonacci-Sphere-Views** (statt fixe Ortho/Iso) — gleichmäßige Kamera-Verteilung um das Objekt
+- Suche: **MAX-per-Part über `part_views`**, nicht Mean-Pool — Mean glättete Form-Diskriminanz weg
+- Multi-Foto: bis zu 5 Fotos pro Suche, n parallele HNSW-Queries + JS-Merge (kein CROSS-JOIN, der den Index umgehen würde)
 - Vektordatenbank: pgvector **HNSW** (NIEMALS IVFFlat)
 - STEP-Verarbeitung: Python-Microservice (Docker), NICHT in Next.js/Vercel
 - Async-Queue: FastAPI + Celery + Redis
 - DB-Client: Neon (`@neondatabase/serverless`), **nicht** Supabase-Client — `src/lib/db.ts` ist server-only
+
+**Bei Änderungen an `embedder.py`, `renderer.py` oder `preprocess.py` ist ein Reindex aller Teile pflicht:**
+```bash
+docker compose exec worker python -m worker.reindex                  # alle ready-Teile
+docker compose exec worker python -m worker.reindex <part-uuid>      # einzelnes Teil, bypass status-Filter
+```
+Bei Schema-Wechseln (z.B. neuer Embedding-Dim) erst Migration einspielen, dann reindexen.
 
 ## Design System
 
@@ -162,6 +187,17 @@ Worker nutzt eigene `.env` (`worker/.env.example`). Wichtig: `DECOMPOSEDS3_ENDPO
 - Unit-Tests co-located neben Quelldateien (z.B. `route.test.ts` neben `route.ts`)
 - E2E-Tests in `tests/` (Playwright)
 - Vitest mit `environment: 'jsdom'`, globals aktiv, Setup in `src/test/setup.ts`
+
+## Retrieval-Eval-Harness
+
+Reproduzierbare Messung der Such-Qualität in `eval/` + `scripts/eval_baseline.mjs` — Top-1/3/5-Trefferquote gegen einen festen Referenzfoto-Korpus. Nach jeder Render-/Preprocess-/Embedder-Änderung laufen lassen (Pflicht bei Modellwechseln):
+
+```bash
+node scripts/eval_baseline.mjs                                       # gegen Production
+SEARCH_BASE_URL=http://localhost:3000 node scripts/eval_baseline.mjs # gegen lokalen Dev
+```
+
+Output: `eval/results/baseline_<ts>.json` + Konsolen-Report. Snapshot in Git einchecken, damit der Trend dokumentiert ist (`eval/README.md` listet die bisherigen Messpunkte). Referenzfotos selbst sind **nicht** im Repo (Kunden-IP, Pfad via `REF_DIR`-Env überschreibbar).
 
 ## Feature Overview
 
