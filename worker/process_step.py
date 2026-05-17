@@ -136,28 +136,33 @@ def process(part_id: str) -> None:
                 geometry = None
 
             # Schritt 3c: Shape Foundation Model Embedding (Hebel 4 — 3D-Form-Re-Ranking).
-            # get_shape_embedding lädt das Mesh aus der STEP-Datei eigenständig (trimesh/gmsh),
-            # da das Shape-Modell direkt auf 3D-Surface-Points arbeitet. Bei Fehler oder
-            # nicht-installiertem Modell wird None zurückgegeben — Pipeline läuft weiter.
             #
-            # SAFETY-GATE: bei sehr komplexen Meshes (>2000 Faces) bleibt trimesh.load auf
-            # CPU dauerhaft hängen, das hat den Reindex schon zweimal blockiert. Wir
-            # überspringen die Shape-Berechnung dann komplett. Effekt: für diese (wenigen)
-            # Teile ist der Shape-Re-Rank-Beitrag NULL, alle anderen Hebel wirken weiter.
-            SHAPE_MAX_FACES = int(os.environ.get("SHAPE_MAX_FACES", "2000"))
-            face_count_for_shape = geometry["face_count"] if geometry else 0
-            if face_count_for_shape > SHAPE_MAX_FACES:
-                logger.warning(
-                    f"[{part_id}] Mesh zu komplex für CPU-Shape-Inferenz "
-                    f"({face_count_for_shape} > {SHAPE_MAX_FACES} faces) — überspringe Shape-Embedding"
-                )
-                shape_embedding = None
+            # KILL-SWITCH: SHAPE_DISABLE=1 deaktiviert die komplette Shape-Pipeline.
+            # Hintergrund: das Shape-Foundation-Modell läuft auf CPU für unsere STEP-Files
+            # strukturell unzuverlässig — verschiedene Teile hängen bei trimesh.load oder
+            # OCC-Tessellation aus verschiedenen Gründen (Face-Count-Filter und SIGALRM-Timeout
+            # greifen nicht zuverlässig, weil C-Extensions Python-Signale ignorieren).
+            # Default ist DEAKTIVIERT, bis wir GPU haben oder einen alternativen Inferenzpfad.
+            #
+            # Wenn aktiv: Face-Count-Gate als Schutz vor offensichtlich teuren Meshes.
+            shape_disabled = os.environ.get("SHAPE_DISABLE", "1") == "1"
+            shape_embedding = None
+            if shape_disabled:
+                logger.info(f"[{part_id}] Shape-Embedding deaktiviert (SHAPE_DISABLE=1) — Re-Ranking-Beitrag wird NULL")
             else:
-                shape_embedding = get_shape_embedding(step_path)
-            if shape_embedding is not None:
-                logger.info(f"[{part_id}] Shape-Embedding berechnet: shape={shape_embedding.shape}")
-            else:
-                logger.info(f"[{part_id}] Shape-Embedding nicht verfügbar — Re-Ranking-Beitrag wird NULL")
+                SHAPE_MAX_FACES = int(os.environ.get("SHAPE_MAX_FACES", "1000"))
+                face_count_for_shape = geometry["face_count"] if geometry else 0
+                if face_count_for_shape > SHAPE_MAX_FACES:
+                    logger.warning(
+                        f"[{part_id}] Mesh zu komplex für CPU-Shape-Inferenz "
+                        f"({face_count_for_shape} > {SHAPE_MAX_FACES} faces) — überspringe Shape-Embedding"
+                    )
+                else:
+                    shape_embedding = get_shape_embedding(step_path)
+                if shape_embedding is not None:
+                    logger.info(f"[{part_id}] Shape-Embedding berechnet: shape={shape_embedding.shape}")
+                else:
+                    logger.info(f"[{part_id}] Shape-Embedding nicht verfügbar — Re-Ranking-Beitrag wird NULL")
 
             # Schritt 4: VIEW_COUNT Views rendern
             views_dir = os.path.join(tmpdir, "views")
