@@ -1,0 +1,2207 @@
+{
+  "timestamp": "2026-05-17T06-42-02-057",
+  "searchUrl": "https://objekt.bielingserver.de/api/search?threshold=0&limit=10",
+  "summary": {
+    "total": 29,
+    "errors": 0,
+    "top1": 28,
+    "top3": 29,
+    "top5": 29,
+    "top1Pct": 96.6,
+    "top3Pct": 100,
+    "top5Pct": 100
+  },
+  "perFolder": {
+    "4770": {
+      "total": 9,
+      "top1": 8,
+      "top3": 9,
+      "top5": 9
+    },
+    "4910": {
+      "total": 8,
+      "top1": 8,
+      "top3": 8,
+      "top5": 8
+    },
+    "4973": {
+      "total": 7,
+      "top1": 7,
+      "top3": 7,
+      "top5": 7
+    },
+    "4973-1": {
+      "total": 5,
+      "top1": 5,
+      "top3": 5,
+      "top5": 5
+    }
+  },
+  "labeledResults": [
+    {
+      "folder": "4770",
+      "file": "IMG_3460.jpg",
+      "expectedProject": "004770",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "4aab3396-7947-4c7b-a140-f063710c2e90",
+          "name": "P11544-M01",
+          "part_number": "P11544-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-10T19:14:40.976Z",
+          "similarity": 0.7586551885543407
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7012681822606454
+        },
+        {
+          "id": "5bf45759-1de6-4217-80d6-bdccd4f14dec",
+          "name": "P11535-M01",
+          "part_number": "P11535-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:14:34.872Z",
+          "similarity": 0.7007493917781769
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.6950059250441086
+        },
+        {
+          "id": "25aac180-e21e-401c-aa90-d64a0ae493ca",
+          "name": "P11541-M01",
+          "part_number": "P11541-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:16:34.687Z",
+          "similarity": 0.6884752484921439
+        }
+      ],
+      "durationMs": 2020
+    },
+    {
+      "folder": "4770",
+      "file": "IMG_3461.jpg",
+      "expectedProject": "004770",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "4aab3396-7947-4c7b-a140-f063710c2e90",
+          "name": "P11544-M01",
+          "part_number": "P11544-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-10T19:14:40.976Z",
+          "similarity": 0.7973934718982998
+        },
+        {
+          "id": "25aac180-e21e-401c-aa90-d64a0ae493ca",
+          "name": "P11541-M01",
+          "part_number": "P11541-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:16:34.687Z",
+          "similarity": 0.7542447800069078
+        },
+        {
+          "id": "5bf45759-1de6-4217-80d6-bdccd4f14dec",
+          "name": "P11535-M01",
+          "part_number": "P11535-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:14:34.872Z",
+          "similarity": 0.7425787930858385
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7395359322270408
+        },
+        {
+          "id": "e9ccfc09-3c15-4b47-abdb-54e806d8f813",
+          "name": "P13374-M01",
+          "part_number": "P13374-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:14:22.028Z",
+          "similarity": 0.7305334932555104
+        }
+      ],
+      "durationMs": 1888
+    },
+    {
+      "folder": "4770",
+      "file": "IMG_3462.jpg",
+      "expectedProject": "004770",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "4aab3396-7947-4c7b-a140-f063710c2e90",
+          "name": "P11544-M01",
+          "part_number": "P11544-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-10T19:14:40.976Z",
+          "similarity": 0.7561050205323324
+        },
+        {
+          "id": "5bf45759-1de6-4217-80d6-bdccd4f14dec",
+          "name": "P11535-M01",
+          "part_number": "P11535-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:14:34.872Z",
+          "similarity": 0.7129632817043503
+        },
+        {
+          "id": "25aac180-e21e-401c-aa90-d64a0ae493ca",
+          "name": "P11541-M01",
+          "part_number": "P11541-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:16:34.687Z",
+          "similarity": 0.702929984625585
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.6901921054006112
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.6862546689606271
+        }
+      ],
+      "durationMs": 1744
+    },
+    {
+      "folder": "4770",
+      "file": "IMG_3463.jpg",
+      "expectedProject": "004770",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "4aab3396-7947-4c7b-a140-f063710c2e90",
+          "name": "P11544-M01",
+          "part_number": "P11544-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-10T19:14:40.976Z",
+          "similarity": 0.7509628128795219
+        },
+        {
+          "id": "b9502bae-d60b-4a1b-b037-93bcb9437813",
+          "name": "P13373-M01",
+          "part_number": "P13373-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:13:49.259Z",
+          "similarity": 0.7345525479521149
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.7327464310456473
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7309674625726034
+        },
+        {
+          "id": "38654fae-1cd4-41e9-b948-57d5898261ee",
+          "name": "P13371-M01",
+          "part_number": "P13371-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:12:10.284Z",
+          "similarity": 0.7266525895889618
+        }
+      ],
+      "durationMs": 1789
+    },
+    {
+      "folder": "4770",
+      "file": "IMG_3464.jpg",
+      "expectedProject": "004770",
+      "rank": 2,
+      "top1": false,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7241006937696602
+        },
+        {
+          "id": "4aab3396-7947-4c7b-a140-f063710c2e90",
+          "name": "P11544-M01",
+          "part_number": "P11544-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-10T19:14:40.976Z",
+          "similarity": 0.7124834706884172
+        },
+        {
+          "id": "b9502bae-d60b-4a1b-b037-93bcb9437813",
+          "name": "P13373-M01",
+          "part_number": "P13373-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:13:49.259Z",
+          "similarity": 0.7014391492974337
+        },
+        {
+          "id": "38654fae-1cd4-41e9-b948-57d5898261ee",
+          "name": "P13371-M01",
+          "part_number": "P13371-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:12:10.284Z",
+          "similarity": 0.6870952649633169
+        },
+        {
+          "id": "25aac180-e21e-401c-aa90-d64a0ae493ca",
+          "name": "P11541-M01",
+          "part_number": "P11541-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:16:34.687Z",
+          "similarity": 0.6790223781768102
+        }
+      ],
+      "durationMs": 1781
+    },
+    {
+      "folder": "4770",
+      "file": "IMG_3465.jpg",
+      "expectedProject": "004770",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "4aab3396-7947-4c7b-a140-f063710c2e90",
+          "name": "P11544-M01",
+          "part_number": "P11544-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-10T19:14:40.976Z",
+          "similarity": 0.7541169166275751
+        },
+        {
+          "id": "5bf45759-1de6-4217-80d6-bdccd4f14dec",
+          "name": "P11535-M01",
+          "part_number": "P11535-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:14:34.872Z",
+          "similarity": 0.7202132107830731
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7166389676358257
+        },
+        {
+          "id": "de172c23-40e6-4697-90a7-de63b7f815d9",
+          "name": "P13380-M01",
+          "part_number": "P13380-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:17:41.361Z",
+          "similarity": 0.71484255429463
+        },
+        {
+          "id": "25aac180-e21e-401c-aa90-d64a0ae493ca",
+          "name": "P11541-M01",
+          "part_number": "P11541-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:16:34.687Z",
+          "similarity": 0.7106710207202137
+        }
+      ],
+      "durationMs": 1811
+    },
+    {
+      "folder": "4770",
+      "file": "IMG_3466.jpg",
+      "expectedProject": "004770",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "4aab3396-7947-4c7b-a140-f063710c2e90",
+          "name": "P11544-M01",
+          "part_number": "P11544-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-10T19:14:40.976Z",
+          "similarity": 0.7543687697269637
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7201713855754129
+        },
+        {
+          "id": "5bf45759-1de6-4217-80d6-bdccd4f14dec",
+          "name": "P11535-M01",
+          "part_number": "P11535-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:14:34.872Z",
+          "similarity": 0.7195038116501096
+        },
+        {
+          "id": "25aac180-e21e-401c-aa90-d64a0ae493ca",
+          "name": "P11541-M01",
+          "part_number": "P11541-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:16:34.687Z",
+          "similarity": 0.701235678877807
+        },
+        {
+          "id": "38654fae-1cd4-41e9-b948-57d5898261ee",
+          "name": "P13371-M01",
+          "part_number": "P13371-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:12:10.284Z",
+          "similarity": 0.699222092313964
+        }
+      ],
+      "durationMs": 1666
+    },
+    {
+      "folder": "4770",
+      "file": "IMG_3467.jpg",
+      "expectedProject": "004770",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "4aab3396-7947-4c7b-a140-f063710c2e90",
+          "name": "P11544-M01",
+          "part_number": "P11544-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-10T19:14:40.976Z",
+          "similarity": 0.7264138546171347
+        },
+        {
+          "id": "5bf45759-1de6-4217-80d6-bdccd4f14dec",
+          "name": "P11535-M01",
+          "part_number": "P11535-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:14:34.872Z",
+          "similarity": 0.6826762876962558
+        },
+        {
+          "id": "de172c23-40e6-4697-90a7-de63b7f815d9",
+          "name": "P13380-M01",
+          "part_number": "P13380-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:17:41.361Z",
+          "similarity": 0.6724999017004951
+        },
+        {
+          "id": "25aac180-e21e-401c-aa90-d64a0ae493ca",
+          "name": "P11541-M01",
+          "part_number": "P11541-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:16:34.687Z",
+          "similarity": 0.6723545308590119
+        },
+        {
+          "id": "dfdbdd75-832a-4e99-bf9f-62c139aae53e",
+          "name": "P13376-M01",
+          "part_number": "P13376-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:15:28.003Z",
+          "similarity": 0.6542358049731958
+        }
+      ],
+      "durationMs": 1737
+    },
+    {
+      "folder": "4770",
+      "file": "IMG_3468.jpg",
+      "expectedProject": "004770",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "4aab3396-7947-4c7b-a140-f063710c2e90",
+          "name": "P11544-M01",
+          "part_number": "P11544-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-10T19:14:40.976Z",
+          "similarity": 0.7782043864884775
+        },
+        {
+          "id": "25aac180-e21e-401c-aa90-d64a0ae493ca",
+          "name": "P11541-M01",
+          "part_number": "P11541-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:16:34.687Z",
+          "similarity": 0.7191350436893047
+        },
+        {
+          "id": "5bf45759-1de6-4217-80d6-bdccd4f14dec",
+          "name": "P11535-M01",
+          "part_number": "P11535-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:14:34.872Z",
+          "similarity": 0.7184243486384813
+        },
+        {
+          "id": "de172c23-40e6-4697-90a7-de63b7f815d9",
+          "name": "P13380-M01",
+          "part_number": "P13380-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:17:41.361Z",
+          "similarity": 0.7165969668024599
+        },
+        {
+          "id": "28a42d6b-63dc-4286-97de-84022f2541aa",
+          "name": "P11533-M01",
+          "part_number": "P11533-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:13:20.108Z",
+          "similarity": 0.6996507516812965
+        }
+      ],
+      "durationMs": 1632
+    },
+    {
+      "folder": "4910",
+      "file": "IMG_3445.jpg",
+      "expectedProject": "004910",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.7268580511543847
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.7213861705399816
+        },
+        {
+          "id": "e89080b5-e48f-4a0e-a3fc-0eb5b269c09b",
+          "name": "P12967-M01",
+          "part_number": "P12967-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T05:49:31.511Z",
+          "similarity": 0.7207174319566364
+        },
+        {
+          "id": "5ada4504-5441-4c80-a7cf-21af8ed23d3b",
+          "name": "P12968-M01",
+          "part_number": "P12968-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-14T15:23:22.072Z",
+          "similarity": 0.7147219891711317
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.6952934893936062
+        }
+      ],
+      "durationMs": 1761
+    },
+    {
+      "folder": "4910",
+      "file": "IMG_3446.jpg",
+      "expectedProject": "004910",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "5ada4504-5441-4c80-a7cf-21af8ed23d3b",
+          "name": "P12968-M01",
+          "part_number": "P12968-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-14T15:23:22.072Z",
+          "similarity": 0.716500856945652
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.703780422416245
+        },
+        {
+          "id": "e89080b5-e48f-4a0e-a3fc-0eb5b269c09b",
+          "name": "P12967-M01",
+          "part_number": "P12967-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T05:49:31.511Z",
+          "similarity": 0.698596643199978
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.6976820695371447
+        },
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.6934347346097329
+        }
+      ],
+      "durationMs": 1698
+    },
+    {
+      "folder": "4910",
+      "file": "IMG_3447.jpg",
+      "expectedProject": "004910",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "5ada4504-5441-4c80-a7cf-21af8ed23d3b",
+          "name": "P12968-M01",
+          "part_number": "P12968-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-14T15:23:22.072Z",
+          "similarity": 0.7371787906689123
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7205692633826729
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.7163107728521254
+        },
+        {
+          "id": "e89080b5-e48f-4a0e-a3fc-0eb5b269c09b",
+          "name": "P12967-M01",
+          "part_number": "P12967-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T05:49:31.511Z",
+          "similarity": 0.7103688138161468
+        },
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.706286805836668
+        }
+      ],
+      "durationMs": 1757
+    },
+    {
+      "folder": "4910",
+      "file": "IMG_3448.jpg",
+      "expectedProject": "004910",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "e89080b5-e48f-4a0e-a3fc-0eb5b269c09b",
+          "name": "P12967-M01",
+          "part_number": "P12967-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T05:49:31.511Z",
+          "similarity": 0.7819571497214294
+        },
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.7808378273842326
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.7707719122585408
+        },
+        {
+          "id": "5ada4504-5441-4c80-a7cf-21af8ed23d3b",
+          "name": "P12968-M01",
+          "part_number": "P12968-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-14T15:23:22.072Z",
+          "similarity": 0.7355878965969497
+        },
+        {
+          "id": "f388f967-069f-483f-a629-4a2e78786da9",
+          "name": "P13382-M01",
+          "part_number": "P13382-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:19:14.898Z",
+          "similarity": 0.6584547156118397
+        }
+      ],
+      "durationMs": 1825
+    },
+    {
+      "folder": "4910",
+      "file": "IMG_3449.jpg",
+      "expectedProject": "004910",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.7858369552891326
+        },
+        {
+          "id": "e89080b5-e48f-4a0e-a3fc-0eb5b269c09b",
+          "name": "P12967-M01",
+          "part_number": "P12967-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T05:49:31.511Z",
+          "similarity": 0.7837652650843664
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.7786939572054011
+        },
+        {
+          "id": "5ada4504-5441-4c80-a7cf-21af8ed23d3b",
+          "name": "P12968-M01",
+          "part_number": "P12968-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-14T15:23:22.072Z",
+          "similarity": 0.7230512435946604
+        },
+        {
+          "id": "38654fae-1cd4-41e9-b948-57d5898261ee",
+          "name": "P13371-M01",
+          "part_number": "P13371-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:12:10.284Z",
+          "similarity": 0.6581593208937127
+        }
+      ],
+      "durationMs": 1709
+    },
+    {
+      "folder": "4910",
+      "file": "IMG_3450.jpg",
+      "expectedProject": "004910",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "e89080b5-e48f-4a0e-a3fc-0eb5b269c09b",
+          "name": "P12967-M01",
+          "part_number": "P12967-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T05:49:31.511Z",
+          "similarity": 0.6872531244945627
+        },
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.6842922279299077
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.6799929884451659
+        },
+        {
+          "id": "5ada4504-5441-4c80-a7cf-21af8ed23d3b",
+          "name": "P12968-M01",
+          "part_number": "P12968-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-14T15:23:22.072Z",
+          "similarity": 0.6351552821676207
+        },
+        {
+          "id": "f388f967-069f-483f-a629-4a2e78786da9",
+          "name": "P13382-M01",
+          "part_number": "P13382-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:19:14.898Z",
+          "similarity": 0.6110515781760111
+        }
+      ],
+      "durationMs": 1764
+    },
+    {
+      "folder": "4910",
+      "file": "IMG_3451.jpg",
+      "expectedProject": "004910",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.7029778908512746
+        },
+        {
+          "id": "e89080b5-e48f-4a0e-a3fc-0eb5b269c09b",
+          "name": "P12967-M01",
+          "part_number": "P12967-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T05:49:31.511Z",
+          "similarity": 0.7006457949144881
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.6994214674219381
+        },
+        {
+          "id": "5ada4504-5441-4c80-a7cf-21af8ed23d3b",
+          "name": "P12968-M01",
+          "part_number": "P12968-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-14T15:23:22.072Z",
+          "similarity": 0.6988030670134804
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.6769767284833005
+        }
+      ],
+      "durationMs": 1944
+    },
+    {
+      "folder": "4910",
+      "file": "IMG_3452.jpg",
+      "expectedProject": "004910",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.7848054316583558
+        },
+        {
+          "id": "e89080b5-e48f-4a0e-a3fc-0eb5b269c09b",
+          "name": "P12967-M01",
+          "part_number": "P12967-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T05:49:31.511Z",
+          "similarity": 0.7840694621151636
+        },
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.7762333337622827
+        },
+        {
+          "id": "5ada4504-5441-4c80-a7cf-21af8ed23d3b",
+          "name": "P12968-M01",
+          "part_number": "P12968-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-14T15:23:22.072Z",
+          "similarity": 0.7207327643097796
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.6790921153212885
+        }
+      ],
+      "durationMs": 1724
+    },
+    {
+      "folder": "4973",
+      "file": "IMG_3453.jpg",
+      "expectedProject": "004973",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.8502592911334446
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.8477869445934348
+        },
+        {
+          "id": "801bac33-5320-4619-81b7-853858bd79af",
+          "name": "P13389-M01",
+          "part_number": "P13389-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:20:47.115Z",
+          "similarity": 0.8024990046501143
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.801371529738298
+        },
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.7979720499596685
+        }
+      ],
+      "durationMs": 1963
+    },
+    {
+      "folder": "4973",
+      "file": "IMG_3454.jpg",
+      "expectedProject": "004973",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.7510548854068719
+        },
+        {
+          "id": "61be483b-aca4-49b3-a1dc-52b8e3b8e2ac",
+          "name": "P13375-M01",
+          "part_number": "P13375-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:14:56.326Z",
+          "similarity": 0.7457252324748432
+        },
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.7446628644168225
+        },
+        {
+          "id": "dfdbdd75-832a-4e99-bf9f-62c139aae53e",
+          "name": "P13376-M01",
+          "part_number": "P13376-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:15:28.003Z",
+          "similarity": 0.7418113828892116
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7350752836207906
+        }
+      ],
+      "durationMs": 1686
+    },
+    {
+      "folder": "4973",
+      "file": "IMG_3455.jpg",
+      "expectedProject": "004973",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "dfdbdd75-832a-4e99-bf9f-62c139aae53e",
+          "name": "P13376-M01",
+          "part_number": "P13376-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:15:28.003Z",
+          "similarity": 0.7570853878646363
+        },
+        {
+          "id": "b9502bae-d60b-4a1b-b037-93bcb9437813",
+          "name": "P13373-M01",
+          "part_number": "P13373-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:13:49.259Z",
+          "similarity": 0.7450946493996695
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.732436972473832
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.7299864822954332
+        },
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.7175672335060802
+        }
+      ],
+      "durationMs": 1880
+    },
+    {
+      "folder": "4973",
+      "file": "IMG_3456.jpg",
+      "expectedProject": "004973",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.8257061360797112
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.8132461208776866
+        },
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.7663980741573109
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.760685516145549
+        },
+        {
+          "id": "801bac33-5320-4619-81b7-853858bd79af",
+          "name": "P13389-M01",
+          "part_number": "P13389-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:20:47.115Z",
+          "similarity": 0.7587739950676676
+        }
+      ],
+      "durationMs": 1987
+    },
+    {
+      "folder": "4973",
+      "file": "IMG_3457.jpg",
+      "expectedProject": "004973",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.8459235225145799
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.8362963096796522
+        },
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.7926026877362663
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.7852650988203903
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7837985558820321
+        }
+      ],
+      "durationMs": 1777
+    },
+    {
+      "folder": "4973",
+      "file": "IMG_3458.jpg",
+      "expectedProject": "004973",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "61be483b-aca4-49b3-a1dc-52b8e3b8e2ac",
+          "name": "P13375-M01",
+          "part_number": "P13375-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:14:56.326Z",
+          "similarity": 0.7534982309793616
+        },
+        {
+          "id": "dfdbdd75-832a-4e99-bf9f-62c139aae53e",
+          "name": "P13376-M01",
+          "part_number": "P13376-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:15:28.003Z",
+          "similarity": 0.7176879001868478
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.70980898144348
+        },
+        {
+          "id": "e9ccfc09-3c15-4b47-abdb-54e806d8f813",
+          "name": "P13374-M01",
+          "part_number": "P13374-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:14:22.028Z",
+          "similarity": 0.7046483731221841
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.6892598852896255
+        }
+      ],
+      "durationMs": 1900
+    },
+    {
+      "folder": "4973",
+      "file": "IMG_3459.jpg",
+      "expectedProject": "004973",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "61be483b-aca4-49b3-a1dc-52b8e3b8e2ac",
+          "name": "P13375-M01",
+          "part_number": "P13375-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:14:56.326Z",
+          "similarity": 0.77088582931276
+        },
+        {
+          "id": "dfdbdd75-832a-4e99-bf9f-62c139aae53e",
+          "name": "P13376-M01",
+          "part_number": "P13376-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:15:28.003Z",
+          "similarity": 0.7240723626056371
+        },
+        {
+          "id": "e9ccfc09-3c15-4b47-abdb-54e806d8f813",
+          "name": "P13374-M01",
+          "part_number": "P13374-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:14:22.028Z",
+          "similarity": 0.7193181953780948
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.6995397551625292
+        },
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.6887152112794878
+        }
+      ],
+      "durationMs": 2058
+    },
+    {
+      "folder": "4973-1",
+      "file": "IMG_3469.jpg",
+      "expectedProject": "004973",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.8569574287221058
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.8452124121267055
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.8056036703479628
+        },
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.8031384014408894
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.7999418310344834
+        }
+      ],
+      "durationMs": 2068
+    },
+    {
+      "folder": "4973-1",
+      "file": "IMG_3470.jpg",
+      "expectedProject": "004973",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.7790048431938553
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.7745749603917943
+        },
+        {
+          "id": "61be483b-aca4-49b3-a1dc-52b8e3b8e2ac",
+          "name": "P13375-M01",
+          "part_number": "P13375-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:14:56.326Z",
+          "similarity": 0.7551045372323101
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7532965374729241
+        },
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.7499840740416195
+        }
+      ],
+      "durationMs": 1955
+    },
+    {
+      "folder": "4973-1",
+      "file": "IMG_3471.jpg",
+      "expectedProject": "004973",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.721763551891255
+        },
+        {
+          "id": "dfdbdd75-832a-4e99-bf9f-62c139aae53e",
+          "name": "P13376-M01",
+          "part_number": "P13376-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:15:28.003Z",
+          "similarity": 0.7191891175855954
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.7173403111358657
+        },
+        {
+          "id": "e9ccfc09-3c15-4b47-abdb-54e806d8f813",
+          "name": "P13374-M01",
+          "part_number": "P13374-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:14:22.028Z",
+          "similarity": 0.7133536170104278
+        },
+        {
+          "id": "b9502bae-d60b-4a1b-b037-93bcb9437813",
+          "name": "P13373-M01",
+          "part_number": "P13373-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:13:49.259Z",
+          "similarity": 0.7102525912610529
+        }
+      ],
+      "durationMs": 2026
+    },
+    {
+      "folder": "4973-1",
+      "file": "IMG_3472.jpg",
+      "expectedProject": "004973",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "61be483b-aca4-49b3-a1dc-52b8e3b8e2ac",
+          "name": "P13375-M01",
+          "part_number": "P13375-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:14:56.326Z",
+          "similarity": 0.8330661595902444
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7691549188363798
+        },
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.7664662854259566
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.7573836397509698
+        },
+        {
+          "id": "e9ccfc09-3c15-4b47-abdb-54e806d8f813",
+          "name": "P13374-M01",
+          "part_number": "P13374-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:14:22.028Z",
+          "similarity": 0.7423279738082776
+        }
+      ],
+      "durationMs": 1913
+    },
+    {
+      "folder": "4973-1",
+      "file": "IMG_3473.jpg",
+      "expectedProject": "004973",
+      "rank": 1,
+      "top1": true,
+      "top3": true,
+      "top5": true,
+      "top5Results": [
+        {
+          "id": "61be483b-aca4-49b3-a1dc-52b8e3b8e2ac",
+          "name": "P13375-M01",
+          "part_number": "P13375-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:14:56.326Z",
+          "similarity": 0.7949370465496559
+        },
+        {
+          "id": "dfdbdd75-832a-4e99-bf9f-62c139aae53e",
+          "name": "P13376-M01",
+          "part_number": "P13376-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:15:28.003Z",
+          "similarity": 0.7554297013578544
+        },
+        {
+          "id": "e9ccfc09-3c15-4b47-abdb-54e806d8f813",
+          "name": "P13374-M01",
+          "part_number": "P13374-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:14:22.028Z",
+          "similarity": 0.7482319816400392
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.7260054112548745
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7240898072382521
+        }
+      ],
+      "durationMs": 1972
+    }
+  ],
+  "unlabeledResults": [
+    {
+      "file": "IMG_3474.jpg",
+      "top5Results": [
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.8430913648904194
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.8305471026960555
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.8266290490164631
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.8221328721535548
+        },
+        {
+          "id": "e89080b5-e48f-4a0e-a3fc-0eb5b269c09b",
+          "name": "P12967-M01",
+          "part_number": "P12967-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T05:49:31.511Z",
+          "similarity": 0.8146097574700422
+        }
+      ],
+      "durationMs": 1808
+    },
+    {
+      "file": "IMG_3475.jpg",
+      "top5Results": [
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7868227998342237
+        },
+        {
+          "id": "61be483b-aca4-49b3-a1dc-52b8e3b8e2ac",
+          "name": "P13375-M01",
+          "part_number": "P13375-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:14:56.326Z",
+          "similarity": 0.7817851189764258
+        },
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.7656746238386323
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.7571127495947236
+        },
+        {
+          "id": "e89080b5-e48f-4a0e-a3fc-0eb5b269c09b",
+          "name": "P12967-M01",
+          "part_number": "P12967-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T05:49:31.511Z",
+          "similarity": 0.7564808464075802
+        }
+      ],
+      "durationMs": 1849
+    },
+    {
+      "file": "IMG_3476.jpg",
+      "top5Results": [
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7724479874506203
+        },
+        {
+          "id": "b9502bae-d60b-4a1b-b037-93bcb9437813",
+          "name": "P13373-M01",
+          "part_number": "P13373-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:13:49.259Z",
+          "similarity": 0.7532286392741182
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.7284818201316925
+        },
+        {
+          "id": "dfdbdd75-832a-4e99-bf9f-62c139aae53e",
+          "name": "P13376-M01",
+          "part_number": "P13376-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:15:28.003Z",
+          "similarity": 0.7267237045040394
+        },
+        {
+          "id": "4aab3396-7947-4c7b-a140-f063710c2e90",
+          "name": "P11544-M01",
+          "part_number": "P11544-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-10T19:14:40.976Z",
+          "similarity": 0.7145665663231161
+        }
+      ],
+      "durationMs": 1752
+    },
+    {
+      "file": "IMG_3477.jpg",
+      "top5Results": [
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7993384709658684
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.7986761365165631
+        },
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.7905607601881849
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.7868220562783927
+        },
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.7839906593809218
+        }
+      ],
+      "durationMs": 1690
+    },
+    {
+      "file": "IMG_3478.jpg",
+      "top5Results": [
+        {
+          "id": "801bac33-5320-4619-81b7-853858bd79af",
+          "name": "P13389-M01",
+          "part_number": "P13389-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:20:47.115Z",
+          "similarity": 0.8319681119074377
+        },
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.8140659766840281
+        },
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.8117758561399081
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7913461938547809
+        },
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.7726966360039474
+        }
+      ],
+      "durationMs": 1786
+    },
+    {
+      "file": "IMG_3479.jpg",
+      "top5Results": [
+        {
+          "id": "d697c4ed-7fe6-4f45-a23b-e4c3dbbcc60c",
+          "name": "P13392-M01",
+          "part_number": "P13392-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:21:24.514Z",
+          "similarity": 0.8126455747905744
+        },
+        {
+          "id": "801bac33-5320-4619-81b7-853858bd79af",
+          "name": "P13389-M01",
+          "part_number": "P13389-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:20:47.115Z",
+          "similarity": 0.7968152751005846
+        },
+        {
+          "id": "9f56bc8e-f31b-47be-9930-dba06de6a75f",
+          "name": "P13384-M01",
+          "part_number": "P13384-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-10T19:10:41.660Z",
+          "similarity": 0.7956638580057782
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7906434058167713
+        },
+        {
+          "id": "5ec05a46-90c1-4228-8656-ecd08122de0b",
+          "name": "P13031-M01",
+          "part_number": "P13031-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:13:20.954Z",
+          "similarity": 0.7711085882603095
+        }
+      ],
+      "durationMs": 2133
+    },
+    {
+      "file": "IMG_3480.jpg",
+      "top5Results": [
+        {
+          "id": "5bf45759-1de6-4217-80d6-bdccd4f14dec",
+          "name": "P11535-M01",
+          "part_number": "P11535-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:14:34.872Z",
+          "similarity": 0.7417397711116538
+        },
+        {
+          "id": "4aab3396-7947-4c7b-a140-f063710c2e90",
+          "name": "P11544-M01",
+          "part_number": "P11544-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-10T19:14:40.976Z",
+          "similarity": 0.7364156410884419
+        },
+        {
+          "id": "48fba91d-5c0c-455c-9b8e-1aacfaa62d67",
+          "name": "P13377-M01",
+          "part_number": "P13377-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:16:01.386Z",
+          "similarity": 0.7095694179235119
+        },
+        {
+          "id": "25aac180-e21e-401c-aa90-d64a0ae493ca",
+          "name": "P11541-M01",
+          "part_number": "P11541-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:16:34.687Z",
+          "similarity": 0.7005941916269226
+        },
+        {
+          "id": "56b6fdf7-6c1a-4830-a816-4490520de6a8",
+          "name": "P11540-M01",
+          "part_number": "P11540-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:15:57.805Z",
+          "similarity": 0.6930348456069658
+        }
+      ],
+      "durationMs": 1716
+    },
+    {
+      "file": "IMG_3481.jpg",
+      "top5Results": [
+        {
+          "id": "4aab3396-7947-4c7b-a140-f063710c2e90",
+          "name": "P11544-M01",
+          "part_number": "P11544-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-10T19:14:40.976Z",
+          "similarity": 0.7104647479843373
+        },
+        {
+          "id": "5bf45759-1de6-4217-80d6-bdccd4f14dec",
+          "name": "P11535-M01",
+          "part_number": "P11535-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:14:34.872Z",
+          "similarity": 0.6908471505664865
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.6649107841510864
+        },
+        {
+          "id": "de172c23-40e6-4697-90a7-de63b7f815d9",
+          "name": "P13380-M01",
+          "part_number": "P13380-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:17:41.361Z",
+          "similarity": 0.6637034837634929
+        },
+        {
+          "id": "48fba91d-5c0c-455c-9b8e-1aacfaa62d67",
+          "name": "P13377-M01",
+          "part_number": "P13377-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:16:01.386Z",
+          "similarity": 0.6620866826586467
+        }
+      ],
+      "durationMs": 1837
+    },
+    {
+      "file": "IMG_3482.jpg",
+      "top5Results": [
+        {
+          "id": "4aab3396-7947-4c7b-a140-f063710c2e90",
+          "name": "P11544-M01",
+          "part_number": "P11544-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-10T19:14:40.976Z",
+          "similarity": 0.7613112539707445
+        },
+        {
+          "id": "5bf45759-1de6-4217-80d6-bdccd4f14dec",
+          "name": "P11535-M01",
+          "part_number": "P11535-M01",
+          "project": "004770",
+          "status": "ready",
+          "created_at": "2026-05-14T14:14:34.872Z",
+          "similarity": 0.7475414565812587
+        },
+        {
+          "id": "cd892646-2bf6-4c9d-a285-b44e38cea37d",
+          "name": "P13395-M01",
+          "part_number": "P13395-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:22:10.846Z",
+          "similarity": 0.7164577933893973
+        },
+        {
+          "id": "48fba91d-5c0c-455c-9b8e-1aacfaa62d67",
+          "name": "P13377-M01",
+          "part_number": "P13377-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:16:01.386Z",
+          "similarity": 0.7107689866698219
+        },
+        {
+          "id": "de172c23-40e6-4697-90a7-de63b7f815d9",
+          "name": "P13380-M01",
+          "part_number": "P13380-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:17:41.361Z",
+          "similarity": 0.7098363923467592
+        }
+      ],
+      "durationMs": 1799
+    },
+    {
+      "file": "IMG_3483.jpg",
+      "top5Results": [
+        {
+          "id": "f388f967-069f-483f-a629-4a2e78786da9",
+          "name": "P13382-M01",
+          "part_number": "P13382-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:19:14.898Z",
+          "similarity": 0.6001053087288973
+        },
+        {
+          "id": "5ada4504-5441-4c80-a7cf-21af8ed23d3b",
+          "name": "P12968-M01",
+          "part_number": "P12968-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-14T15:23:22.072Z",
+          "similarity": 0.5758444142377667
+        },
+        {
+          "id": "38654fae-1cd4-41e9-b948-57d5898261ee",
+          "name": "P13371-M01",
+          "part_number": "P13371-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:12:10.284Z",
+          "similarity": 0.5584629777464492
+        },
+        {
+          "id": "b9502bae-d60b-4a1b-b037-93bcb9437813",
+          "name": "P13373-M01",
+          "part_number": "P13373-M01",
+          "project": "004973",
+          "status": "ready",
+          "created_at": "2026-05-14T15:13:49.259Z",
+          "similarity": 0.5541631630670009
+        },
+        {
+          "id": "373b5df0-2f57-40c2-a5c8-2b5cd1310b88",
+          "name": "P12972-M01",
+          "part_number": "P12972-M01",
+          "project": "004910",
+          "status": "ready",
+          "created_at": "2026-05-10T06:04:05.177Z",
+          "similarity": 0.5479787585324187
+        }
+      ],
+      "durationMs": 1962
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 'use client'
 
 // src/app/search/SearchResultCard.tsx
-// Phase 8 — Einzelne Trefferkarte (SEARCH-03, D-01 bis D-05)
+// Einzelne Trefferkarte. Hebel 1 (Farbschwellen angehoben) + Hebel 2 (view_hits-Hinweis).
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -14,13 +14,21 @@ interface SearchResultCardProps {
   id: string
   name: string
   part_number: string | null
-  similarity: number  // Float 0–1 aus API
+  similarity: number       // Float 0–1 aus API (rohes top_sim)
+  view_hits?: number       // Anzahl Views (von 16), die als Hit zählten (Hebel 2)
+  is_top_hit?: boolean     // True wenn dieses Ergebnis der eindeutige Top-Treffer ist
 }
 
-function SearchResultCard({ id, name, part_number, similarity }: SearchResultCardProps) {
+function SearchResultCard({
+  id,
+  name,
+  part_number,
+  similarity,
+  view_hits,
+  is_top_hit,
+}: SearchResultCardProps) {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null)
 
-  // Thumbnail lazy laden — nur [id] im Deps-Array, kein thumbnailUrl (verhindert Endlosloop)
   useEffect(() => {
     fetch(`/api/parts/${id}/thumbnail`)
       .then(r => (r.ok ? r.json() : null))
@@ -30,26 +38,32 @@ function SearchResultCard({ id, name, part_number, similarity }: SearchResultCar
 
   const matchPercent = Math.round(similarity * 100)
 
-  // D-04: Farb-Schwellwerte — direkte className statt shadcn-Varianten
-  // hover:bg-* Override nötig — shadcn Badge hat eigenen Hover-State
+  // Farbschwellen angehoben (Hebel 1): DINOv3-Baseline in CAD-Render ist ~0.65–0.75 —
+  // alles in dem Bereich ist NICHT "ziemlich sicher", sondern Rauschen.
+  //   ≥ 0.88  grün   (sehr starker Treffer)
+  //   ≥ 0.78  amber  (möglicher Treffer — manuell prüfen)
+  //   < 0.78  rot    (wahrscheinlich Rauschen)
   const badgeClass = cn(
-    similarity >= 0.8
+    similarity >= 0.88
       ? 'bg-green-500 text-white hover:bg-green-500'
-      : similarity >= 0.6
+      : similarity >= 0.78
       ? 'bg-amber-500 text-white hover:bg-amber-500'
       : 'bg-red-500 text-white hover:bg-red-500'
   )
 
   return (
-    // D-03: Karte ist anklickbar — Link zu /parts/[id] (Phase 9 erstellt Zielseite; 404 akzeptiert)
     <Link
       href={`/parts/${id}`}
       className="block"
       aria-label={`Bauteil ${name} anzeigen, Ähnlichkeit ${matchPercent}%`}
     >
-      <Card className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
+      <Card
+        className={cn(
+          'overflow-hidden hover:shadow-md transition-shadow cursor-pointer',
+          is_top_hit && 'ring-2 ring-primary'
+        )}
+      >
         <div className="flex gap-3 p-3">
-          {/* D-02: Thumbnail 64×64 quadratisch, Skeleton-Placeholder beim Laden */}
           <div className="relative w-16 h-16 shrink-0 rounded-md overflow-hidden bg-muted">
             {thumbnailUrl ? (
               <img
@@ -62,14 +76,21 @@ function SearchResultCard({ id, name, part_number, similarity }: SearchResultCar
               <Skeleton className="w-full h-full" />
             )}
           </div>
-          {/* D-02: Name + Badge */}
           <div className="flex flex-col justify-between flex-1 min-w-0 py-0.5">
             <p className="text-sm font-medium leading-tight truncate">{name}</p>
             {part_number && (
               <p className="text-xs text-muted-foreground truncate">{part_number}</p>
             )}
-            {/* D-05: Badge rechts unten, nach Name */}
-            <div className="flex justify-end">
+            <div className="flex justify-end items-center gap-2">
+              {/* Hebel 2: view_hits als sekundäre Info — wie viele Perspektiven passten */}
+              {typeof view_hits === 'number' && view_hits > 0 && (
+                <span
+                  className="text-[10px] text-muted-foreground"
+                  title="Anzahl Render-Perspektiven, die zu deinem Foto passten"
+                >
+                  {view_hits}/16 Views
+                </span>
+              )}
               <Badge className={badgeClass}>{matchPercent}%</Badge>
             </div>
           </div>

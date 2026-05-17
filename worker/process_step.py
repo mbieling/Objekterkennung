@@ -20,6 +20,7 @@ from dotenv import load_dotenv
 # Worker-Module (aus worker/-Verzeichnis)
 from worker.renderer import load_step, validate_geometry, render_views, VIEW_COUNT
 from worker.embedder import get_embedding, mean_pool, EMBEDDING_DIM
+from worker.geometry import extract_geometry
 
 # .env-Datei laden wenn vorhanden (lokale Entwicklung)
 load_dotenv()
@@ -124,6 +125,15 @@ def process(part_id: str) -> None:
             validate_geometry(shape)
             logger.info(f"[{part_id}] Geometrie-Validierung: OK")
 
+            # Schritt 3b: Geometrische Merkmale extrahieren (Hebel 3a — Re-Ranking in der Suche).
+            # Nullable in DB — bei Extraktionsfehler wird die Pipeline nicht abgebrochen,
+            # sondern die Werte fallen weg (Geometrie-Beitrag im Re-Ranking = 0).
+            try:
+                geometry = extract_geometry(shape)
+            except Exception as geo_err:
+                logger.warning(f"[{part_id}] Geometrie-Extraktion fehlgeschlagen, fahre ohne fort: {geo_err}")
+                geometry = None
+
             # Schritt 4: VIEW_COUNT Views rendern
             views_dir = os.path.join(tmpdir, "views")
             os.makedirs(views_dir, exist_ok=True)
@@ -166,7 +176,15 @@ def process(part_id: str) -> None:
                 )
             logger.info(f"[{part_id}] {len(embeddings)} View-Embeddings in part_views geschrieben")
 
-            # Schritt 7c: parts-Tabelle aktualisieren (Mean-Embedding bleibt als Fallback)
+            # Schritt 7c: parts-Tabelle aktualisieren (Mean-Embedding bleibt als Fallback).
+            # Geometrie-Werte als Tupel (möglicherweise None bei Extraktionsfehler).
+            geo_x = geometry["bbox_x"] if geometry else None
+            geo_y = geometry["bbox_y"] if geometry else None
+            geo_z = geometry["bbox_z"] if geometry else None
+            geo_vol = geometry["volume"] if geometry else None
+            geo_surf = geometry["surface_area"] if geometry else None
+            geo_faces = geometry["face_count"] if geometry else None
+
             cur.execute("""
                 UPDATE parts SET
                     embedding = %s,
@@ -174,6 +192,12 @@ def process(part_id: str) -> None:
                     embedding_version = %s,
                     thumbnail_urls = %s,
                     thumbnail_count = %s,
+                    bbox_x = %s,
+                    bbox_y = %s,
+                    bbox_z = %s,
+                    volume = %s,
+                    surface_area = %s,
+                    face_count = %s,
                     status = 'ready'
                 WHERE id = %s
             """, (
@@ -182,6 +206,7 @@ def process(part_id: str) -> None:
                 "facebook/dinov3-vitl16-pretrain-lvd1689m",      # embedding_version
                 thumbnail_urls,          # list[str] → text[]
                 len(png_paths),          # thumbnail_count — benötigt von /api/parts/[id]/thumbnails
+                geo_x, geo_y, geo_z, geo_vol, geo_surf, geo_faces,
                 part_id
             ))
             conn.commit()

@@ -10,7 +10,7 @@ import numpy as np
 import torch
 from transformers import AutoImageProcessor, AutoModel
 
-from worker.preprocess import prepare_image
+from worker.preprocess import PrepareMeta, prepare_image, prepare_image_with_meta
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,24 @@ def get_embedding(
            werden bewusst übersprungen.
     """
     img = prepare_image(image_path, mode=mode)
+    return _embed_pil(img)
 
+
+def get_embedding_with_meta(
+    image_path: str,
+    mode: Literal["photo", "render"] = "photo",
+) -> tuple[np.ndarray, PrepareMeta]:
+    """Wie get_embedding, gibt zusätzlich Preprocess-Meta (Aspect-Ratio) zurück.
+
+    Wird vom Suchpfad in /api/search verwendet — wir brauchen das Foto-Aspect-Ratio
+    für das geometrische Re-Ranking gegen die 3D-Bbox-Proportionen in `parts`.
+    """
+    img, meta = prepare_image_with_meta(image_path, mode=mode)
+    return _embed_pil(img), meta
+
+
+def _embed_pil(img) -> np.ndarray:
+    """Patch-Token Mean-Pool DINOv3-Embedding aus einem bereits vorbereiteten PIL-Bild."""
     inputs = _processor(images=img, return_tensors="pt")
 
     with torch.no_grad():

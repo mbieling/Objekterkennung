@@ -1,7 +1,8 @@
 'use client'
 
 // src/app/search/SearchResults.tsx
-// Phase 8 — Ergebnis-Controller (SEARCH-03, SEARCH-04, SEARCH-05, D-07 bis D-10)
+// Ergebnis-Controller — zeigt Treffer, threshold-Slider, Limit-Select und
+// (Hebel 1) ein Konfidenz-Banner bei unsicheren Ergebnissen.
 
 import { Slider } from '@/components/ui/slider'
 import {
@@ -11,9 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { SearchResultCard } from './SearchResultCard'
 
-// SearchResponse-Interface — identisch mit CameraCapture.tsx (kein Cross-Import um Zirkel zu vermeiden)
 interface SearchResultItem {
   id: string
   name: string
@@ -22,12 +24,20 @@ interface SearchResultItem {
   status: 'ready'
   similarity: number
   created_at: string
+  view_hits?: number
+  geo_score?: number
 }
 
 interface SearchResultsProps {
   searchResult: {
     results: SearchResultItem[]
-    query: { threshold: number; limit: number; results_count: number }
+    query: {
+      threshold: number
+      limit: number
+      results_count: number
+      margin?: number | null
+      confidence?: 'high' | 'medium' | 'low'
+    }
   }
   displayThreshold: number      // 0.0–1.0; Slider-Wert
   displayLimit: number          // 10 | 20 | 50
@@ -42,16 +52,49 @@ function SearchResults({
   onThresholdChange,
   onLimitChange,
 }: SearchResultsProps) {
-  // D-07: Lokale Filterung — API liefert bereits sortiert nach similarity DESC
+  // Lokale Filterung — API liefert bereits sortiert nach final_score DESC
   const filteredResults = searchResult.results
     .filter(r => r.similarity >= displayThreshold)
     .slice(0, displayLimit)
 
+  const confidence = searchResult.query.confidence
+  // Konfidenz-Banner nur zeigen, wenn nach lokalem Filter noch mehrere Treffer da sind —
+  // ein "unsicheres" Top-1, das den lokalen Threshold als einziges schafft, ist effektiv eindeutig.
+  const showConfidenceBanner = filteredResults.length >= 2 && confidence != null
+
   return (
     <div className="flex flex-col gap-4">
-      {/* D-09: Controls-Zeile direkt über dem Grid */}
+      {/* Hebel 1: Konfidenz-Banner */}
+      {showConfidenceBanner && confidence === 'low' && (
+        <Alert>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Mehrere ähnliche Kandidaten</strong> — die Top-Treffer liegen sehr
+            nah beieinander. Bitte das richtige Bauteil manuell auswählen oder ein
+            weiteres Foto aus einem anderen Winkel hinzufügen.
+          </AlertDescription>
+        </Alert>
+      )}
+      {showConfidenceBanner && confidence === 'medium' && (
+        <Alert>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            Top-Treffer wahrscheinlich richtig, aber andere Kandidaten sind ähnlich nah.
+            Bitte gegebenenfalls Foto-Auswahl prüfen.
+          </AlertDescription>
+        </Alert>
+      )}
+      {showConfidenceBanner && confidence === 'high' && (
+        <Alert>
+          <CheckCircle2 className="h-4 w-4" />
+          <AlertDescription>
+            Eindeutiger Top-Treffer — klar bessere Übereinstimmung als die Alternativen.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Controls-Zeile */}
       <div className="flex flex-row items-center gap-4 flex-wrap">
-        {/* D-06: Threshold-Slider */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Ähnlichkeit</span>
           <Slider
@@ -68,7 +111,6 @@ function SearchResults({
             {Math.round(displayThreshold * 100)}%
           </span>
         </div>
-        {/* D-08: Limit-Select — Wechsel triggert neue API-Anfrage via onLimitChange */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Ergebnisse</span>
           <Select
@@ -87,7 +129,7 @@ function SearchResults({
         </div>
       </div>
 
-      {/* D-10: Leer-Zustand */}
+      {/* Leer-Zustand */}
       {filteredResults.length === 0 && (
         <div role="status" className="text-center py-8">
           <p className="font-medium">Keine ähnlichen Teile gefunden.</p>
@@ -97,16 +139,18 @@ function SearchResults({
         </div>
       )}
 
-      {/* Ergebnis-Grid — 1 Spalte (D-01), aria-live für Screen-Reader */}
+      {/* Ergebnis-Grid — 1 Spalte, aria-live für Screen-Reader */}
       {filteredResults.length > 0 && (
         <div aria-live="polite" className="flex flex-col gap-3">
-          {filteredResults.map(r => (
+          {filteredResults.map((r, idx) => (
             <SearchResultCard
               key={r.id}
               id={r.id}
               name={r.name}
               part_number={r.part_number}
               similarity={r.similarity}
+              view_hits={r.view_hits}
+              is_top_hit={idx === 0 && (confidence === 'high' || confidence === 'medium')}
             />
           ))}
         </div>

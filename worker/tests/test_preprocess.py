@@ -39,24 +39,29 @@ class TestCropToAlphaBbox:
     def test_crops_to_alpha_region(self):
         """Wenn Alpha nur in einer kleinen Region gesetzt ist, wird darauf gecroppt (plus Padding)."""
         img = _make_rgba(100, 100, alpha_box=(40, 30, 60, 70))
-        cropped = _crop_to_alpha_bbox(img, padding_pct=0.0)
+        cropped, aspect = _crop_to_alpha_bbox(img, padding_pct=0.0)
         # Crop sollte ungefähr 20x40 sein (x: 40..60, y: 30..70)
         assert cropped.size[0] == 21  # 60-40+1
         assert cropped.size[1] == 41  # 70-30+1
+        # Aspect-Ratio = max/min: 41/21 ≈ 1.95
+        assert 1.8 < aspect < 2.1
 
     def test_padding_extends_bbox(self):
         """5% Padding vergrößert den Crop in beide Richtungen."""
         img = _make_rgba(200, 200, alpha_box=(50, 50, 150, 150))
-        cropped = _crop_to_alpha_bbox(img, padding_pct=0.1)
+        cropped, aspect = _crop_to_alpha_bbox(img, padding_pct=0.1)
         # bbox=100x100, padding=10 → erwartet ~120x120
         assert 115 <= cropped.size[0] <= 125
         assert 115 <= cropped.size[1] <= 125
+        # Quadrat → aspect ≈ 1.0 (Aspect basiert auf der ungepaddeten Objekt-Größe)
+        assert 0.95 <= aspect <= 1.05
 
-    def test_empty_alpha_returns_original(self):
-        """rembg hat nichts gefunden → Fallback: Originalbild unverändert."""
+    def test_empty_alpha_returns_original_with_neutral_aspect(self):
+        """rembg hat nichts gefunden → Fallback: Originalbild + Aspect=1.0."""
         img = _make_rgba(100, 100, alpha_box=None)
-        result = _crop_to_alpha_bbox(img)
+        result, aspect = _crop_to_alpha_bbox(img)
         assert result.size == (100, 100)
+        assert aspect == 1.0
 
 
 class TestComposeOnWhiteSquare:

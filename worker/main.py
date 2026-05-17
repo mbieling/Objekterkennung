@@ -16,7 +16,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel, UUID4, Field
 
 from worker.tasks import process_step_task
-from worker.embedder import get_embedding
+from worker.embedder import get_embedding_with_meta
 
 logging.basicConfig(
     level=logging.INFO,
@@ -49,9 +49,13 @@ class EmbedRequest(BaseModel):
 class EmbedResponse(BaseModel):
     """Response-Body für POST /embed.
 
-    embedding enthält 768 Floats (DINOv2 ViT-B/14 Patch-Token Mean-Pool).
+    embedding enthält 1024 Floats (DINOv3 ViT-L/16 Patch-Token Mean-Pool).
+    aspect_ratio = max(w,h)/min(w,h) des Objekt-Crops nach rembg (≥ 1.0).
+                   Wird vom geometrischen Re-Ranking in /api/search benutzt
+                   (Vergleich gegen sortierte 3D-Bbox-Proportionen in parts).
     """
     embedding: list[float]
+    aspect_ratio: float
 
 
 @app.get("/health")
@@ -104,9 +108,12 @@ def embed(req: EmbedRequest) -> EmbedResponse:
             req.s3_key,
             tmp_path,
         )
-        embedding = get_embedding(tmp_path, mode=req.mode)
-        logger.info(f"[{req.s3_key}] Embedding berechnet (mode={req.mode}), shape={embedding.shape}")
-        return EmbedResponse(embedding=embedding.tolist())
+        embedding, meta = get_embedding_with_meta(tmp_path, mode=req.mode)
+        logger.info(
+            f"[{req.s3_key}] Embedding berechnet (mode={req.mode}), "
+            f"shape={embedding.shape}, aspect={meta['aspect_ratio']:.2f}"
+        )
+        return EmbedResponse(embedding=embedding.tolist(), aspect_ratio=meta["aspect_ratio"])
     finally:
         if os.path.exists(tmp_path):
             os.unlink(tmp_path)

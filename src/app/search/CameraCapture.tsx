@@ -34,12 +34,19 @@ interface SearchResponse {
     status: 'ready'
     similarity: number
     created_at: string
+    // Hebel 2/3 ergänzte Felder (alle optional, damit ältere API-Antworten weiter geparsed werden)
+    view_hits?: number
+    geo_score?: number
+    combined_score?: number
+    final_score?: number
   }>
   query: {
     threshold: number
     limit: number
     photo_count?: number  // ergänzt durch Multi-Foto-API
     results_count: number
+    margin?: number | null
+    confidence?: 'high' | 'medium' | 'low'
   }
 }
 
@@ -87,7 +94,9 @@ function CameraCapture() {
   const [capturedBlobs, setCapturedBlobs] = useState<Blob[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [searchResult, setSearchResult] = useState<SearchResponse | null>(null)
-  const [displayThreshold, setDisplayThreshold] = useState<number>(0.5)
+  // Default-Slider-Wert auf 0.70 angehoben. Für DINOv3 in der CAD-Render-Domäne liegt
+  // alles unter ~0.70 im Rauschen — niedrigere Defaults erzeugen Schein-Treffer im UI.
+  const [displayThreshold, setDisplayThreshold] = useState<number>(0.70)
   const [displayLimit, setDisplayLimit] = useState<number>(10)
 
   const videoRef = useRef<HTMLVideoElement>(null)

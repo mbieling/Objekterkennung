@@ -16,54 +16,56 @@ describe('Phase 8: SearchResultCard', () => {
   it('SEARCH-03: zeigt Skeleton während Thumbnail lädt', () => {
     vi.mocked(global.fetch).mockReturnValue(new Promise(() => {}))
     const { container } = render(
-      <SearchResultCard id="test-id" name="Testbauteil" similarity={0.75} />
+      <SearchResultCard id="test-id" name="Testbauteil" part_number={null} similarity={0.75} />
     )
     // Skeleton sollte sichtbar sein (animate-pulse Klasse)
     expect(container.querySelector('.animate-pulse')).toBeTruthy()
   })
 
-  it('SEARCH-03: Badge bg-green-500 bei similarity >= 0.80', () => {
+  // Hebel 1: Farbschwellen angehoben — DINOv3-Baseline in CAD-Render-Domäne ist hoch.
+  //   ≥ 0.88 grün, ≥ 0.78 amber, < 0.78 rot.
+  it('SEARCH-03: Badge bg-green-500 bei similarity >= 0.88', () => {
     vi.mocked(global.fetch).mockReturnValue(new Promise(() => {}))
     const { container } = render(
-      <SearchResultCard id="test-id" name="Teil" similarity={0.80} />
+      <SearchResultCard id="test-id" name="Teil" part_number={null} similarity={0.90} />
     )
     const badge = container.querySelector('[class*="bg-green-500"]')
     expect(badge).toBeTruthy()
-    expect(badge?.textContent).toBe('80%')
+    expect(badge?.textContent).toBe('90%')
   })
 
   it('SEARCH-03: Badge bg-green-500 bei similarity 0.95', () => {
     vi.mocked(global.fetch).mockReturnValue(new Promise(() => {}))
     const { container } = render(
-      <SearchResultCard id="test-id" name="Teil" similarity={0.95} />
+      <SearchResultCard id="test-id" name="Teil" part_number={null} similarity={0.95} />
     )
     expect(container.querySelector('[class*="bg-green-500"]')).toBeTruthy()
   })
 
-  it('SEARCH-03: Badge bg-amber-500 bei similarity 0.60–0.79', () => {
+  it('SEARCH-03: Badge bg-amber-500 bei similarity 0.78–0.87', () => {
     vi.mocked(global.fetch).mockReturnValue(new Promise(() => {}))
     const { container } = render(
-      <SearchResultCard id="test-id" name="Teil" similarity={0.67} />
+      <SearchResultCard id="test-id" name="Teil" part_number={null} similarity={0.80} />
     )
     const badge = container.querySelector('[class*="bg-amber-500"]')
     expect(badge).toBeTruthy()
-    expect(badge?.textContent).toBe('67%')
+    expect(badge?.textContent).toBe('80%')
   })
 
-  it('SEARCH-03: Badge bg-red-500 bei similarity < 0.60', () => {
+  it('SEARCH-03: Badge bg-red-500 bei similarity < 0.78', () => {
     vi.mocked(global.fetch).mockReturnValue(new Promise(() => {}))
     const { container } = render(
-      <SearchResultCard id="test-id" name="Teil" similarity={0.45} />
+      <SearchResultCard id="test-id" name="Teil" part_number={null} similarity={0.67} />
     )
     const badge = container.querySelector('[class*="bg-red-500"]')
     expect(badge).toBeTruthy()
-    expect(badge?.textContent).toBe('45%')
+    expect(badge?.textContent).toBe('67%')
   })
 
   it('SEARCH-03: Link href="/parts/{id}" korrekt gesetzt', () => {
     vi.mocked(global.fetch).mockReturnValue(new Promise(() => {}))
     const { container } = render(
-      <SearchResultCard id="abc-123" name="Teil" similarity={0.75} />
+      <SearchResultCard id="abc-123" name="Teil" part_number={null} similarity={0.75} />
     )
     const link = container.querySelector('a')
     expect(link?.getAttribute('href')).toBe('/parts/abc-123')
@@ -71,7 +73,7 @@ describe('Phase 8: SearchResultCard', () => {
 
   it('SEARCH-03: Name mit truncate dargestellt', () => {
     vi.mocked(global.fetch).mockReturnValue(new Promise(() => {}))
-    render(<SearchResultCard id="test-id" name="Flanschplatte" similarity={0.75} />)
+    render(<SearchResultCard id="test-id" name="Flanschplatte" part_number={null} similarity={0.75} />)
     expect(screen.getByText('Flanschplatte')).toBeTruthy()
   })
 
@@ -81,7 +83,7 @@ describe('Phase 8: SearchResultCard', () => {
       json: async () => ({ url: 'https://example.com/thumb.png' }),
     } as Response)
     const { container } = render(
-      <SearchResultCard id="test-id" name="Teil" similarity={0.75} />
+      <SearchResultCard id="test-id" name="Teil" part_number={null} similarity={0.75} />
     )
     await waitFor(() => {
       expect(container.querySelector('img')).toBeTruthy()
@@ -95,7 +97,7 @@ describe('Phase 8: SearchResultCard', () => {
       json: async () => null,
     } as Response)
     const { container } = render(
-      <SearchResultCard id="test-id" name="Teil" similarity={0.75} />
+      <SearchResultCard id="test-id" name="Teil" part_number={null} similarity={0.75} />
     )
     // Nach fetch-Fehler: kein img, Skeleton bleibt
     await new Promise(r => setTimeout(r, 50))

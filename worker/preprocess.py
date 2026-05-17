@@ -5,10 +5,14 @@
 #       statt Hintergrund-Texturen oder Beleuchtung.
 
 import logging
-from typing import Literal
+from typing import Literal, TypedDict
 
 import numpy as np
 from PIL import Image
+
+
+class PrepareMeta(TypedDict):
+    aspect_ratio: float  # max(bbox_w, bbox_h) / min(bbox_w, bbox_h) — ≥ 1.0, rotations­invariant
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +52,7 @@ def _remove_background(img: Image.Image) -> Image.Image:
     return remove(img, session=_get_rembg_session())
 
 
-def _crop_to_alpha_bbox(rgba: Image.Image, padding_pct: float = 0.05) -> Image.Image:
+def _crop_to_alpha_bbox(rgba: Image.Image, padding_pct: float = 0.05) -> tuple[Image.Image, float]:
     """Croppt das Bild auf die Bounding-Box des Alpha-Kanals (= des Objekts).
 
     Ein kleines Padding (5%) verhindert, dass Kanten an Bildränder stoßen — DINOv2
@@ -56,17 +60,22 @@ def _crop_to_alpha_bbox(rgba: Image.Image, padding_pct: float = 0.05) -> Image.I
 
     Fallback: wenn Alpha-Kanal leer ist (rembg hat nichts gefunden), wird das
     Originalbild unverändert zurückgegeben.
+
+    Returns:
+        (cropped_rgba, aspect_ratio) — aspect_ratio = max(w,h) / min(w,h),
+        also ≥ 1.0 und unabhängig von der Bild-Orientierung. 1.0 = Fallback
+        (Crop nicht möglich) oder echtes Quadrat.
     """
     alpha = np.array(rgba.split()[-1])
     if alpha.max() == 0:
         logger.warning("Alpha-Kanal leer — rembg hat kein Objekt gefunden. Fallback: kein Crop.")
-        return rgba
+        return rgba, 1.0
 
     rows = np.any(alpha > 10, axis=1)
     cols = np.any(alpha > 10, axis=0)
     if not rows.any() or not cols.any():
         logger.warning("Alpha-BBox degeneriert. Fallback: kein Crop.")
-        return rgba
+        return rgba, 1.0
 
     y0, y1 = np.where(rows)[0][[0, -1]]
     x0, x1 = np.where(cols)[0][[0, -1]]
@@ -80,7 +89,13 @@ def _crop_to_alpha_bbox(rgba: Image.Image, padding_pct: float = 0.05) -> Image.I
     x1 = min(w, x1 + pad_x)
     y1 = min(h, y1 + pad_y)
 
-    return rgba.crop((x0, y0, x1 + 1, y1 + 1))
+    # Aspect-Ratio des Objekt-Crops (vor Padding-Resize). Wir nehmen die Größe
+    # OHNE das 5%-Padding, damit das Ratio echtes Form-Verhältnis abbildet.
+    obj_w = max(1, x1 - x0 + 1 - 2 * pad_x)
+    obj_h = max(1, y1 - y0 + 1 - 2 * pad_y)
+    aspect_ratio = max(obj_w, obj_h) / min(obj_w, obj_h)
+
+    return rgba.crop((x0, y0, x1 + 1, y1 + 1)), float(aspect_ratio)
 
 
 def _compose_on_white_square(rgba: Image.Image, size: int = DINO_INPUT_SIZE) -> Image.Image:
@@ -115,17 +130,12 @@ def prepare_image(
     image_path: str,
     mode: Literal["photo", "render"] = "photo",
 ) -> Image.Image:
-    """Bereitet ein Bild für DINOv2-Embedding vor.
+    """Bereitet ein Bild für DINOv3-Embedding vor (nur Bild).
 
-    Pipeline (für beide Modi konsistent — Entscheidung: gleicher Bildraum für Render und Foto):
-        1. Bild laden, in RGB konvertieren
-        2. Hintergrund entfernen (rembg / U²Net) → RGBA
-        3. Auf Alpha-BBox croppen (Teil füllt den Frame)
-        4. Auf weißen Hintergrund komponieren, quadratisch mit Padding, 224x224
-
-    `mode` ist derzeit informativ und wird geloggt — die Pipeline ist identisch.
-    Falls sich später Mode-Unterschiede zeigen (z.B. anderes rembg-Modell für Renderings),
-    kann hier dispatched werden.
+    Dünner Wrapper um prepare_image_with_meta(...) — gibt nur das Bild zurück,
+    damit Bestandscode (process_step.py, Tests) unverändert weiterläuft.
+    Neue Caller, die das Aspect-Ratio brauchen (geometrisches Re-Ranking in
+    /api/search), nutzen direkt prepare_image_with_meta.
 
     Args:
         image_path: Pfad zur Bilddatei (PNG/JPG).
@@ -134,10 +144,30 @@ def prepare_image(
     Returns:
         PIL.Image (RGB, 224x224) — direkt einsetzbar für AutoImageProcessor.
     """
+    img, _meta = prepare_image_with_meta(image_path, mode=mode)
+    return img
+
+
+def prepare_image_with_meta(
+    image_path: str,
+    mode: Literal["photo", "render"] = "photo",
+) -> tuple[Image.Image, PrepareMeta]:
+    """Wie prepare_image, gibt zusätzlich Crop-Metadaten zurück.
+
+    Pipeline (identisch für beide Modi):
+        1. Bild laden, in RGB konvertieren
+        2. Hintergrund entfernen (rembg / U²Net) → RGBA
+        3. Auf Alpha-BBox croppen + Aspect-Ratio des Objekts berechnen
+        4. Auf weißen Hintergrund komponieren, quadratisch mit Padding, 224x224
+
+    Returns:
+        (image, meta) — meta.aspect_ratio = max(w,h)/min(w,h) des entfernten-Hintergrund-Crops.
+        Bei Fallback (rembg fand nichts) ist aspect_ratio = 1.0.
+    """
     logger.info(f"Preprocess [{mode}]: {image_path}")
     img = Image.open(image_path).convert("RGB")
 
     rgba = _remove_background(img)
-    cropped = _crop_to_alpha_bbox(rgba)
+    cropped, aspect_ratio = _crop_to_alpha_bbox(rgba)
     canvas = _compose_on_white_square(cropped, size=DINO_INPUT_SIZE)
-    return canvas
+    return canvas, {"aspect_ratio": aspect_ratio}
