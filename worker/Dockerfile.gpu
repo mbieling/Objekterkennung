@@ -1,0 +1,88 @@
+# worker/Dockerfile.gpu
+# GPU-Variante des Worker-Stacks für Server mit NVIDIA-GPU.
+# Identisch zum CPU-Dockerfile (gleiche Worker-Logik, gleiche Models), aber:
+#   - Base-Image: nvidia/cuda statt continuumio/miniconda3
+#   - torch + torch-cluster mit CUDA-Wheels statt CPU
+#   - Shape-Foundation-Stack standardmäßig AKTIV (ENABLE_SHAPE=1)
+#   - SHAPE_DISABLE=0 als Default-Env (Re-Ranker scharf)
+#
+# Build:
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml build worker
+# Run:
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d worker
+#
+# Voraussetzungen auf dem Host:
+#   - NVIDIA-Driver ≥ 545 (CUDA 12.4-kompatibel)
+#   - nvidia-container-toolkit installiert
+#   - docker compose mit --gpus all support
+#
+# GPU-Empfehlung: ≥6 GB VRAM (DINOv3 ViT-L + Shape Foundation passen in 4 GB,
+# 6 GB lässt Puffer für batched inference und mehrere parallele requests).
+
+FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
+
+# Conda installieren (analog zum CPU-Image — wir wollen pythonocc-core via conda-forge)
+ENV CONDA_DIR=/opt/conda
+ENV PATH=$CONDA_DIR/bin:$PATH
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget bzip2 ca-certificates curl \
+    libgl1 libglib2.0-0 libgomp1 \
+    libxft2 libxcursor1 libxinerama1 libxmu6 libxi6 libglu1-mesa \
+    xvfb \
+    && rm -rf /var/lib/apt/lists/* \
+    && wget -qO /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    && bash /tmp/miniconda.sh -b -p $CONDA_DIR \
+    && rm /tmp/miniconda.sh \
+    && conda clean -afy
+
+WORKDIR /app
+
+# OSMesa wird für headless OCC-Rendering gebraucht (Pitfall 1)
+ENV VTK_DEFAULT_OPENGL_WINDOW=vtkOSOpenGLRenderWindow
+
+# pythonocc-core via conda-forge
+COPY environment.yml .
+RUN conda env update -n base -f environment.yml && conda clean -afy
+
+# torch mit CUDA-Wheels (NICHT die CPU-Wheels aus requirements.txt nehmen!)
+# torch-Version muss kompatibel zu torch-cluster Wheels sein — pyg.org reicht bis 2.9.1
+RUN pip install --no-cache-dir torch==2.9.1+cu124 torchvision==0.24.1+cu124 \
+    --index-url https://download.pytorch.org/whl/cu124
+
+# Restliche Python-Deps (Shape-spezifische Pakete werden im Shape-Block separat installiert)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Model-Cache: persistiert über Container-Restarts via Volume
+ENV HF_HOME=/app/model_cache
+ENV U2NET_HOME=/app/u2net_cache
+
+# DINOv3 pre-download — auf GPU würde sich der Download sonst sichtbar in den ersten
+# Such-Latenzen niederschlagen. HF_TOKEN für Privacy-Gate.
+ARG HF_TOKEN
+RUN HF_TOKEN="${HF_TOKEN}" python -c "from transformers import AutoImageProcessor, AutoModel; AutoImageProcessor.from_pretrained('facebook/dinov3-vitl16-pretrain-lvd1689m'); AutoModel.from_pretrained('facebook/dinov3-vitl16-pretrain-lvd1689m')" || \
+    echo "DINOv3 pre-download fehlgeschlagen — wird zur Laufzeit geladen (HF_TOKEN nötig)"
+
+# rembg U²Net pre-download
+RUN python -c "from rembg import new_session; new_session('u2net')" || \
+    echo "rembg pre-download fehlgeschlagen"
+
+# Hebel 4 — Shape Foundation Model. Auf GPU standardmäßig AKTIV, weil hier
+# der Grund für die ursprüngliche Deaktivierung (CPU-Hänger) wegfällt.
+# Override mit --build-arg ENABLE_SHAPE=0 falls explizit nicht gewünscht.
+ARG ENABLE_SHAPE=1
+ENV SHAPE_CHECKPOINT_PATH=/app/model_cache/shape-foundation-small-v3/checkpoint_final.pt
+RUN if [ "$ENABLE_SHAPE" = "1" ]; then \
+        echo "===== GPU-Build mit Shape-Foundation-Stack =====" && \
+        pip install --no-cache-dir \
+            "trimesh>=4.0.0" "gmsh>=4.11.0" "huggingface_hub>=0.24.0" "torch-geometric>=2.5.0" && \
+        pip install --no-cache-dir torch-cluster torch-scatter \
+            -f https://data.pyg.org/whl/torch-2.9.1+cu124.html && \
+        pip install --no-cache-dir "git+https://github.com/simd-ai/shape@main" && \
+        python -c "from huggingface_hub import snapshot_download; snapshot_download('bayang/shape-foundation-small-v3', local_dir='/app/model_cache/shape-foundation-small-v3', allow_patterns=['checkpoint_final.pt', 'small.yaml'])" ; \
+    else \
+        echo "===== ENABLE_SHAPE=0 — Hebel 4 deaktiviert =====" ; \
+    fi
+
+# Worker-Code zuletzt kopieren — Layer-Caching für Code-Iteration
+COPY . ./worker/

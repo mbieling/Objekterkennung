@@ -1,0 +1,39 @@
+# docker-compose.gpu.yml
+# Override-File für GPU-Worker. Wird zusätzlich zur Basis-compose geladen:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml build worker
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d worker
+#
+# Ändert gegenüber Default:
+#   - worker baut aus Dockerfile.gpu (CUDA-Base)
+#   - nvidia runtime + GPU-Device-Request (alle verfügbaren GPUs)
+#   - SHAPE_DISABLE=0 (Hebel 4 scharf — kein Hängen mehr, weil GPU)
+#   - cpus-Limit raus (GPU macht die Heavy-Lifting, CPU-Limit ist nicht mehr der Engpass)
+
+services:
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile.gpu
+      args:
+        ENABLE_SHAPE: "1"
+        # HF_TOKEN wird über --build-arg oder Environment durchgereicht
+    environment:
+      # Hebel 4 scharf — Shape-Embeddings werden bei Upload berechnet,
+      # Re-Ranker im Such-Pfad nutzt sie.
+      - SHAPE_DISABLE=0
+      # GPU-Inferenz braucht weniger CPU-Threads (nur Pre/Post-Processing).
+      # 4 Threads sind genug, lässt mehr Luft für andere Container.
+      - OMP_NUM_THREADS=4
+      - MKL_NUM_THREADS=4
+      - OPENBLAS_NUM_THREADS=4
+      - NUMEXPR_NUM_THREADS=4
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # cpus-Limit aus dem Base-Compose explizit überschreiben (raus)
+    cpus: 0

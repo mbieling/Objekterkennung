@@ -162,6 +162,7 @@ Einspielen: manuell im Neon Dashboard oder via `supabase db push`. RLS ist **bew
 - STEP-Verarbeitung: Python-Microservice (Docker), NICHT in Next.js/Vercel
 - Async-Queue: FastAPI + Celery + Redis
 - DB-Client: Neon (`@neondatabase/serverless`), **nicht** Supabase-Client — `src/lib/db.ts` ist server-only
+- **Hebel 4 (Shape Foundation Model)**: Code in `worker/shape_embedder.py` + DB-Spalte `parts.shape_embedding` + Re-Ranker in `src/app/api/search/route.ts` sind implementiert, aber via `SHAPE_DISABLE=1` (worker/.env) deaktiviert — CPU-Inferenz hängt deterministisch bei einzelnen STEP-Files. Reaktivierung beim Wechsel auf GPU-Hardware: siehe `docs/GPU-MIGRATION.md` (separate `Dockerfile.gpu` + `docker-compose.gpu.yml` liegen bereit).
 
 **Bei Änderungen an `embedder.py`, `renderer.py` oder `preprocess.py` ist ein Reindex aller Teile pflicht:**
 ```bash
