@@ -22,6 +22,7 @@ import os
 os.environ.setdefault("VTK_DEFAULT_OPENGL_WINDOW", "vtkOSOpenGLRenderWindow")
 
 import logging
+import signal
 from typing import Optional
 
 import numpy as np
@@ -29,6 +30,19 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 EMBEDDING_DIM = 128  # Shape small-v3 — siehe small.yaml: heads.embedding_dim
+
+# Sicherheitsnetz: Mesh-Loading + Inferenz wird nach diesen Sekunden hart abgebrochen.
+# Auf CPU mit komplexen STEP-Files (>2000 Faces) hängt trimesh.load mehrere Minuten
+# bis ewig. Wir lieber kein Shape-Embedding als einen blockierten Worker.
+SHAPE_TIMEOUT_SECONDS = int(os.environ.get("SHAPE_TIMEOUT_SECONDS", "60"))
+
+
+class _ShapeTimeout(Exception):
+    pass
+
+
+def _timeout_handler(signum, frame):
+    raise _ShapeTimeout(f"Shape-Embedding-Timeout nach {SHAPE_TIMEOUT_SECONDS}s")
 
 # Anzahl Surface-Punkte pro Mesh-Sampling. Default in small.yaml ist 4096 — das ist
 # für GPU-Training gedacht. Auf CPU skaliert das radius_search im MAGNO-Encoder
@@ -134,6 +148,17 @@ def get_shape_embedding(step_path: str) -> Optional[np.ndarray]:
     except ImportError:
         return None
 
+    # Timeout via SIGALRM — Schutz vor trimesh-STEP-Loader, der bei komplexen
+    # Geometrien auf CPU minutenlang hängen kann. Funktioniert nur im main thread
+    # (reindex.py + celery --pool=solo). In Worker-Pools muss der Aufrufer den
+    # Timeout selbst lösen.
+    try:
+        signal.signal(signal.SIGALRM, _timeout_handler)
+        signal.alarm(SHAPE_TIMEOUT_SECONDS)
+    except (ValueError, AttributeError):
+        # Nicht in main thread oder Plattform ohne SIGALRM — laufen wir ohne Timeout
+        pass
+
     try:
         mesh = load_mesh(step_path)
         if mesh.vertices.shape[0] < 4 or mesh.faces.shape[0] < 4:
@@ -171,6 +196,14 @@ def get_shape_embedding(step_path: str) -> Optional[np.ndarray]:
         assert emb.shape == (EMBEDDING_DIM,), f"Unerwartete Embedding-Shape: {emb.shape}"
         return emb
 
+    except _ShapeTimeout:
+        logger.warning(f"Shape-Embedding-Timeout (>{SHAPE_TIMEOUT_SECONDS}s) für {step_path} — überspringe")
+        return None
     except Exception as e:
         logger.exception(f"Shape-Embedding fehlgeschlagen für {step_path}: {e}")
         return None
+    finally:
+        try:
+            signal.alarm(0)
+        except (ValueError, AttributeError):
+            pass

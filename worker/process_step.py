@@ -139,7 +139,21 @@ def process(part_id: str) -> None:
             # get_shape_embedding lädt das Mesh aus der STEP-Datei eigenständig (trimesh/gmsh),
             # da das Shape-Modell direkt auf 3D-Surface-Points arbeitet. Bei Fehler oder
             # nicht-installiertem Modell wird None zurückgegeben — Pipeline läuft weiter.
-            shape_embedding = get_shape_embedding(step_path)
+            #
+            # SAFETY-GATE: bei sehr komplexen Meshes (>2000 Faces) bleibt trimesh.load auf
+            # CPU dauerhaft hängen, das hat den Reindex schon zweimal blockiert. Wir
+            # überspringen die Shape-Berechnung dann komplett. Effekt: für diese (wenigen)
+            # Teile ist der Shape-Re-Rank-Beitrag NULL, alle anderen Hebel wirken weiter.
+            SHAPE_MAX_FACES = int(os.environ.get("SHAPE_MAX_FACES", "2000"))
+            face_count_for_shape = geometry["face_count"] if geometry else 0
+            if face_count_for_shape > SHAPE_MAX_FACES:
+                logger.warning(
+                    f"[{part_id}] Mesh zu komplex für CPU-Shape-Inferenz "
+                    f"({face_count_for_shape} > {SHAPE_MAX_FACES} faces) — überspringe Shape-Embedding"
+                )
+                shape_embedding = None
+            else:
+                shape_embedding = get_shape_embedding(step_path)
             if shape_embedding is not None:
                 logger.info(f"[{part_id}] Shape-Embedding berechnet: shape={shape_embedding.shape}")
             else:
