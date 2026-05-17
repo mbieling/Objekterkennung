@@ -49,5 +49,21 @@ ENV U2NET_HOME=/app/u2net_cache
 RUN python -c "from rembg import new_session; new_session('u2net')" || \
     echo "rembg pre-download fehlgeschlagen — Modell wird beim ersten Aufruf geladen"
 
+# Hebel 4 — Shape Foundation Model (3D-Mesh-Embeddings für Re-Ranking).
+# torch-geometric-Stack ist optional (CPU-only Wheels). Wenn die Installation
+# scheitert (Versions-Konflikt, Network-Fehler), läuft die Pipeline ohne Shape weiter
+# (siehe worker/shape_embedder.py — graceful fallback bei ImportError).
+RUN pip install --no-cache-dir torch-geometric>=2.5.0 || \
+    echo "torch-geometric pre-install fehlgeschlagen — Shape-Re-Ranking wird übersprungen"
+RUN pip install --no-cache-dir "git+https://github.com/simd-ai/shape@main" || \
+    echo "shape-foundation Install fehlgeschlagen — Shape-Re-Ranking wird übersprungen"
+
+# Shape-Checkpoint vorab herunterladen (~80MB). HF_HOME unten ist bereits gesetzt,
+# huggingface_hub schreibt nach /app/model_cache. Im shape_embedder.py wird
+# SHAPE_CHECKPOINT_PATH gelesen, default zeigt auf den hier abgelegten Pfad.
+ENV SHAPE_CHECKPOINT_PATH=/app/model_cache/shape-foundation-small-v3/checkpoint_final.pt
+RUN python -c "from huggingface_hub import snapshot_download; snapshot_download('bayang/shape-foundation-small-v3', local_dir='/app/model_cache/shape-foundation-small-v3', allow_patterns=['checkpoint_final.pt', 'small.yaml'])" || \
+    echo "Shape-Checkpoint pre-download fehlgeschlagen — Re-Ranking startet ohne Modell"
+
 # Dateien als worker/-Paket kopieren, damit uvicorn/celery worker.main finden
 COPY . ./worker/

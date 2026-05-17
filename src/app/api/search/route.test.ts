@@ -77,8 +77,12 @@ function makeViewRows(
     bbox_x: number | null
     bbox_y: number | null
     bbox_z: number | null
+    shape_embedding: number[] | null
   }> = {}
 ) {
+  const shapeEmbStr = extras.shape_embedding
+    ? `[${extras.shape_embedding.join(',')}]`
+    : null
   return Array.from({ length: viewCount }, (_, i) => ({
     id: partId,
     name: extras.name ?? 'Testbauteil',
@@ -89,9 +93,20 @@ function makeViewRows(
     bbox_x: extras.bbox_x ?? null,
     bbox_y: extras.bbox_y ?? null,
     bbox_z: extras.bbox_z ?? null,
+    shape_embedding: shapeEmbStr,
     view_idx: i,
     sim,
   }))
+}
+
+// Helfer für Shape-Embeddings: erzeugt einen 128-dim Vektor mit konstanten Werten in
+// einigen Dimensionen, damit wir paarweise Cosine-Similarity gezielt steuern können.
+function shapeVec(seed: number): number[] {
+  // Einfache Form: Einheitsvektor in Richtung seed mod 128 — orthogonale Vektoren für
+  // unterschiedliche Seeds, cosine zwischen verschiedenen Seeds = 0.
+  const v = new Array(128).fill(0)
+  v[seed % 128] = 1.0
+  return v
 }
 
 const DEFAULT_PART_ID = '123e4567-e89b-12d3-a456-426614174000'
@@ -399,6 +414,82 @@ describe('POST /api/search', () => {
 
     expect(response.status).toBe(200)
     expect(data.results[0].geo_score).toBe(1.0)
+  })
+
+  // Hebel 4: Shape Foundation Model Re-Rank
+  it('Shape-Re-Rank: orthogonale Form-Embeddings werten Kandidaten ab', async () => {
+    // Anker (partA) und Kandidat (partB) haben identische DINOv3-Sim, aber komplett
+    // unterschiedliche Shape-Embeddings (orthogonal: cosine = 0 → shape_score = 0).
+    // Erwartung: partB rutscht im final_score klar unter partA.
+    const partA = '11111111-1111-1111-1111-111111111111'
+    const partB = '22222222-2222-2222-2222-222222222222'
+    const rows = [
+      ...makeViewRows(partA, '0.85', 8, { name: 'A-Anker', shape_embedding: shapeVec(0) }),
+      ...makeViewRows(partB, '0.85', 8, { name: 'B-Fremdform', shape_embedding: shapeVec(50) }),
+    ]
+    mockDb.mockResolvedValueOnce(rows)
+
+    const { POST } = await import('./route')
+    const request = makeImageRequest('http://localhost/api/search?threshold=0.7')
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.results).toHaveLength(2)
+    expect(data.results[0].id).toBe(partA)
+    expect(data.results[0].shape_sim_to_anchor).toBe(1.0)
+    // Orthogonale Shape-Vektoren → shape_score = 0 → final_score klar niedriger
+    expect(data.results[1].shape_sim_to_anchor).toBeLessThan(0.1)
+    expect(data.results[1].shape_score).toBe(0)
+  })
+
+  it('Shape-Re-Rank: bleibt neutral, wenn der Anker kein Shape-Embedding hat', async () => {
+    // Anker ohne Shape-Embedding → Re-Rank wird komplett übersprungen.
+    const partA = '11111111-1111-1111-1111-111111111111'
+    const partB = '22222222-2222-2222-2222-222222222222'
+    const rows = [
+      ...makeViewRows(partA, '0.85', 8, { name: 'A', shape_embedding: null }),
+      ...makeViewRows(partB, '0.80', 8, { name: 'B', shape_embedding: shapeVec(50) }),
+    ]
+    mockDb.mockResolvedValueOnce(rows)
+
+    const { POST } = await import('./route')
+    const request = makeImageRequest('http://localhost/api/search?threshold=0.7')
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.results[0].id).toBe(partA)
+    // Kein Re-Rank — shape_sim_to_anchor bleibt null, shape_score neutral
+    expect(data.results[0].shape_sim_to_anchor).toBeNull()
+    expect(data.results[0].shape_score).toBe(1.0)
+  })
+
+  it('Shape-Re-Rank: Kandidat ohne Shape-Embedding bleibt neutral, andere werden abgewertet', async () => {
+    const partA = '11111111-1111-1111-1111-111111111111'   // Anker mit Shape
+    const partB = '22222222-2222-2222-2222-222222222222'   // ohne Shape → neutral
+    const partC = '33333333-3333-3333-3333-333333333333'   // fremder Shape → abgewertet
+    const rows = [
+      ...makeViewRows(partA, '0.85', 8, { name: 'A', shape_embedding: shapeVec(0) }),
+      ...makeViewRows(partB, '0.84', 8, { name: 'B', shape_embedding: null }),
+      ...makeViewRows(partC, '0.83', 8, { name: 'C', shape_embedding: shapeVec(50) }),
+    ]
+    mockDb.mockResolvedValueOnce(rows)
+
+    const { POST } = await import('./route')
+    const request = makeImageRequest('http://localhost/api/search?threshold=0.7')
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    const byId = Object.fromEntries(data.results.map((r: { id: string }) => [r.id, r]))
+    expect(byId[partA].shape_score).toBe(1.0)         // Anker
+    expect(byId[partB].shape_score).toBe(1.0)         // kein Shape — neutral
+    expect(byId[partB].shape_sim_to_anchor).toBeNull()
+    expect(byId[partC].shape_score).toBe(0)           // orthogonal — abgewertet
   })
 
   it('behandelt fehlende Bbox-Daten neutral (geo_score = 1.0)', async () => {

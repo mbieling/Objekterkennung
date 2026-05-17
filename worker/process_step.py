@@ -21,6 +21,7 @@ from dotenv import load_dotenv
 from worker.renderer import load_step, validate_geometry, render_views, VIEW_COUNT
 from worker.embedder import get_embedding, mean_pool, EMBEDDING_DIM
 from worker.geometry import extract_geometry
+from worker.shape_embedder import get_shape_embedding
 
 # .env-Datei laden wenn vorhanden (lokale Entwicklung)
 load_dotenv()
@@ -134,6 +135,16 @@ def process(part_id: str) -> None:
                 logger.warning(f"[{part_id}] Geometrie-Extraktion fehlgeschlagen, fahre ohne fort: {geo_err}")
                 geometry = None
 
+            # Schritt 3c: Shape Foundation Model Embedding (Hebel 4 — 3D-Form-Re-Ranking).
+            # get_shape_embedding lädt das Mesh aus der STEP-Datei eigenständig (trimesh/gmsh),
+            # da das Shape-Modell direkt auf 3D-Surface-Points arbeitet. Bei Fehler oder
+            # nicht-installiertem Modell wird None zurückgegeben — Pipeline läuft weiter.
+            shape_embedding = get_shape_embedding(step_path)
+            if shape_embedding is not None:
+                logger.info(f"[{part_id}] Shape-Embedding berechnet: shape={shape_embedding.shape}")
+            else:
+                logger.info(f"[{part_id}] Shape-Embedding nicht verfügbar — Re-Ranking-Beitrag wird NULL")
+
             # Schritt 4: VIEW_COUNT Views rendern
             views_dir = os.path.join(tmpdir, "views")
             os.makedirs(views_dir, exist_ok=True)
@@ -198,6 +209,7 @@ def process(part_id: str) -> None:
                     volume = %s,
                     surface_area = %s,
                     face_count = %s,
+                    shape_embedding = %s,
                     status = 'ready'
                 WHERE id = %s
             """, (
@@ -207,6 +219,7 @@ def process(part_id: str) -> None:
                 thumbnail_urls,          # list[str] → text[]
                 len(png_paths),          # thumbnail_count — benötigt von /api/parts/[id]/thumbnails
                 geo_x, geo_y, geo_z, geo_vol, geo_surf, geo_faces,
+                shape_embedding,         # numpy(128,) oder None — Shape-Foundation-Model
                 part_id
             ))
             conn.commit()

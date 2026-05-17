@@ -49,6 +49,18 @@ const GEO_FAIL_LOG_DIFF = Math.log(2.0)     // ab 2.0× Faktor-Unterschied → m
 // wird der visuelle Score also nur um max. (1 - GEO_MIN_FACTOR) abgewertet.
 const GEO_MIN_FACTOR = 0.70
 
+// Shape-Re-Rank (Hebel 4): Vergleich der 3D-Mesh-Embeddings (Shape Foundation Model)
+// zwischen Top-K-Kandidaten und dem DINOv3-Top-1-Anker. Form-Cluster-Logik:
+//   - Anker = Top-1 nach DINOv3 + Multi-View + Geo-Re-Rank
+//   - Für jeden anderen Kandidaten: shape_sim_to_anchor = cosine(anchor_shape, kandidat_shape)
+//   - Im Shape-Raum sind random-Mesh-Paare ≈ orthogonal (cosine ≈ 0). Echte Form-Familie
+//     liegt deutlich höher. Wir interpretieren: > 0.5 = gleiche Form-Familie, < 0.2 = klar fremd.
+const SHAPE_PERFECT_SIM = 0.50  // ab dieser Anker-Similarity: gleiche Form-Familie (factor=1.0)
+const SHAPE_FAIL_SIM = 0.10     // bis dahin: andere Form-Familie (factor=SHAPE_MIN_FACTOR)
+// Wirkt als zweiter sanfter Multiplikator. 0.55..1.0 — also bis zu 45% Abwertung bei klarem
+// Form-Mismatch zum Anker. Das ist stärker als Geo (das nur sehr grobe Aspect-Mismatches fängt).
+const SHAPE_MIN_FACTOR = 0.55
+
 // Gewichtung visuell vs. multi-view-consensus für combined_score.
 const COMBINED_W_TOP = 0.6
 const COMBINED_W_HITS = 0.4
@@ -125,6 +137,34 @@ async function embedSingle(
     ? body.aspect_ratio
     : 1.0
   return { ok: true, embedding: body.embedding, aspect_ratio: aspectRatio }
+}
+
+// Cosine-Similarity zwischen zwei gleichgroßen Vektoren (beide L2-normalisiert empfohlen
+// — der Shape-Embedder liefert bereits L2-normalisierte 128-dim Vektoren).
+function cosineSim(a: number[], b: number[]): number {
+  if (a.length !== b.length || a.length === 0) return 0
+  let dot = 0
+  let na = 0
+  let nb = 0
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i]
+    na += a[i] * a[i]
+    nb += b[i] * b[i]
+  }
+  const denom = Math.sqrt(na) * Math.sqrt(nb)
+  return denom > 0 ? dot / denom : 0
+}
+
+// Shape-Re-Rank-Score (Hebel 4): Cosine-Similarity des Shape-Embeddings eines Kandidaten
+// gegen den Anker-Top-1, normalisiert auf [0, 1]. Im Shape-Raum sind random-Mesh-Paare
+// orthogonal — eine echte Form-Familie hat klar höhere Werte als ein zufälliger Treffer.
+//
+// Rückgabe: 1.0 = sehr ähnliche Form (≥ SHAPE_PERFECT_SIM), 0 = klare Form-Mismatch (≤ SHAPE_FAIL_SIM),
+// linear interpoliert dazwischen.
+function shapeMatchScore(simToAnchor: number): number {
+  if (simToAnchor >= SHAPE_PERFECT_SIM) return 1.0
+  if (simToAnchor <= SHAPE_FAIL_SIM) return 0.0
+  return (simToAnchor - SHAPE_FAIL_SIM) / (SHAPE_PERFECT_SIM - SHAPE_FAIL_SIM)
 }
 
 // Geometrie-Score: wie gut passt das Foto-Aspect-Ratio zu den möglichen 2D-Projektionen
@@ -259,8 +299,26 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     bbox_x: number | null
     bbox_y: number | null
     bbox_z: number | null
+    shape_embedding: string | null   // pgvector liefert "[0.1,0.2,...]" als String
     view_idx: number
     sim: string | number
+  }
+
+  // Parser für pgvector-Strings — Neon serverless liefert vector(N) als JSON-array-String.
+  // Bei NULL oder ungültigem Format geben wir null zurück (Re-Ranker bleibt neutral).
+  function parseVector(s: string | null): number[] | null {
+    if (!s) return null
+    try {
+      const trimmed = s.trim()
+      if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) return null
+      const arr = JSON.parse(trimmed) as unknown
+      if (!Array.isArray(arr)) return null
+      const nums = arr.map(v => typeof v === 'number' ? v : parseFloat(String(v)))
+      if (nums.some(v => !Number.isFinite(v))) return null
+      return nums
+    } catch {
+      return null
+    }
   }
 
   const perPhotoRows = await Promise.all(
@@ -277,6 +335,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           p.bbox_x,
           p.bbox_y,
           p.bbox_z,
+          p.shape_embedding::text AS shape_embedding,
           pv.view_idx,
           1 - (pv.embedding <=> ${embeddingLiteral}::vector) AS sim
         FROM part_views pv
@@ -299,6 +358,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     status: string
     created_at: string
     bbox: { x: number | null; y: number | null; z: number | null }
+    shapeEmbedding: number[] | null   // 128-dim Shape Foundation Model Embedding (oder null)
     topSim: number
     hitViewIdx: Set<number>   // Views, die in IRGENDEINEM Foto einen Hit hatten
     bestPhotoAspect: number   // Aspect-Ratio des Fotos, das den top_sim lieferte
@@ -321,6 +381,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           status: row.status,
           created_at: row.created_at,
           bbox: { x: row.bbox_x, y: row.bbox_y, z: row.bbox_z },
+          shapeEmbedding: parseVector(row.shape_embedding),
           topSim: sim,
           hitViewIdx: new Set<number>(),
           bestPhotoAspect: photoAspect,
@@ -347,19 +408,23 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     similarity: number       // = topSim (kompatibel mit Frontend)
     view_hits: number
     geo_score: number
-    combined_score: number   // visuell + Konsens (vor Geo)
-    final_score: number      // combined × Geo-Multiplikator
+    shape_sim_to_anchor: number | null   // Cosine-Sim zum Top-1-Anker; null wenn kein Shape-Embedding
+    shape_score: number      // 0..1 nach Shape-Re-Rank (1.0 = neutral wenn kein Embedding)
+    combined_score: number   // visuell + Konsens (vor Geo + Shape)
+    final_score: number      // combined × geo_factor × shape_factor
+    // intern für Sortierung
+    _acc: PartAcc
   }
 
-  const scored: Scored[] = []
+  const preScored: Scored[] = []
   for (const acc of parts.values()) {
     const hitsNorm = Math.min(acc.hitViewIdx.size, HITS_NORMALIZATION_CAP) / HITS_NORMALIZATION_CAP
     const combined = COMBINED_W_TOP * acc.topSim + COMBINED_W_HITS * hitsNorm
     const geo = geometryScore(acc.bestPhotoAspect, acc.bbox)
-    // Sanfter Multiplikator: zwischen GEO_MIN_FACTOR (Mismatch) und 1.0 (perfekt).
     const geoFactor = GEO_MIN_FACTOR + (1 - GEO_MIN_FACTOR) * geo
-    const final = combined * geoFactor
-    scored.push({
+    // Vorläufiger Score OHNE Shape — wird im nächsten Schritt um Shape-Faktor erweitert
+    const preFinal = combined * geoFactor
+    preScored.push({
       id: acc.id,
       name: acc.name,
       part_number: acc.part_number,
@@ -369,19 +434,58 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       similarity: acc.topSim,
       view_hits: acc.hitViewIdx.size,
       geo_score: Number(geo.toFixed(4)),
+      shape_sim_to_anchor: null,
+      shape_score: 1.0,
       combined_score: Number(combined.toFixed(4)),
-      final_score: Number(final.toFixed(4)),
+      final_score: Number(preFinal.toFixed(4)),
+      _acc: acc,
     })
   }
 
-  // 10. Threshold-Filter wirkt auf die ROHE Similarity (das ist die Zahl, die der User
-  //     im UI-Slider sieht — kompatibel zur bisherigen Mental-Map). Sortierung erfolgt
-  //     nach final_score, damit Multi-View-Konsens und Geo-Re-Rank greifen.
-  const filtered = scored
+  // 10a. Threshold-Filter und vorläufige Sortierung nach Visual+Geo-Score.
+  //      Threshold wirkt auf ROHE Similarity (UI-Slider-Anker bleibt stabil).
+  const preFiltered = preScored
     .filter(s => s.similarity >= threshold)
     .sort((a, b) => b.final_score - a.final_score)
 
-  const top = filtered.slice(0, limit)
+  // 10b. Shape-Re-Rank (Hebel 4): Top-1 als Anker — alle anderen Kandidaten werden
+  //      gegen den Anker im Shape-Embedding-Raum verglichen. Kandidaten aus einer
+  //      anderen Form-Familie (cosine < SHAPE_FAIL_SIM zum Anker) werden abgewertet.
+  //
+  //      Bewusste Entscheidung: der Anker selbst bekommt shape_score=1.0 (keine
+  //      Selbstabwertung), und Kandidaten OHNE Shape-Embedding bleiben neutral
+  //      (shape_score=1.0). So bricht die Suche bei fehlenden Shape-Daten nicht ein.
+  //
+  //      Wir wenden den Re-Rank NUR an, wenn der Anker ein Shape-Embedding hat —
+  //      sonst wäre der Vergleich sinnlos.
+  if (preFiltered.length > 0 && preFiltered[0]._acc.shapeEmbedding) {
+    const anchorShape = preFiltered[0]._acc.shapeEmbedding
+    for (let i = 0; i < preFiltered.length; i++) {
+      const cand = preFiltered[i]
+      if (i === 0) {
+        cand.shape_sim_to_anchor = 1.0
+        cand.shape_score = 1.0
+        continue
+      }
+      const candShape = cand._acc.shapeEmbedding
+      if (!candShape) {
+        // Kein Shape-Embedding für diesen Kandidaten — neutral lassen
+        continue
+      }
+      const sim = cosineSim(anchorShape, candShape)
+      cand.shape_sim_to_anchor = Number(sim.toFixed(4))
+      cand.shape_score = Number(shapeMatchScore(sim).toFixed(4))
+      // Final-Score um Shape-Faktor erweitern
+      const shapeFactor = SHAPE_MIN_FACTOR + (1 - SHAPE_MIN_FACTOR) * cand.shape_score
+      cand.final_score = Number((cand.combined_score * (cand.geo_score === 0 ? GEO_MIN_FACTOR : GEO_MIN_FACTOR + (1 - GEO_MIN_FACTOR) * cand.geo_score) * shapeFactor).toFixed(4))
+    }
+  }
+
+  // 10c. Nach Shape-Re-Rank erneut sortieren — die abgewerteten Fremdform-Kandidaten
+  //      rutschen nach unten.
+  const filtered = preFiltered.sort((a, b) => b.final_score - a.final_score)
+
+  const top = filtered.slice(0, limit).map(({ _acc, ...rest }) => rest)
 
   // 11. Margin & Confidence — wirken auf final_score (Ranking-Score).
   let margin: number | null = null

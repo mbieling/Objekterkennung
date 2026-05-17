@@ -1,5 +1,5 @@
 vtk>=9.4
-torch>=2.3
+torch>=2.6
 torchvision>=0.18
 transformers>=4.41
 Pillow>=10.0
@@ -16,3 +16,9 @@ redis>=7.0.0,<8.0.0
 # Hebel 1: Background-Removal für Foto-Vorverarbeitung (rembg = U²Net via onnxruntime)
 rembg>=2.0.50,<3.0.0
 onnxruntime>=1.16.0,<2.0.0
+# Hebel 4: STEP-Mesh-Loading für Shape Foundation Model
+# trimesh nutzt OCC (bereits via conda installiert) als STEP-Backend
+trimesh>=4.0.0
+# gmsh als robuster STEP-Tessellation-Fallback wenn trimesh scheitert
+gmsh>=4.11.0
+huggingface_hub>=0.24.0
