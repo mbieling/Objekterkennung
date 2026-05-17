@@ -1,10 +1,17 @@
 FROM continuumio/miniconda3:latest
 
 # Systemabhängigkeiten für OSMesa (RESEARCH.md Pitfall 3: libGL muss vorhanden sein)
+# X11-Libs (libxft2 etc.) werden von gmsh/trimesh beim STEP-Laden gebraucht (Hebel 4 — Shape Foundation Model)
 RUN apt-get update && apt-get install -y \
     libgl1 \
     libglib2.0-0 \
     libgomp1 \
+    libxft2 \
+    libxcursor1 \
+    libxinerama1 \
+    libxmu6 \
+    libxi6 \
+    libglu1-mesa \
     curl \
     xvfb \
     --no-install-recommends && rm -rf /var/lib/apt/lists/*
