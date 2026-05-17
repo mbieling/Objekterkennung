@@ -57,25 +57,28 @@ RUN python -c "from rembg import new_session; new_session('u2net')" || \
     echo "rembg pre-download fehlgeschlagen — Modell wird beim ersten Aufruf geladen"
 
 # Hebel 4 — Shape Foundation Model (3D-Mesh-Embeddings für Re-Ranking).
-# torch-geometric + torch-cluster + torch-scatter sind PyG-Companion-Pakete, die
-# Shape für radius-search im MAGNO-Encoder braucht. CPU-Wheels von data.pyg.org —
-# müssen zur installierten torch-Version passen (siehe requirements.txt: torch>=2.6).
-# Wenn die Installation scheitert (Versions-Konflikt, Network-Fehler), läuft die
-# Pipeline ohne Shape weiter (siehe worker/shape_embedder.py — graceful fallback bei ImportError).
-RUN pip install --no-cache-dir torch-geometric>=2.5.0 || \
-    echo "torch-geometric pre-install fehlgeschlagen — Shape-Re-Ranking wird übersprungen"
-RUN pip install --no-cache-dir torch-cluster torch-scatter \
-    -f https://data.pyg.org/whl/torch-2.9.1+cpu.html || \
-    echo "torch-cluster/torch-scatter pre-install fehlgeschlagen — Shape-Re-Ranking wird übersprungen"
-RUN pip install --no-cache-dir "git+https://github.com/simd-ai/shape@main" || \
-    echo "shape-foundation Install fehlgeschlagen — Shape-Re-Ranking wird übersprungen"
-
-# Shape-Checkpoint vorab herunterladen (~80MB). HF_HOME unten ist bereits gesetzt,
-# huggingface_hub schreibt nach /app/model_cache. Im shape_embedder.py wird
-# SHAPE_CHECKPOINT_PATH gelesen, default zeigt auf den hier abgelegten Pfad.
+# Standardmäßig NICHT installiert, weil CPU-Inferenz für unsere STEP-Files
+# strukturell unzuverlässig ist (trimesh-STEP-Loader hängt bei komplexen Meshes,
+# torch-cluster braucht torch<2.10 — siehe SHAPE_DISABLE in process_step.py).
+#
+# Aktivieren mit:
+#   docker compose build --build-arg ENABLE_SHAPE=1 worker
+# Dann auch in worker/.env setzen: SHAPE_DISABLE=0
+# Beim Aktivieren muss requirements.txt auf torch>=2.6,<2.10 gepinnt werden,
+# sonst gibt's keine PyG-Wheels (data.pyg.org reicht aktuell bis torch 2.9.1).
+ARG ENABLE_SHAPE=0
 ENV SHAPE_CHECKPOINT_PATH=/app/model_cache/shape-foundation-small-v3/checkpoint_final.pt
-RUN python -c "from huggingface_hub import snapshot_download; snapshot_download('bayang/shape-foundation-small-v3', local_dir='/app/model_cache/shape-foundation-small-v3', allow_patterns=['checkpoint_final.pt', 'small.yaml'])" || \
-    echo "Shape-Checkpoint pre-download fehlgeschlagen — Re-Ranking startet ohne Modell"
+RUN if [ "$ENABLE_SHAPE" = "1" ]; then \
+        echo "===== Hebel 4 aktiviert — installiere Shape-Foundation-Stack =====" && \
+        pip install --no-cache-dir \
+            "trimesh>=4.0.0" "gmsh>=4.11.0" "huggingface_hub>=0.24.0" "torch-geometric>=2.5.0" && \
+        pip install --no-cache-dir torch-cluster torch-scatter \
+            -f https://data.pyg.org/whl/torch-2.9.1+cpu.html && \
+        pip install --no-cache-dir "git+https://github.com/simd-ai/shape@main" && \
+        python -c "from huggingface_hub import snapshot_download; snapshot_download('bayang/shape-foundation-small-v3', local_dir='/app/model_cache/shape-foundation-small-v3', allow_patterns=['checkpoint_final.pt', 'small.yaml'])" ; \
+    else \
+        echo "===== ENABLE_SHAPE=0 — Hebel 4 deaktiviert, überspringe Shape-Stack =====" ; \
+    fi
 
 # Dateien als worker/-Paket kopieren, damit uvicorn/celery worker.main finden
 COPY . ./worker/

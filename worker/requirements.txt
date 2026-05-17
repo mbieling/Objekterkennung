@@ -21,9 +21,9 @@ redis>=7.0.0,<8.0.0
 # Hebel 1: Background-Removal für Foto-Vorverarbeitung (rembg = U²Net via onnxruntime)
 rembg>=2.0.50,<3.0.0
 onnxruntime>=1.16.0,<2.0.0
-# Hebel 4: STEP-Mesh-Loading für Shape Foundation Model
-# trimesh nutzt OCC (bereits via conda installiert) als STEP-Backend
-trimesh>=4.0.0
-# gmsh als robuster STEP-Tessellation-Fallback wenn trimesh scheitert
-gmsh>=4.11.0
-huggingface_hub>=0.24.0
+# Hebel 4 (Shape Foundation Model) — Stack wird nur bei
+# `docker build --build-arg ENABLE_SHAPE=1` installiert (siehe Dockerfile):
+#   trimesh, gmsh (STEP-Mesh-Loading)
+#   torch-geometric, torch-cluster, torch-scatter (MAGNO-Encoder radius search)
+#   git+https://github.com/simd-ai/shape (Modell-Code)
+#   huggingface_hub (Checkpoint-Download — kommt sonst implizit via transformers)
