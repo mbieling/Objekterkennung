@@ -66,6 +66,14 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - HF_HOME=/app/model_cache
       - DISPLAY=:99
+      # Multi-Threading für PyTorch/Numpy/MKL — sonst nutzt der Worker nur 1 Kern.
+      # Bei 12-Kern-Host: 8 Kerne für Worker, 4 bleiben für App/Postgres/Traefik.
+      # Wichtig für Shape-Foundation-Model und DINOv3-Inference auf CPU.
+      - OMP_NUM_THREADS=8
+      - MKL_NUM_THREADS=8
+      - OPENBLAS_NUM_THREADS=8
+      - NUMEXPR_NUM_THREADS=8
+    cpus: 8
     env_file:
       - worker/.env
     volumes:
