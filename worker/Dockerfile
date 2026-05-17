@@ -57,11 +57,16 @@ RUN python -c "from rembg import new_session; new_session('u2net')" || \
     echo "rembg pre-download fehlgeschlagen — Modell wird beim ersten Aufruf geladen"
 
 # Hebel 4 — Shape Foundation Model (3D-Mesh-Embeddings für Re-Ranking).
-# torch-geometric-Stack ist optional (CPU-only Wheels). Wenn die Installation
-# scheitert (Versions-Konflikt, Network-Fehler), läuft die Pipeline ohne Shape weiter
-# (siehe worker/shape_embedder.py — graceful fallback bei ImportError).
+# torch-geometric + torch-cluster + torch-scatter sind PyG-Companion-Pakete, die
+# Shape für radius-search im MAGNO-Encoder braucht. CPU-Wheels von data.pyg.org —
+# müssen zur installierten torch-Version passen (siehe requirements.txt: torch>=2.6).
+# Wenn die Installation scheitert (Versions-Konflikt, Network-Fehler), läuft die
+# Pipeline ohne Shape weiter (siehe worker/shape_embedder.py — graceful fallback bei ImportError).
 RUN pip install --no-cache-dir torch-geometric>=2.5.0 || \
     echo "torch-geometric pre-install fehlgeschlagen — Shape-Re-Ranking wird übersprungen"
+RUN pip install --no-cache-dir torch-cluster torch-scatter \
+    -f https://data.pyg.org/whl/torch-2.6.0+cpu.html || \
+    echo "torch-cluster/torch-scatter pre-install fehlgeschlagen — Shape-Re-Ranking wird übersprungen"
 RUN pip install --no-cache-dir "git+https://github.com/simd-ai/shape@main" || \
     echo "shape-foundation Install fehlgeschlagen — Shape-Re-Ranking wird übersprungen"
 
