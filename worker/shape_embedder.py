@@ -30,6 +30,14 @@ logger = logging.getLogger(__name__)
 
 EMBEDDING_DIM = 128  # Shape small-v3 — siehe small.yaml: heads.embedding_dim
 
+# Anzahl Surface-Punkte pro Mesh-Sampling. Default in small.yaml ist 4096 — das ist
+# für GPU-Training gedacht. Auf CPU skaliert das radius_search im MAGNO-Encoder
+# überlinear mit der Punktzahl und wird bei komplexen Meshes (>2000 Faces) unbenutzbar
+# langsam (10+ Min pro Teil). 1024 Punkte sind ~4× schneller und reichen für unsere
+# Größenklasse von Bauteilen (~20-100mm Kantenlänge) erfahrungsgemäß für stabile Embeddings.
+# Override per Env-Var möglich für Experimente.
+SURFACE_POINTS_OVERRIDE = int(os.environ.get("SHAPE_SURFACE_POINTS", "1024"))
+
 # Lazy-Singleton-Pattern: Modell, Preprocessor und Sampler werden beim ersten
 # Aufruf von get_shape_embedding initialisiert, NICHT beim Modulimport. Das hält
 # Worker-Startup-Tests offen, die Shape nicht brauchen (Renderer-Tests etc.).
@@ -73,8 +81,15 @@ def _ensure_loaded() -> bool:
         ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
         cfg = ckpt.get("config") or ShapeConfig()
 
+        # Anzahl Surface-Punkte runterdrehen, damit CPU-Inferenz mit komplexen Meshes nicht
+        # explodiert (radius_search ist O(N×M) und wird bei 4096 Punkten × 13824 Grid-Tokens
+        # auf CPU unbenutzbar). 1024 ist der Sweet-Spot für unsere Bauteil-Größenklasse.
+        if hasattr(cfg, "input") and hasattr(cfg.input, "num_surface_points"):
+            cfg.input.num_surface_points = SURFACE_POINTS_OVERRIDE
+            logger.info(f"Surface-Sample-Punkte gesetzt auf {SURFACE_POINTS_OVERRIDE} (CPU-Optimierung)")
+
         model = GAOTBackbone(cfg)
-        model.load_state_dict(ckpt["model_state_dict"])
+        model.load_state_dict(ckpt["model_state_dict"], strict=False)
         model.eval()
 
         device = "cuda" if torch.cuda.is_available() else "cpu"
