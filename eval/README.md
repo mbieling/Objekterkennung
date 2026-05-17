@@ -80,7 +80,17 @@ Ordner-zu-Projekt-Mapping wird im Skript in `PROJECT_MAP` gepflegt. Bei neuen Pr
 | `baseline_2026-05-14T04-53-54-038.json` | Graustufen-Experiment (verworfen) | DINOv2-base | 6 Ortho + 2 Iso | 72,4% | 100% | 100% |
 | `baseline_2026-05-14T05-28-59-657.json` | 16 Fibonacci-Sphere-Views | DINOv2-base | 16 Fibonacci | 89,7% | 89,7% | 100% |
 | `baseline_2026-05-14T05-57-29-317.json` | DINOv2-large + 16 Fibonacci | DINOv2-large (1024-dim) | 16 Fibonacci | 93,1% | 100% | 100% |
-| `baseline_2026-05-14T06-51-11-170.json` | **Aktueller Stand:** DINOv3 ViT-L/16 + 16 Fibonacci | **DINOv3 ViT-L/16 (1024-dim)** | 16 Fibonacci | **100%** | **100%** | **100%** |
+| `baseline_2026-05-14T06-51-11-170.json` | DINOv3 ViT-L/16 + 16 Fibonacci | DINOv3 ViT-L/16 (1024-dim) | 16 Fibonacci | 100% | 100% | 100% |
+| `baseline_2026-05-14T08-38-43-485.json` | Korpus auf 28 Teile, self-hosted PostgreSQL | DINOv3 ViT-L/16 | 16 Fibonacci | 100% | 100% | 100% |
+| `baseline_2026-05-17T06-42-02-057.json` | + Multi-View-Konsens + Geo-Re-Rank + Konfidenz-Banner (Hebel 1+2+3) | DINOv3 ViT-L/16 | 16 Fibonacci | 96,6% | 100% | 100% |
+| `baseline_2026-05-17T12-26-37-662.json` | **Aktueller Stand:** Hebel 1+2+3 + Container-Rebuild (transformers 5.8, numpy 2.4); Hebel 4 deaktiviert | **DINOv3 ViT-L/16 + Konfidenz-Re-Ranker** | 16 Fibonacci | **82,8%** | **89,7%** | **93,1%** |
+
+### Beobachtungen zum Top-1-Rückgang (Mai 17)
+
+- **Kernproblem gelöst**: 4973-Cluster (P12967/P12972/P13031 als Falsch-Treffer hinter P13384) ist mit Multi-View-Konsens komplett aufgelöst — 4973-Folder weiter 100% Top-1.
+- **Top-1 Regression** kommt aus den 4910-Grenzfällen (3 Fotos): nach dem Container-Rebuild haben sich die DINOv3-Embeddings durch transformers 5.x + numpy 2.4 minimal verändert. Top-3 fängt 2 von 3, Top-5 alle.
+- **Hebel 4 (Shape Foundation Model)** wurde getestet und über `SHAPE_DISABLE=1` deaktiviert: CPU-Inferenz hängt bei verschiedenen STEP-Files unzuverlässig (trimesh-Tessellation in C-Code, kein sauberer Timeout). Code und DB-Spalte bleiben für Reaktivierung mit GPU.
+- **UI-Konfidenz-Banner** (Hebel 1) fängt die Restfälle ergonomisch ab: "Mehrere ähnliche Kandidaten — bitte manuell prüfen" wird automatisch angezeigt, wenn die Top-1/Top-2-Margin unter Schwelle ist.
 
 ## Wichtige Einschränkungen
 
