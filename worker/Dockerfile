@@ -65,7 +65,7 @@ RUN python -c "from rembg import new_session; new_session('u2net')" || \
 RUN pip install --no-cache-dir torch-geometric>=2.5.0 || \
     echo "torch-geometric pre-install fehlgeschlagen — Shape-Re-Ranking wird übersprungen"
 RUN pip install --no-cache-dir torch-cluster torch-scatter \
-    -f https://data.pyg.org/whl/torch-2.6.0+cpu.html || \
+    -f https://data.pyg.org/whl/torch-2.9.1+cpu.html || \
     echo "torch-cluster/torch-scatter pre-install fehlgeschlagen — Shape-Re-Ranking wird übersprungen"
 RUN pip install --no-cache-dir "git+https://github.com/simd-ai/shape@main" || \
     echo "shape-foundation Install fehlgeschlagen — Shape-Re-Ranking wird übersprungen"

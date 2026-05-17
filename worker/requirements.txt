@@ -1,5 +1,9 @@
 vtk>=9.4
-torch>=2.6
+# torch auf 2.9.x gepinnt — PyG (torch-cluster, torch-scatter) hat aktuell keine
+# pre-compiled Wheels für torch ≥ 2.10. Hebel 4 (Shape Foundation Model) braucht
+# torch-cluster für radius-search im MAGNO-Encoder. Bei Update bitte
+# https://data.pyg.org/whl/ prüfen, welche torch-Versionen Wheels haben.
+torch>=2.6,<2.10
 torchvision>=0.18
 transformers>=4.41
 Pillow>=10.0
