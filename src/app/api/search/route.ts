@@ -47,7 +47,12 @@ const GEO_PERFECT_LOG_DIFF = Math.log(1.3)  // bis 1.3× Faktor-Unterschied → 
 const GEO_FAIL_LOG_DIFF = Math.log(2.0)     // ab 2.0× Faktor-Unterschied → maximal abgewertet (score=0)
 // Geo wirkt als sanfter Multiplikator: min(GEO_MIN_FACTOR)..1.0 — bei einem Total-Mismatch
 // wird der visuelle Score also nur um max. (1 - GEO_MIN_FACTOR) abgewertet.
-const GEO_MIN_FACTOR = 0.70
+// A/B-TEST 2026-05-20: Geo-Re-Rank effektiv deaktiviert (Faktor konstant 1.0), um zu
+// verifizieren, dass die Top-1-Regression vom 17.05. (96,6 % -> 82,8 %) durch den
+// Geo-Multiplikator verursacht wird (4910-Fotos mit niedriger DINOv3-Sim und schrägem
+// Aufnahmewinkel werden gegen geometrisch "kompaktere" 4973-Teile abgewertet).
+// Original-Wert: 0.70. Zurueckrollen, sobald die Eval gefahren ist.
+const GEO_MIN_FACTOR = 1.0
 
 // Shape-Re-Rank (Hebel 4): Vergleich der 3D-Mesh-Embeddings (Shape Foundation Model)
 // zwischen Top-K-Kandidaten und dem DINOv3-Top-1-Anker. Form-Cluster-Logik:
