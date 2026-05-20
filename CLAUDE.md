@@ -49,6 +49,9 @@ Dieses Projekt verwendet Get-Shit-Done (GSD). Planungsdokumente liegen in `.plan
 - **DINOv3 ViT-L/16** (`facebook/dinov3-vitl16-pretrain-lvd1689m`) für Embeddings (`worker/embedder.py`)
 - STEP → Thumbnails via OCC/PythonOCC (`worker/process_step.py`, `worker/renderer.py`)
 - Celery-Task-Definition in `worker/tasks.py`, FastAPI-App in `worker/main.py`, Celery-Konfiguration in `worker/celery_app.py`
+- `worker/geometry.py` — extrahiert Bounding-Box (sortiert, rotationsinvariant), Volumen, Oberfläche, Face-Count aus STEP-Datei via OCC. Speist die geometrischen Re-Ranking-Spalten in `parts` (Hebel 3a).
+- `worker/shape_embedder.py` — Mesh-basiertes Shape Foundation Model (`bayang/shape-foundation-small-v3`, 128-dim) für den Shape-Re-Ranker (Hebel 4). Aktuell via `SHAPE_DISABLE=1` deaktiviert; lädt erst beim ersten Import.
+- `worker/preprocess.py` — Hintergrund-Entfernung mit austauschbarem Backend (Hebel 5): `SEGMENTATION_BACKEND=rembg` (Default, U²Net) oder `=groundedsam` (Grounding DINO Tiny + SAM ViT-Base). GroundedSAM-Pfad auf CPU ~9 s/Foto, daher default off — sinnvoll erst nach GPU-Migration.
 - Läuft als Docker-Container: `docker compose up`
 - **HF_TOKEN** nötig (`worker/.env`) — DINOv3 ist hinter einer HF-Privacy-Policy-Gate
 
@@ -108,7 +111,7 @@ npm test -- src/app/api/parts/route.test.ts
 **Embedding-Details (`worker/embedder.py`):**
 - Modell: `facebook/dinov3-vitl16-pretrain-lvd1689m` (gecacht in `/app/model_cache` via Dockerfile + `model_cache`-Volume)
 - **Patch-Token Mean-Pool** (Indizes 5..200 aus `last_hidden_state`) — CLS-Token (Index 0) **und 4 Register-Tokens** (Indizes 1..4) bewusst überspringen. Wenn HF das Layout je ändert: Shape-Assertion in `get_embedding` schlägt zu.
-- Input: 224×224px (rembg + Crop + Padding via `worker/preprocess.py`, beide Modi `photo` und `render` identisch)
+- Input: 224×224px (rembg ODER GroundedSAM + Crop + Padding via `worker/preprocess.py`, beide Modi `photo` und `render` identisch; Backend per `SEGMENTATION_BACKEND`-Env)
 - Output: `np.ndarray` Shape `(1024,)` — Konstante `EMBEDDING_DIM` in `embedder.py`
 
 ## Kritische Nicht-Offensichtlichkeiten
@@ -136,6 +139,8 @@ Tabelle `parts` — wichtigste Felder:
 - `thumbnail_urls text[]`, `thumbnail_count integer`
 - `embedding_model text`, `embedding_version text` — bei Modellwechsel mitführen
 - `is_archived boolean` — Admin-Aktion, unabhängig von `status`
+- `bbox_x ≥ bbox_y ≥ bbox_z`, `volume`, `surface_area`, `face_count` (Migration 005) — geometrische Merkmale für Re-Ranking (Hebel 3a), alle NULLABLE
+- `shape_embedding vector(128)` (Migration 006) — Mesh-Embedding für Shape-Re-Ranker (Hebel 4), HNSW-indiziert, NULLABLE (Re-Ranker neutral wenn NULL)
 
 Tabelle `part_views` (Migration 003) — eine Zeile pro Render-Perspektive:
 - `(part_id, view_idx)` Primary Key, `view_idx` in 0..15
@@ -149,6 +154,8 @@ Migration-Dateien in `supabase/migrations/`:
 - `002_add_thumbnail_count.sql` — `thumbnail_count`-Spalte
 - `003_part_views.sql` — Multi-View-Tabelle
 - `004_embedding_dim_1024.sql` — Wechsel vector(768) → vector(1024) (DINOv2-base → -large/DINOv3)
+- `005_part_geometry.sql` — Bounding-Box (sortiert), Volumen, Oberfläche, Face-Count (Hebel 3a, alle NULLABLE — ohne Reindex einspielbar)
+- `006_shape_embedding.sql` — `parts.shape_embedding vector(128)` + HNSW-Index für Shape Foundation Model (Hebel 4, NULLABLE)
 
 Einspielen: manuell im Neon Dashboard oder via `supabase db push`. RLS ist **bewusst deaktiviert** (kein direkter Client-Zugriff auf DB).
 
@@ -163,6 +170,8 @@ Einspielen: manuell im Neon Dashboard oder via `supabase db push`. RLS ist **bew
 - Async-Queue: FastAPI + Celery + Redis
 - DB-Client: Neon (`@neondatabase/serverless`), **nicht** Supabase-Client — `src/lib/db.ts` ist server-only
 - **Hebel 4 (Shape Foundation Model)**: Code in `worker/shape_embedder.py` + DB-Spalte `parts.shape_embedding` + Re-Ranker in `src/app/api/search/route.ts` sind implementiert, aber via `SHAPE_DISABLE=1` (worker/.env) deaktiviert — CPU-Inferenz hängt deterministisch bei einzelnen STEP-Files. Reaktivierung beim Wechsel auf GPU-Hardware: siehe `docs/GPU-MIGRATION.md` (separate `Dockerfile.gpu` + `docker-compose.gpu.yml` liegen bereit).
+- **Hebel 5 (GroundedSAM-Segmentierung)**: Code in `worker/preprocess.py` (Backend-Pattern) ist implementiert, aber via `SEGMENTATION_BACKEND` (worker/.env) standardmäßig auf `rembg`. Aktivierung mit `SEGMENTATION_BACKEND=groundedsam` lädt Grounding DINO Tiny + SAM ViT-Base (~530 MB) lazy beim ersten Foto. Auf CPU ~9 s/Foto — multi-photo-Suche (5 Fotos × 9 s = 45 s) sprengt das 28 s-Timeout in `route.ts`. Daher: sinnvoll erst auf GPU oder als gezieltes Diagnose-Tool. Spike-Vergleich: `scripts/spike_groundedsam.py` (siehe Hilfsscripts-Block).
+- **Tuning Hebel 2+3a (Stand 20.05.)**: `COMBINED_W_HITS = 0` und `GEO_MIN_FACTOR = 1.0` in `route.ts` deaktivieren Multi-View-Konsens und Geo-Re-Rank de facto. Grund: beide kosteten beim aktuellen 28-Teile-Korpus mehr Top-1 als sie brachten (vgl. eval/results/baseline_2026-05-20T19-*.json). Reaktivieren, sobald der Korpus wächst und Konflikte messbar werden.
 
 **Bei Änderungen an `embedder.py`, `renderer.py` oder `preprocess.py` ist ein Reindex aller Teile pflicht:**
 ```bash
@@ -201,6 +210,24 @@ SEARCH_BASE_URL=http://localhost:3000 node scripts/eval_baseline.mjs # gegen lok
 ```
 
 Output: `eval/results/baseline_<ts>.json` + Konsolen-Report. Snapshot in Git einchecken, damit der Trend dokumentiert ist (`eval/README.md` listet die bisherigen Messpunkte). Referenzfotos selbst sind **nicht** im Repo (Kunden-IP, Pfad via `REF_DIR`-Env überschreibbar).
+
+**Shape-Re-Ranker-Hilfsscripts (`scripts/`):**
+- `scripts/shape_calibration.py` — misst paarweise Cosine-Verteilung der Shape-Embeddings im Korpus und gibt datengetriebene Schwellwert-Empfehlungen für `SHAPE_FAIL_SIM` / `SHAPE_PERFECT_SIM`. Im Worker-Container ausführen (siehe Docstring).
+- `scripts/test_shape_embed.py` — Isolierter End-to-End-Test (STEP → Shape-Embedding → DB-Write → Read-Back) für ein einzelnes Teil. Diagnose-Tool, wenn `shape_embedding` unerwartet NULL bleibt.
+
+**Hebel-5-Spike-Tooling (`scripts/`):**
+- `scripts/spike_groundedsam.py` — vergleicht rembg- und GroundedSAM-Maske auf einer Stichprobe Referenzfotos. Produziert side-by-side PNG-Panels und `summary.json` mit Laufzeiten, Masken-Flächen, IoU.
+- `scripts/run_spike_groundedsam_remote.sh` — Helper, der das Spike-Script gegen den Produktions-Worker fährt (lädt Fotos hoch, ruft im Container auf, holt Output zurück). Setzt `SERVER=user@host` und `REPO_REMOTE=/pfad` voraus. Vor jeder Aktivierung von `SEGMENTATION_BACKEND=groundedsam` laufen lassen, um auf der eigenen Foto-Verteilung zu prüfen, ob es lohnt. Outputs landen in `eval/spike_results/` und sind via `.gitignore` vom Repo ausgeschlossen (Kunden-Fotos).
+
+## GPU-Setup (vorbereitet, nicht aktiv)
+
+Hebel 4 (Shape Foundation Model) ist auf CPU instabil und deshalb via `SHAPE_DISABLE=1` deaktiviert. Für die Reaktivierung auf GPU-Hardware liegen bereits parallele Build-Artefakte im Repo:
+
+- `Dockerfile.gpu` — CUDA-fähiges Worker-Image
+- `docker-compose.gpu.yml` — Override mit GPU-Reservation
+- `docs/GPU-MIGRATION.md` — Schritt-für-Schritt-Anleitung (Treiber, NVIDIA Container Toolkit, Compose-Override)
+
+CPU-Stack bleibt unverändert lauffähig — beide Pfade existieren parallel.
 
 ## Detaillierte Entwicklungsregeln
 
