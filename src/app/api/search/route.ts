@@ -67,8 +67,12 @@ const SHAPE_FAIL_SIM = 0.10     // bis dahin: andere Form-Familie (factor=SHAPE_
 const SHAPE_MIN_FACTOR = 0.55
 
 // Gewichtung visuell vs. multi-view-consensus für combined_score.
+// A/B-TEST 2026-05-20 (Folge auf GEO_MIN_FACTOR=1.0): Konsens-Bonus stark reduziert
+// (0.40 -> 0.15), weil der bisherige Wert IMG_3463 (4770) trotz hoechster Sim (0.7510)
+// auf Rang 4 verdraengt hat — die 4973-Distraktoren matchten in mehr Views.
+// Hypothese: Konsens als milder Tiebreaker statt Hauptfaktor. Originalwert: 0.40.
 const COMBINED_W_TOP = 0.6
-const COMBINED_W_HITS = 0.4
+const COMBINED_W_HITS = 0.15
 
 // Confidence-Schwellen auf der margin (Top-1 final - Top-2 final).
 const CONFIDENCE_HIGH_MARGIN = 0.10
