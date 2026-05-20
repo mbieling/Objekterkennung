@@ -42,3 +42,6 @@ worker/.env
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Spike-Outputs (enthalten Kunden-Fotos, nur lokal vorhalten)
+/eval/spike_results/
