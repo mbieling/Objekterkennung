@@ -15,14 +15,17 @@ Visuelle Ähnlichkeitssuche für CAD-Teile auf Basis von **DINOv3-Embeddings** u
 
 ### Aktueller Stand der Suchqualität
 
-| Modell | Views | Top-1 | Top-3 | Top-5 |
+Gemessen auf 29 Referenzfotos gegen einen Katalog von ~28 Bauteilen (Stand 20.05.):
+
+| Konfiguration | Views | Top-1 | Top-3 | Top-5 |
 |---|---|---|---|---|
 | DINOv2-base, 6 Ortho + 2 Iso | 8 | 82,8 % | 96,6 % | 100 % |
 | DINOv2-base, 16 Fibonacci | 16 | 89,7 % | 89,7 % | 100 % |
 | DINOv2-large, 16 Fibonacci | 16 | 93,1 % | 100 % | 100 % |
-| **DINOv3 ViT-L/16, 16 Fibonacci** | **16** | **100 %** | **100 %** | **100 %** |
+| DINOv3 ViT-L/16 + Hebel 1+2+3 (Geo 0.70, W_HITS 0.40) | 16 | 82,8 % | 89,7 % | 93,1 % |
+| **DINOv3 ViT-L/16, MAX-per-Part, Re-Ranker aus** | **16** | **96,6 %** | **100 %** | **100 %** |
 
-Snapshots in `eval/results/`. Beachte: Der Katalog umfasst aktuell nur 5 Referenz-Bauteile — die 100 % sind eine Untergrenze, die Eval gewinnt erst mit wachsendem Katalog echte Aussagekraft.
+Aktuelle Produktiv-Konfiguration: `GEO_MIN_FACTOR = 1.0`, `COMBINED_W_HITS = 0` in `src/app/api/search/route.ts` — d. h. Multi-View-Konsens (Hebel 2) und Geo-Re-Rank (Hebel 3a) sind faktisch aus. Begründung und Diagnose-Reihe: [`eval/README.md`](eval/README.md). Snapshots in `eval/results/`. Der verbleibende Top-1-Miss ist ein reines DINOv3-Limit (Distraktor hat höhere Foto-Similarity als das richtige Teil).
 
 ---
 
@@ -65,8 +68,10 @@ Zwei Services, klar getrennt:
 |---|---|
 | `process_step.py` | STEP herunterladen → 16 Thumbnails rendern → embedden → DB schreiben |
 | `renderer.py` | Fibonacci-Sphere-Sampling, OCC → VTK → PNG (512 × 512 px) |
-| `preprocess.py` | rembg + Crop + Padding → 224 × 224 px, einheitlich für Foto und Render |
+| `preprocess.py` | Hintergrund-Entfernung + Crop + Padding → 224 × 224 px. Backend austauschbar (Hebel 5): `rembg` (Default) oder `groundedsam` |
 | `embedder.py` | DINOv3 ViT-L/16, Patch-Token Mean-Pool (Indizes 5–200), 1024-dim |
+| `geometry.py` | Bbox/Volumen/Oberfläche/Face-Count aus STEP (Hebel 3a, default neutral) |
+| `shape_embedder.py` | Mesh-Embedding via Shape Foundation Model (Hebel 4, via `SHAPE_DISABLE=1` aus) |
 | `tasks.py` | Celery-Task `process_step_task` |
 | `main.py` | FastAPI: `/health`, `/enqueue`, `/embed` |
 
@@ -125,6 +130,8 @@ supabase/migrations/001_parts_schema.sql
 supabase/migrations/002_add_thumbnail_count.sql
 supabase/migrations/003_part_views.sql
 supabase/migrations/004_embedding_dim_1024.sql
+supabase/migrations/005_part_geometry.sql       # Bbox/Volumen/Oberfläche (Hebel 3a)
+supabase/migrations/006_shape_embedding.sql     # parts.shape_embedding vector(128) (Hebel 4)
 ```
 
 ### 4. Worker starten
@@ -202,6 +209,20 @@ Diese Festlegungen sind absichtlich getroffen worden und sollten nicht ohne Disk
 - **STEP-Verarbeitung:** Python-Microservice (Docker), niemals in Next.js/Vercel — PythonOCC und VTK gehören nicht in eine Serverless-Runtime.
 - **DB-Client:** Neon (`@neondatabase/serverless`) als Tagged-Template-Literal-Client, **nicht** Supabase-Client. RLS bewusst deaktiviert — alle DB-Zugriffe gehen server-only durch Next.js-API-Routen.
 
+### Status der optionalen Hebel
+
+Mehrere Re-Ranker und Segment-Backends sind implementiert, aber **bewusst deaktiviert**, weil sie auf dem aktuellen Korpus mehr kosten als sie bringen oder weil die CPU-Latenz prohibitiv ist:
+
+| Hebel | Was | Stand | Reaktivierung |
+|---|---|---|---|
+| 1 | Konfidenz/Margin-Banner in der UI | aktiv (kein Ranking-Effekt) | – |
+| 2 | Multi-View-Konsens (`COMBINED_W_HITS`) | **aus** (=0) seit 20.05. | wenn Katalog so wächst, dass 4973-artige Cluster-Konflikte auftreten |
+| 3a | Geometrie-Re-Rank (`GEO_MIN_FACTOR`) | **aus** (=1.0) seit 20.05. | wenn ein eigenes Eval messbaren Nutzen zeigt — sonst lieber weglassen |
+| 4 | Shape Foundation Model (`SHAPE_DISABLE=1`) | **aus** auf CPU | nach GPU-Migration (`docs/GPU-MIGRATION.md`) |
+| 5 | GroundedSAM-Segmentierung (`SEGMENTATION_BACKEND`) | **aus** (Default rembg) | nach GPU-Migration; oder gezielt für komplexe Werkstattfotos |
+
+Details und Datengrundlage: [`eval/README.md`](eval/README.md).
+
 ### Häufige Stolperfallen
 
 - **pgvector-Query-Format:** Neon serialisiert `number[]` als PG-Array `{0.1,...}`, pgvector erwartet `[0.1,...]::vector`. Embedding immer als String übergeben.
@@ -218,14 +239,22 @@ bauteil-finder/
 ├── CLAUDE.md                       # Projekt-Kontext für Claude Code
 ├── DESIGN-SYSTEM.md                # BBS Design System (Orange #f29000, Blau #007cba)
 ├── docker-compose.yml              # Prod-Stack (App + Worker + Redis)
+├── docker-compose.gpu.yml          # GPU-Override (Hebel 4 + 5, nicht aktiv)
 ├── Dockerfile                      # Next.js Image
+├── docs/
+│   └── GPU-MIGRATION.md            # Anleitung für CUDA-Worker
 ├── .planning/                      # GSD-Workflow (Phasen, Roadmap, Forschung)
 ├── eval/
 │   ├── README.md                   # Eval-Harness-Doku
-│   └── results/                    # Top-1/3/5-Snapshots pro Modell-Generation
+│   ├── results/                    # Top-1/3/5-Snapshots pro Modell-Generation
+│   └── spike_results/              # GroundedSAM-Spike-Outputs (gitignored, Kunden-Fotos)
 ├── scripts/
-│   └── eval_baseline.mjs           # Eval-Skript
-├── supabase/migrations/            # 001–004 SQL-Migrationen
+│   ├── eval_baseline.mjs           # Eval-Skript
+│   ├── spike_groundedsam.py        # Hebel-5-Spike (rembg vs. GroundedSAM)
+│   ├── run_spike_groundedsam_remote.sh
+│   ├── shape_calibration.py        # Hebel-4-Schwellwert-Kalibrierung
+│   └── test_shape_embed.py         # Hebel-4-Roundtrip-Diagnose
+├── supabase/migrations/            # 001–006 SQL-Migrationen
 ├── src/
 │   ├── app/                        # Next.js App Router (pages + api)
 │   ├── components/
@@ -235,13 +264,16 @@ bauteil-finder/
 │   ├── lib/                        # db.ts (Neon), s3.ts
 │   └── middleware.ts               # HTTP Basic Auth für /admin
 ├── worker/
-│   ├── Dockerfile
+│   ├── Dockerfile                  # CPU-Image (Standard)
+│   ├── Dockerfile.gpu              # CUDA-Image (nicht aktiv)
 │   ├── main.py                     # FastAPI (/health, /enqueue, /embed)
 │   ├── tasks.py                    # Celery-Task
 │   ├── process_step.py             # STEP → Thumbnails → Embeddings
 │   ├── renderer.py                 # Fibonacci-Sphere Sampling, OCC → VTK
-│   ├── preprocess.py               # rembg + Crop + Padding
+│   ├── preprocess.py               # Backend-Pattern: rembg | groundedsam
 │   ├── embedder.py                 # DINOv3 Patch-Token Mean-Pool
+│   ├── geometry.py                 # Bbox/Volumen/Face-Count (Hebel 3a)
+│   ├── shape_embedder.py           # Shape Foundation Model (Hebel 4)
 │   └── reindex.py                  # Bulk-Reindex CLI
 └── tests/                          # Playwright E2E
 ```
